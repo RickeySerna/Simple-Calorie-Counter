@@ -11,8 +11,9 @@ def calculate_calories():
     
     food_name = data.get('foodName')
     subclass = data.get('subclass')
-    amount = data.get('amount')
+    weight = data.get('weight')
     calories = data.get('calories')
+    servingSize = data.get('servingSize')
     fat = data.get('fat')
     protein = data.get('protein')
     carbs = data.get('carbs')
@@ -22,8 +23,9 @@ def calculate_calories():
     return jsonify({
         'foodName': food_name,
         'subclass': subclass,
-        'amount': amount,
+        'weight': weight,
         'calories': calories,
+        'servingSize': servingSize,
         'fat': fat,
         'protein': protein,
         'carbs': carbs,

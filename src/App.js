@@ -5,8 +5,9 @@ function App() {
   const [formData, setFormData] = useState({
     foodName: '',
     subclass: '',
-    amount: '',
+    weight: '',
     calories: '',
+    servingSize: '',
     fat: '',
     protein: '',
     carbs: '',
@@ -52,7 +53,7 @@ function App() {
               <label>Item:</label>
               <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
               <label>Weight (g):</label>
-              <input type="number" name="amount" value={formData.amount} onChange={handleChange} required />
+              <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Sub-description:</label>
@@ -64,8 +65,8 @@ function App() {
             <div className="form-group">
               <label>Calories:</label>
               <input type="number" name="calories" value={formData.calories} onChange={handleChange} required />
-              <label>Weight (g):</label>
-              <input type="number" name="amount" value={formData.amount} onChange={handleChange} required />
+              <label>Serving size (g):</label>
+              <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label>Protein (g):</label>
