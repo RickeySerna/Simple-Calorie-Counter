@@ -5,20 +5,34 @@ app = Flask(__name__)
 CORS(app)
 
 @app.route('/api/calories', methods=['POST'])
-def calculate_calories():
+def calculate_macros():
     data = request.get_json()
     print("Received data:", data)
-    
+
+    # Defining all of the different bits of info we got from the frontend.
     food_name = data.get('foodName')
     subclass = data.get('subclass')
-    weight = data.get('weight')
+    weight = float(data.get('weight'))
     calories = data.get('calories')
-    servingSize = data.get('servingSize')
-    fat = data.get('fat')
-    protein = data.get('protein')
-    carbs = data.get('carbs')
+    servingSize = float(data.get('servingSize'))
+    fat_per_serving = float(data.get('fat'))
+    protein_per_serving = float(data.get('protein'))
+    carbs_per_serving = float(data.get('carbs'))
     fiber = data.get('fiber')
     sodium = data.get('sodium')
+
+    # Calculating the main macros.
+    fat = (fat_per_serving / servingSize) * weight
+    protein = (protein_per_serving / servingSize) * weight
+    carbs = (carbs_per_serving / servingSize) * weight
+    
+    # Calculating the calories from the macros we just calculated.
+    calories = (fat * 9) + (protein * 4) + (carbs * 4)
+
+    # Create the result string that will be passed back to the client.
+    result_string = f"{calories:.2f} calories, {protein:.2f}g of protein, {carbs:.2f}g of carbs, {fat:.2f}g of fat"
+
+    print(result_string)
 
     return jsonify({
         'foodName': food_name,
