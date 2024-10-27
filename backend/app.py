@@ -35,6 +35,7 @@ def calculate_macros():
     print(result_string)
 
     return jsonify({
+        'result': result_string,
         'foodName': food_name,
         'subclass': subclass,
         'weight': weight,
