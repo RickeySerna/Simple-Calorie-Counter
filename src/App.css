@@ -8,6 +8,20 @@
   color: white;
 }
 
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.form-panel, .results-panel {
+  width: 45%;
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+  color: black;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -19,7 +33,7 @@ fieldset {
   border-radius: 8px;
   padding: 20px;
   margin: 10px 0;
-  width: 80%;
+  width: 100%;
 }
 
 legend {
@@ -61,4 +75,16 @@ button {
 
 button:hover {
   background-color: #21a1f1;
+}
+
+.results-panel ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.results-panel li {
+  background-color: #e0e0e0;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 4px;
 }

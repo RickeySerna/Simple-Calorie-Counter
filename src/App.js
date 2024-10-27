@@ -15,6 +15,8 @@ function App() {
     sodium: ''
   });
 
+  const [results, setResults] = useState([]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -34,11 +36,11 @@ function App() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Success:', data);
-      // Handle the response data as needed
+      console.log('Success: ', data);
+      setResults([...results, data.result]);
     })
     .catch(error => {
-      console.error('Error:', error);
+      console.error('Error: ', error);
     });
   };
 
@@ -46,49 +48,61 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Simple Calorie Counter</h1>
-        <form onSubmit={handleSubmit}>
-          <fieldset>
-            <legend>Food Item Information:</legend>
-            <div className="form-group">
-              <label>Item:</label>
-              <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
-              <label>Weight (g):</label>
-              <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>Sub-description:</label>
-              <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} required />
-            </div>
-          </fieldset>
-          <fieldset>
-            <legend>Nutrition Label Information:</legend>
-            <div className="form-group">
-              <label>Calories:</label>
-              <input type="number" name="calories" value={formData.calories} onChange={handleChange} required />
-              <label>Serving size (g):</label>
-              <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>Protein (g):</label>
-              <input type="number" name="protein" value={formData.protein} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>Fat (g):</label>
-              <input type="number" name="fat" value={formData.fat} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>Carbs (g):</label>
-              <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} required />
-              <label>Dietary Fiber (g):</label>
-              <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label>Sodium (mg):</label>
-              <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} />
-            </div>
-          </fieldset>
-          <button type="submit">Submit</button>
-        </form>
+        <div className="container">
+          <div className="form-panel">
+            <form onSubmit={handleSubmit}>
+              <fieldset>
+                <legend>Food Item Information:</legend>
+                <div className="form-group">
+                  <label>Item:</label>
+                  <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
+                  <label>Weight (g):</label>
+                  <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Sub-description:</label>
+                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} required />
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Nutrition Label Information:</legend>
+                <div className="form-group">
+                  <label>Calories:</label>
+                  <input type="number" name="calories" value={formData.calories} onChange={handleChange} required />
+                  <label>Serving size (g):</label>
+                  <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Protein (g):</label>
+                  <input type="number" name="protein" value={formData.protein} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Fat (g):</label>
+                  <input type="number" name="fat" value={formData.fat} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Carbs (g):</label>
+                  <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} required />
+                  <label>Dietary Fiber (g):</label>
+                  <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label>Sodium (mg):</label>
+                  <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} />
+                </div>
+              </fieldset>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+          <div className="results-panel">
+            <h2>Today's Entries</h2>
+            <ul>
+              {results.map((result, index) => (
+                <li key={index}>{result}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </header>
     </div>
   );
