@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import './App.css'; // Make sure to create this file for styling
+import React, { useState, useEffect } from 'react';
+import { format, addDays, subDays } from 'date-fns';
+import './App.css';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,10 @@ function App() {
   });
 
   const [results, setResults] = useState([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+  }, [currentDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +47,10 @@ function App() {
     .catch(error => {
       console.error('Error: ', error);
     });
+  };
+
+  const handleDateChange = (days) => {
+    setCurrentDate(addDays(currentDate, days));
   };
 
   return (
@@ -95,6 +104,11 @@ function App() {
             </form>
           </div>
           <div className="results-panel">
+            <div className="date-navigation">
+              <button onClick={() => handleDateChange(-1)}>Previous</button>
+              <span>{format(currentDate, 'MMMM dd, yyyy')}</span>
+              <button onClick={() => handleDateChange(1)}>Next</button>
+            </div>
             <h2>Today's Entries</h2>
             <ul>
               {results.map((result, index) => (

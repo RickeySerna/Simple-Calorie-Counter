@@ -88,3 +88,29 @@ button:hover {
   padding: 10px;
   border-radius: 4px;
 }
+
+.date-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.date-navigation button {
+  background-color: #61dafb;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px;
+  margin: 0 10px;
+  border-radius: 4px;
+}
+
+.date-navigation button:hover {
+  background-color: #21a1f1;
+}
+
+.date-navigation span {
+  font-size: 18px;
+  font-weight: bold;
+}
