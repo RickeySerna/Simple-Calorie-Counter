@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format, addDays, subDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import './App.css';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
     sodium: ''
   });
 
-  const [results, setResults] = useState([]);
+  const [entriesByDate, setEntriesByDate] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
@@ -41,17 +41,23 @@ function App() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Success: ', data);
-      setResults([...results, data.result]);
+      console.log('Success:', data);
+      const dateKey = format(currentDate, 'yyyy-MM-dd');
+      setEntriesByDate(prevEntries => ({
+        ...prevEntries,
+        [dateKey]: [...(prevEntries[dateKey] || []), data.result]
+      }));
     })
     .catch(error => {
-      console.error('Error: ', error);
+      console.error('Error:', error);
     });
   };
 
   const handleDateChange = (days) => {
     setCurrentDate(addDays(currentDate, days));
   };
+
+  const currentEntries = entriesByDate[format(currentDate, 'yyyy-MM-dd')] || [];
 
   return (
     <div className="App">
@@ -111,7 +117,7 @@ function App() {
             </div>
             <h2>Today's Entries</h2>
             <ul>
-              {results.map((result, index) => (
+              {currentEntries.map((result, index) => (
                 <li key={index}>{result}</li>
               ))}
             </ul>
