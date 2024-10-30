@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
 import { format, addDays } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
 import './App.css';
 
 function App() {
@@ -53,8 +55,8 @@ function App() {
     });
   };
 
-  const handleDateChange = (days) => {
-    setCurrentDate(addDays(currentDate, days));
+  const handleDateChange = (date) => {
+    setCurrentDate(date);
   };
 
   const currentEntries = entriesByDate[format(currentDate, 'yyyy-MM-dd')] || [];
@@ -111,9 +113,13 @@ function App() {
           </div>
           <div className="results-panel">
             <div className="date-navigation">
-              <button onClick={() => handleDateChange(-1)}>Previous</button>
-              <span>{format(currentDate, 'MMMM dd, yyyy')}</span>
-              <button onClick={() => handleDateChange(1)}>Next</button>
+              <button onClick={() => handleDateChange(addDays(currentDate, -1))}>Previous</button>
+              <DatePicker
+                selected={currentDate}
+                onChange={handleDateChange}
+                dateFormat="MMMM dd, yyyy"
+              />
+              <button onClick={() => handleDateChange(addDays(currentDate, 1))}>Next</button>
             </div>
             <h2>Today's Entries</h2>
             <ul>

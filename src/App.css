@@ -110,7 +110,19 @@ button:hover {
   background-color: #21a1f1;
 }
 
-.date-navigation span {
-  font-size: 18px;
-  font-weight: bold;
+.date-navigation .react-datepicker-wrapper {
+  display: inline-block;
+}
+
+.date-navigation .react-datepicker__input-container {
+  display: inline-block;
+}
+
+.date-navigation input {
+  width: auto;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  text-align: center;
 }
