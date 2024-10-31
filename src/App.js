@@ -20,9 +20,34 @@ function App() {
 
   const [entriesByDate, setEntriesByDate] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [totals, setTotals] = useState({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0
+  });
 
   useEffect(() => {
-  }, [currentDate]);
+    const dateKey = format(currentDate, 'yyyy-MM-dd');
+    const currentEntries = entriesByDate[dateKey] || [];
+    const newTotals = currentEntries.reduce(
+      (acc, entry) => {
+        const matches = entry.match(/(\d+(\.\d+)?)/g);
+        if (matches) {
+          const [calories, protein, carbs, fat] = matches.map(Number);
+          return {
+            calories: acc.calories + (calories || 0),
+            protein: acc.protein + (protein || 0),
+            carbs: acc.carbs + (carbs || 0),
+            fat: acc.fat + (fat || 0)
+          };
+        }
+        return acc;
+      },
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
+    setTotals(newTotals);
+  }, [currentDate, entriesByDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -127,6 +152,9 @@ function App() {
                 <li key={index}>{result}</li>
               ))}
             </ul>
+            <div className="totals">
+              <p>{totals.calories} total calories, {totals.protein}g total of protein, {totals.carbs}g total of carbs, {totals.fat}g total of fat</p>
+            </div>
           </div>
         </div>
       </header>
