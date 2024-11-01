@@ -146,7 +146,7 @@ function App() {
               />
               <button onClick={() => handleDateChange(addDays(currentDate, 1))}>Next</button>
             </div>
-            <h2>Today's Entries</h2>
+            <h2>Food Log</h2>
             <ul>
               {currentEntries.map((result, index) => (
                 <li key={index}>{result}</li>

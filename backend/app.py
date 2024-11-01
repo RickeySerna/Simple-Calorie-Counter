@@ -30,7 +30,7 @@ def calculate_macros():
     calories = (fat * 9) + (protein * 4) + (carbs * 4)
 
     # Create the result string that will be passed back to the client.
-    result_string = f"{calories:.2f} calories, {protein:.2f}g of protein, {carbs:.2f}g of carbs, {fat:.2f}g of fat"
+    result_string = f"{weight}g of {food_name} ({subclass}): {calories:.2f} calories, {protein:.2f}g of protein, {carbs:.2f}g of carbs, {fat:.2f}g of fat"
 
     print(result_string)
 
