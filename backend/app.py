@@ -13,24 +13,26 @@ def calculate_macros():
     food_name = data.get('foodName')
     subclass = data.get('subclass')
     weight = float(data.get('weight'))
-    calories = data.get('calories')
-    servingSize = float(data.get('servingSize'))
+    serving_size = float(data.get('servingSize'))
     fat_per_serving = float(data.get('fat'))
     protein_per_serving = float(data.get('protein'))
     carbs_per_serving = float(data.get('carbs'))
-    fiber = data.get('fiber')
-    sodium = data.get('sodium')
+    fiber_per_serving = float(data.get('fiber', 0))
+    sugar_alcohol_per_serving = float(data.get('sugarAlcohol', 0))
+    sodium = data.get('sodium', 0)
+    cholesterol = data.get('cholesterol', 0)
 
     # Calculating the main macros.
-    fat = (fat_per_serving / servingSize) * weight
-    protein = (protein_per_serving / servingSize) * weight
-    carbs = (carbs_per_serving / servingSize) * weight
-    
+    fat = (fat_per_serving / serving_size) * weight
+    protein = (protein_per_serving / serving_size) * weight
+    net_carbs_per_serving = carbs_per_serving - fiber_per_serving - sugar_alcohol_per_serving
+    net_carbs = (net_carbs_per_serving / serving_size) * weight
+
     # Calculating the calories from the macros we just calculated.
-    calories = (fat * 9) + (protein * 4) + (carbs * 4)
+    calories = (fat * 9) + (protein * 4) + (net_carbs * 4)
 
     # Create the result string that will be passed back to the client.
-    result_string = f"{weight}g of {food_name} ({subclass}): {calories:.2f} calories, {protein:.2f}g of protein, {carbs:.2f}g of carbs, {fat:.2f}g of fat"
+    result_string = f"{weight}g of {food_name} ({subclass}): {calories:.2f} calories, {protein:.2f}g of protein, {net_carbs:.2f}g of carbs, {fat:.2f}g of fat"
 
     print(result_string)
 
@@ -38,14 +40,15 @@ def calculate_macros():
         'result': result_string,
         'foodName': food_name,
         'subclass': subclass,
-        'weight': weight,
+        'amount': weight,
         'calories': calories,
-        'servingSize': servingSize,
         'fat': fat,
         'protein': protein,
-        'carbs': carbs,
-        'fiber': fiber,
-        'sodium': sodium
+        'carbs': net_carbs,
+        'fiber': fiber_per_serving,
+        'sugarAlcohol': sugar_alcohol_per_serving,
+        'sodium': sodium,
+        'cholesterol': cholesterol
     })
 
 if __name__ == '__main__':
