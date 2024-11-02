@@ -4,6 +4,12 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+def to_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
 @app.route('/api/calories', methods=['POST'])
 def calculate_macros():
     data = request.get_json()
@@ -12,15 +18,15 @@ def calculate_macros():
     # Defining all of the different bits of info we got from the frontend.
     food_name = data.get('foodName')
     subclass = data.get('subclass')
-    weight = float(data.get('weight'))
-    serving_size = float(data.get('servingSize'))
-    fat_per_serving = float(data.get('fat'))
-    protein_per_serving = float(data.get('protein'))
-    carbs_per_serving = float(data.get('carbs'))
-    fiber_per_serving = float(data.get('fiber', 0))
-    sugar_alcohol_per_serving = float(data.get('sugarAlcohol', 0))
-    sodium = data.get('sodium', 0)
-    cholesterol = data.get('cholesterol', 0)
+    weight = to_float(data.get('weight'))
+    serving_size = to_float(data.get('servingSize'))
+    fat_per_serving = to_float(data.get('fat'))
+    protein_per_serving = to_float(data.get('protein'))
+    carbs_per_serving = to_float(data.get('carbs'))
+    fiber_per_serving = to_float(data.get('fiber'))
+    sugar_alcohol_per_serving = to_float(data.get('sugarAlcohol'))
+    sodium = to_float(data.get('sodium'))
+    cholesterol = to_float(data.get('cholesterol'))
 
     # Calculating the main macros.
     fat = (fat_per_serving / serving_size) * weight
