@@ -15,7 +15,8 @@ function App() {
     protein: '',
     carbs: '',
     fiber: '',
-    sodium: ''
+    sodium: '',
+    cholesterol: ''
   });
 
   const [entriesByDate, setEntriesByDate] = useState({});
@@ -32,9 +33,10 @@ function App() {
     const currentEntries = entriesByDate[dateKey] || [];
     const newTotals = currentEntries.reduce(
       (acc, entry) => {
-        const matches = entry.match(/(\d+(\.\d+)?)/g);
+        const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
+        const matches = entry.match(regex);
         if (matches) {
-          const [calories, protein, carbs, fat] = matches.map(Number);
+          const [, calories, , protein, , carbs, , fat] = matches.map(Number);
           return {
             calories: acc.calories + (calories || 0),
             protein: acc.protein + (protein || 0),
@@ -46,11 +48,17 @@ function App() {
       },
       { calories: 0, protein: 0, carbs: 0, fat: 0 }
     );
-    setTotals(newTotals);
+    setTotals({
+      calories: Math.round(newTotals.calories),
+      protein: Math.round(newTotals.protein),
+      carbs: Math.round(newTotals.carbs),
+      fat: Math.round(newTotals.fat)
+    });
   }, [currentDate, entriesByDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (value < 0) return;
     setFormData({
       ...formData,
       [name]: value
@@ -59,6 +67,17 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const { carbs, fiber, sugarAlcohol } = formData;
+    const fiberValue = parseFloat(fiber) || 0;
+    const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
+    const carbsValue = parseFloat(carbs) || 0;
+  
+    if (fiberValue + sugarAlcoholValue > carbsValue) {
+      alert("Fiber and sugar alcohols together cannot exceed total carbs.");
+      return;
+    }
+
     fetch('http://127.0.0.1:5000/api/calories', {
       method: 'POST',
       headers: {
