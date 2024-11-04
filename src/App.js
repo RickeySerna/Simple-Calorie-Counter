@@ -115,47 +115,61 @@ function App() {
               <fieldset>
                 <legend>Food Item Information:</legend>
                 <div className="form-group">
-                  <label>Item:</label>
-                  <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
-                  <label>Weight (g):</label>
-                  <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
+                  <div className="form-group" style={{ flex: '3' }}>
+                    <label>Item:</label>
+                    <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group" style={{ flex: '1' }}>
+                    <label>Weight (g):</label>
+                    <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Sub-description:</label>
-                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange}/>
+                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
                 </div>
               </fieldset>
               <fieldset>
                 <legend>Nutrition Label Information:</legend>
                 <div className="form-group">
-                  <label>Calories:</label>
-                  <input type="number" name="calories" value={formData.calories} onChange={handleChange} />
-                  <label>Serving size (g):</label>
-                  <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                  <div className="form-group" style={{ flex: '3' }}>
+                    <label>Calories:</label>
+                    <input type="number" name="calories" value={formData.calories} onChange={handleChange} />
+                  </div>
+                  <div className="form-group" style={{ flex: '1' }}>
+                    <label>Serving size (g):</label>
+                    <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Fat (g):</label>
                   <input type="number" name="fat" value={formData.fat} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
                   <label>Carbs (g):</label>
                   <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                  <label>Fiber (g):</label>
-                  <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} />
-                  <label>Sugar Alcohol (g):</label>
-                  <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} />
+                  <div className="form-group half-width">
+                    <label>Fiber (g):</label>
+                    <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} />
+                  </div>
+                  <div className="form-group half-width">
+                    <label>Sugar Alcohol (g):</label>
+                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Protein (g):</label>
                   <input type="number" name="protein" value={formData.protein} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
-                  <label>Sodium (mg):</label>
-                  <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} />
-                  <label>Cholesterol (mg):</label>
-                  <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} />
+                  <div className="form-group half-width">
+                    <label>Sodium (mg):</label>
+                    <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} />
+                  </div>
+                  <div className="form-group half-width">
+                    <label>Cholesterol (mg):</label>
+                    <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} />
+                  </div>
                 </div>
               </fieldset>
               <button type="submit">Submit</button>
