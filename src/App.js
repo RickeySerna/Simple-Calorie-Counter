@@ -58,11 +58,10 @@ function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (value < 0) return;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value < 0 ? 0 : value
+    }));
   };
 
   const handleSubmit = (e) => {
