@@ -11,6 +11,7 @@ function App() {
     weight: '',
     calories: '',
     servingSize: '',
+    unit: 'g',
     fat: '',
     protein: '',
     carbs: '',
@@ -131,13 +132,23 @@ function App() {
               <fieldset>
                 <legend>Nutrition Label Information:</legend>
                 <div className="form-group">
-                  <div className="form-group" style={{ flex: '3' }}>
+                  <div className="form-group" style={{ flex: '2' }}>
                     <label>Calories:</label>
                     <input type="number" name="calories" value={formData.calories} onChange={handleChange} />
                   </div>
                   <div className="form-group" style={{ flex: '1' }}>
-                    <label>Serving size (g):</label>
+                    <label>Serving size:</label>
                     <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group" style={{ flex: '1' }}>
+                    <label>Unit:</label>
+                    <select name="unit" value={formData.unit} onChange={handleChange} required>
+                      <option value="g">g</option>
+                      <option value="oz">oz</option>
+                      <option value="lb_oz">lb & oz</option>
+                      <option value="mL">mL</option>
+                      <option value="kg">Kg</option>
+                    </select>
                   </div>
                 </div>
                 <div className="form-group">
