@@ -120,7 +120,7 @@ function App() {
                     <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
                   </div>
                   <div className="form-group" style={{ flex: '1' }}>
-                    <label>Weight (g):</label>
+                    <label>Weight:</label>
                     <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
                   </div>
                 </div>
