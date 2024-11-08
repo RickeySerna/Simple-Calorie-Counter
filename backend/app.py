@@ -37,7 +37,7 @@ def calculate_macros():
     # Defining all of the different bits of info we got from the frontend.
     food_name = data.get('foodName')
     subclass = data.get('subclass')
-    weight = round(to_float(data.get('weight')))
+    weight = to_float(data.get('weight'))
     serving_size = to_float(data.get('servingSize'))
     unit = data.get('unit')
     fat_per_serving = to_float(data.get('fat'))
@@ -48,21 +48,26 @@ def calculate_macros():
     sodium = to_float(data.get('sodium'))
     cholesterol = to_float(data.get('cholesterol'))
 
-    # Use the above formula to convert weight and serving size to grams.
+    # Convert weight and serving size to grams
     weight_in_grams = convert_to_grams(weight, unit)
     serving_size_in_grams = convert_to_grams(serving_size, unit)
 
     # Calculating the main macros.
-    fat = round((fat_per_serving / serving_size_in_grams) * weight_in_grams)
-    protein = round((protein_per_serving / serving_size_in_grams) * weight_in_grams)
+    fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
+    protein = (protein_per_serving / serving_size_in_grams) * weight_in_grams
     net_carbs_per_serving = carbs_per_serving - fiber_per_serving - sugar_alcohol_per_serving
-    net_carbs = round((net_carbs_per_serving / serving_size_in_grams) * weight_in_grams)
+    net_carbs = (net_carbs_per_serving / serving_size_in_grams) * weight_in_grams
 
     # Calculating the calories from the macros we just calculated.
     calories = (fat * 9) + (protein * 4) + (net_carbs * 4)
 
+    # Rounding the final results.
+    fat = round(fat)
+    protein = round(protein)
+    net_carbs = round(net_carbs)
+    calories = round(calories)
+
     # Create the result string that will be passed back to the client.
-    result_string = f"{weight}g of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
     result_string = f"{weight}{unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
 
     print(result_string)
