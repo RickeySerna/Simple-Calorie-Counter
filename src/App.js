@@ -17,7 +17,9 @@ function App() {
     carbs: '',
     fiber: '',
     sodium: '',
-    cholesterol: ''
+    cholesterol: '',
+    pounds: '',
+    ounces: ''
   });
 
   const [entriesByDate, setEntriesByDate] = useState({});
@@ -136,10 +138,23 @@ function App() {
                     <label>Calories:</label>
                     <input type="number" name="calories" value={formData.calories} onChange={handleChange} />
                   </div>
-                  <div className="form-group" style={{ flex: '1' }}>
-                    <label>Serving size:</label>
-                    <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
-                  </div>
+                  {formData.unit === 'lb_oz' ? (
+                    <>
+                      <div className="form-group" style={{ flex: '1' }}>
+                        <label>Serving size: (lbs)</label>
+                        <input type="number" name="pounds" value={formData.pounds} onChange={handleChange} />
+                      </div>
+                      <div className="form-group" style={{ flex: '1' }}>
+                        <label>Serving size: (oz)</label>
+                        <input type="number" name="ounces" value={formData.ounces} onChange={handleChange} />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="form-group" style={{ flex: '1' }}>
+                      <label>Serving size:</label>
+                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                    </div>
+                  )}
                   <div className="form-group" style={{ flex: '1' }}>
                     <label>Unit:</label>
                     <select name="unit" value={formData.unit} onChange={handleChange} required>
