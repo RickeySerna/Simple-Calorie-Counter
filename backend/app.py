@@ -11,7 +11,7 @@ def to_float(value, default=0.0):
         return default
 
 # Formula to convert food weight and serving size form whatever unit the user used to grams.
-def convert_to_grams(weight, unit):
+def convert_to_grams(weight, unit, ounces=0.0):
     if unit == 'kg':
         return weight * 1000
     elif unit == 'oz':
@@ -21,10 +21,7 @@ def convert_to_grams(weight, unit):
     elif unit == 'mL':
         return weight
     elif unit == 'lb_oz':
-        parts = weight.split()
-        pounds = float(parts[0])
-        ounces = float(parts[2])
-        return (pounds * 453.592) + (ounces * 28.3495)
+        return (weight * 453.592) + (ounces * 28.3495)
     # Or just return it as is if the user used grams.
     else:
         return weight
@@ -47,10 +44,16 @@ def calculate_macros():
     sugar_alcohol_per_serving = to_float(data.get('sugarAlcohol'))
     sodium = to_float(data.get('sodium'))
     cholesterol = to_float(data.get('cholesterol'))
+    pounds = to_float(data.get('pounds'))
+    ounces = to_float(data.get('ounces'))
 
     # Convert weight and serving size to grams
-    weight_in_grams = convert_to_grams(weight, unit)
-    serving_size_in_grams = convert_to_grams(serving_size, unit)
+    if unit == 'lb_oz':
+        weight_in_grams = convert_to_grams(pounds, unit, ounces)
+        serving_size_in_grams = convert_to_grams(pounds, unit, ounces)
+    else:
+        weight_in_grams = convert_to_grams(weight, unit)
+        serving_size_in_grams = convert_to_grams(serving_size, unit)
 
     # Calculating the main macros.
     fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
