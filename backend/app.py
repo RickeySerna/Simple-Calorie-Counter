@@ -35,8 +35,9 @@ def calculate_macros():
     food_name = data.get('foodName')
     subclass = data.get('subclass')
     weight = to_float(data.get('weight'))
+    weight_unit = data.get('weightUnit')
     serving_size = to_float(data.get('servingSize'))
-    unit = data.get('unit')
+    serving_size_unit = data.get('servingSizeUnit')
     fat_per_serving = to_float(data.get('fat'))
     protein_per_serving = to_float(data.get('protein'))
     carbs_per_serving = to_float(data.get('carbs'))
@@ -44,16 +45,21 @@ def calculate_macros():
     sugar_alcohol_per_serving = to_float(data.get('sugarAlcohol'))
     sodium = to_float(data.get('sodium'))
     cholesterol = to_float(data.get('cholesterol'))
-    pounds = to_float(data.get('pounds'))
-    ounces = to_float(data.get('ounces'))
+    weight_pounds = to_float(data.get('weightPounds'))
+    weight_ounces = to_float(data.get('weightOunces'))
+    serving_size_pounds = to_float(data.get('servingSizePounds'))
+    serving_size_ounces = to_float(data.get('servingSizeOunces'))
 
     # Convert weight and serving size to grams
-    if unit == 'lb_oz':
-        weight_in_grams = convert_to_grams(pounds, unit, ounces)
-        serving_size_in_grams = convert_to_grams(pounds, unit, ounces)
+    if weight_unit == 'lb_oz':
+        weight_in_grams = convert_to_grams(weight_pounds, weight_unit, weight_ounces)
     else:
-        weight_in_grams = convert_to_grams(weight, unit)
-        serving_size_in_grams = convert_to_grams(serving_size, unit)
+        weight_in_grams = convert_to_grams(weight, weight_unit)
+
+    if serving_size_unit == 'lb_oz':
+        serving_size_in_grams = convert_to_grams(serving_size_pounds, serving_size_unit, serving_size_ounces)
+    else:
+        serving_size_in_grams = convert_to_grams(serving_size, serving_size_unit)
 
     # Calculating the main macros.
     fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
@@ -71,7 +77,10 @@ def calculate_macros():
     calories = round(calories)
 
     # Create the result string that will be passed back to the client.
-    result_string = f"{weight}{unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+    if weight_unit == 'lb_oz':
+        result_string = f"{weight_pounds} lbs & {weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+    else:
+        result_string = f"{weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
 
     print(result_string)
 
@@ -80,7 +89,7 @@ def calculate_macros():
         'foodName': food_name,
         'subclass': subclass,
         'amount': weight,
-        'unit': unit,
+        'unit': weight_unit,
         'calories': calories,
         'fat': fat,
         'protein': protein,
