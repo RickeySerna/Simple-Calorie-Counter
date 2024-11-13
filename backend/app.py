@@ -26,6 +26,12 @@ def convert_to_grams(weight, unit, ounces=0.0):
     else:
         return weight
 
+def format_weight(weight):
+    if weight == int(weight):
+        return str(int(weight))
+    else:
+        return str(weight)
+
 @app.route('/api/calories', methods=['POST'])
 def calculate_macros():
     data = request.get_json()
@@ -76,11 +82,16 @@ def calculate_macros():
     net_carbs = round(net_carbs)
     calories = round(calories)
 
+    # Format the weight for the result string.
+    formatted_weight = format_weight(weight)
+    formatted_weight_pounds = format_weight(weight_pounds)
+    formatted_weight_ounces = format_weight(weight_ounces)
+
     # Create the result string that will be passed back to the client.
     if weight_unit == 'lb_oz':
-        result_string = f"{weight_pounds} lbs & {weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+        result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
     else:
-        result_string = f"{weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+        result_string = f"{formatted_weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
 
     print(result_string)
 
