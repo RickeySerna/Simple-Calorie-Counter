@@ -32,6 +32,12 @@ def format_weight(weight):
     else:
         return str(weight)
 
+def format_macros(macro):
+    if macro == int(macro):
+        return str(int(macro))
+    else:
+        return str(round(macro, 2))
+
 @app.route('/api/calories', methods=['POST'])
 def calculate_macros():
     data = request.get_json()
@@ -76,11 +82,15 @@ def calculate_macros():
     # Calculating the calories from the macros we just calculated.
     calories = (fat * 9) + (protein * 4) + (net_carbs * 4)
 
-    # Rounding the final results.
-    fat = round(fat)
-    protein = round(protein)
-    net_carbs = round(net_carbs)
+    print(f"Macros before rounding: fat - {fat}, protein - {protein}, carbs - {net_carbs}, and calories - {calories}")
+
+    # Formatting the final macros.
+    formatted_fat = format_macros(fat)
+    formatted_protein = format_macros(protein)
+    formatted_net_carbs = format_macros(net_carbs)
     calories = round(calories)
+
+    print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
 
     # Format the weight for the result string.
     formatted_weight = format_weight(weight)
@@ -89,9 +99,9 @@ def calculate_macros():
 
     # Create the result string that will be passed back to the client.
     if weight_unit == 'lb_oz':
-        result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+        result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
     else:
-        result_string = f"{formatted_weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {protein}g of protein, {net_carbs}g of carbs, {fat}g of fat"
+        result_string = f"{formatted_weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
 
     print(result_string)
 
