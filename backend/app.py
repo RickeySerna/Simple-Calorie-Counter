@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from decimal import Decimal, getcontext
 
 app = Flask(__name__)
 CORS(app)
+getcontext().prec = 10
 
 def to_float(value, default=0.0):
     try:
@@ -10,18 +12,29 @@ def to_float(value, default=0.0):
     except (TypeError, ValueError):
         return default
 
+# Using Decimal to avoid any long floating points where they don't belong.
+## For example, if a computation should come out to 58.0, it can become 57.99999999 using normal floats. Decimal avoids that.
+def to_decimal(value, default=Decimal('0.0')):
+    try:
+        # Checking if the var is empty to avoid conversion errors.
+        if value is None or value == '':
+            return default
+        return Decimal(value)
+    except (TypeError, ValueError, InvalidOperation):
+        return default
+
 # Formula to convert food weight and serving size form whatever unit the user used to grams.
-def convert_to_grams(weight, unit, ounces=0.0):
+def convert_to_grams(weight, unit, ounces=Decimal('0.0')):
     if unit == 'kg':
-        return weight * 1000
+        return weight * Decimal('1000')
     elif unit == 'oz':
-        return weight * 28.3495
+        return weight * Decimal('28.3495')
     elif unit == 'lb':
-        return weight * 453.592
+        return weight * Decimal('453.592')
     elif unit == 'mL':
         return weight
     elif unit == 'lb_oz':
-        return (weight * 453.592) + (ounces * 28.3495)
+        return (weight * Decimal('453.592')) + (ounces * Decimal('28.3495'))
     # Or just return it as is if the user used grams.
     else:
         return weight
@@ -46,21 +59,21 @@ def calculate_macros():
     # Defining all of the different bits of info we got from the frontend.
     food_name = data.get('foodName')
     subclass = data.get('subclass')
-    weight = to_float(data.get('weight'))
+    weight = to_decimal(data.get('weight'))
     weight_unit = data.get('weightUnit')
-    serving_size = to_float(data.get('servingSize'))
+    serving_size = to_decimal(data.get('servingSize'))
     serving_size_unit = data.get('servingSizeUnit')
-    fat_per_serving = to_float(data.get('fat'))
-    protein_per_serving = to_float(data.get('protein'))
-    carbs_per_serving = to_float(data.get('carbs'))
-    fiber_per_serving = to_float(data.get('fiber'))
-    sugar_alcohol_per_serving = to_float(data.get('sugarAlcohol'))
-    sodium = to_float(data.get('sodium'))
-    cholesterol = to_float(data.get('cholesterol'))
-    weight_pounds = to_float(data.get('weightPounds'))
-    weight_ounces = to_float(data.get('weightOunces'))
-    serving_size_pounds = to_float(data.get('servingSizePounds'))
-    serving_size_ounces = to_float(data.get('servingSizeOunces'))
+    fat_per_serving = to_decimal(data.get('fat'))
+    protein_per_serving = to_decimal(data.get('protein'))
+    carbs_per_serving = to_decimal(data.get('carbs'))
+    fiber_per_serving = to_decimal(data.get('fiber'))
+    sugar_alcohol_per_serving = to_decimal(data.get('sugarAlcohol'))
+    sodium = to_decimal(data.get('sodium'))
+    cholesterol = to_decimal(data.get('cholesterol'))
+    weight_pounds = to_decimal(data.get('weightPounds'))
+    weight_ounces = to_decimal(data.get('weightOunces'))
+    serving_size_pounds = to_decimal(data.get('servingSizePounds'))
+    serving_size_ounces = to_decimal(data.get('servingSizeOunces'))
 
     # Convert weight and serving size to grams
     if weight_unit == 'lb_oz':
@@ -80,7 +93,7 @@ def calculate_macros():
     net_carbs = (net_carbs_per_serving / serving_size_in_grams) * weight_in_grams
 
     # Calculating the calories from the macros we just calculated.
-    calories = (fat * 9) + (protein * 4) + (net_carbs * 4)
+    calories = (fat * Decimal('9')) + (protein * Decimal('4')) + (net_carbs * Decimal('4'))
 
     print(f"Macros before rounding: fat - {fat}, protein - {protein}, carbs - {net_carbs}, and calories - {calories}")
 
