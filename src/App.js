@@ -9,7 +9,7 @@ function App() {
     foodName: '',
     subclass: '',
     weight: '',
-    weightUnit: '',
+    weightUnit: 'g',
     calories: '',
     servingSize: '',
     servingSizeUnit: 'g',
