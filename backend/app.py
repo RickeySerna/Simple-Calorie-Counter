@@ -114,7 +114,10 @@ def calculate_macros():
     if weight_unit == 'lb_oz':
         result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
     else:
-        result_string = f"{formatted_weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+        if weight_unit in ['g', 'kg']:
+            result_string = f"{formatted_weight}{weight_unit} of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+        else:
+            result_string = f"{formatted_weight} {weight_unit} of {food_name} ({subclass}): {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
 
     print(result_string)
 
