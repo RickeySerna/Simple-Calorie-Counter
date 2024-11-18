@@ -24,18 +24,21 @@ def to_decimal(value, default=Decimal('0.0')):
         return default
 
 # Formula to convert food weight and serving size form whatever unit the user used to grams.
-def convert_to_grams(weight, unit, ounces=Decimal('0.0')):
-    if unit == 'kg':
-        return weight * Decimal('1000')
-    elif unit == 'oz':
-        return weight * Decimal('28.3495')
-    elif unit == 'lb':
-        return weight * Decimal('453.592')
-    elif unit == 'mL':
-        return weight
-    elif unit == 'lb_oz':
-        return (weight * Decimal('453.592')) + (ounces * Decimal('28.3495'))
-    # Or just return it as is if the user used grams.
+def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0')) -> Decimal:
+    # UPDATE: The function now uses a dictionary to pull the conversion rate.
+    conversion_factors = {
+        "kg": Decimal("1000"),
+        "oz": Decimal("28.3495"),
+        "lb": Decimal("453.592"),
+        "mL": Decimal("1")
+    }
+    # For most units, we just return weight * the conversion factor passed on the function call.
+    if unit in conversion_factors:
+        return weight * conversion_factors[unit]
+    # Lbs and oz is a slightly special case so we call those explicitly here.
+    elif unit == "lb_oz":
+        return (weight * conversion_factors["lb"]) + (ounces * conversion_factors["oz"])
+    # This is triggered is the unit is "g" as that is not in conversion_factors. In that case, just return the weight.
     else:
         return weight
 
