@@ -55,10 +55,10 @@ function App() {
       { calories: 0, protein: 0, carbs: 0, fat: 0 }
     );
     setTotals({
-      calories: Math.round(newTotals.calories),
-      protein: Math.round(newTotals.protein),
-      carbs: Math.round(newTotals.carbs),
-      fat: Math.round(newTotals.fat)
+      calories: Math.round(newTotals.calories * 100) / 100,
+      protein: Math.round(newTotals.protein * 100) / 100,
+      carbs: Math.round(newTotals.carbs * 100) / 100,
+      fat: Math.round(newTotals.fat * 100) / 100
     });
   }, [currentDate, entriesByDate]);
 
