@@ -48,11 +48,12 @@ def format_weight(weight):
     else:
         return str(weight)
 
-def format_macros(macro):
-    if macro == int(macro):
+def format_macros(macro: Decimal) -> str:
+    rounded_macro = str(round(macro, 2))
+    if rounded_macro.endswith('.00'):
         return str(int(macro))
     else:
-        return str(round(macro, 2))
+        return rounded_macro.rstrip('0').rstrip('.')
 
 @app.route('/api/calories', methods=['POST'])
 def calculate_macros():
