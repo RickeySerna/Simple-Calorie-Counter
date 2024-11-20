@@ -43,10 +43,8 @@ def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0'
         return weight
 
 def format_weight(weight):
-    if weight == int(weight):
-        return str(int(weight))
-    else:
-        return str(weight)
+    weight_str = str(weight).rstrip('0').rstrip('.')
+    return weight_str if '.' in weight_str else str(int(weight))
 
 def format_macros(macro: Decimal) -> str:
     rounded_macro = str(round(macro, 2))
