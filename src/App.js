@@ -70,6 +70,13 @@ function App() {
     }));
   };
 
+  const handleKeyDown = (e) => {
+    const invalidChars = ['e', 'E', '+', '-'];
+    if (invalidChars.includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -128,17 +135,17 @@ function App() {
                     <>
                       <div className="form-group" style={{ flex: '1' }}>
                         <label>Weight: (lbs)</label>
-                        <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} />
+                        <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} />
                       </div>
                       <div className="form-group" style={{ flex: '1' }}>
                         <label>Weight: (oz)</label>
-                        <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} />
+                        <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
                       </div>
                     </>
                   ) : (
                     <div className="form-group" style={{ flex: '1' }}>
                       <label>Weight:</label>
-                      <input type="number" name="weight" value={formData.weight} onChange={handleChange} required />
+                      <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
                     </div>
                   )}
                   <div className="form-group" style={{ flex: '1' }}>
@@ -162,23 +169,23 @@ function App() {
                 <div className="form-group">
                   <div className="form-group" style={{ flex: '2' }}>
                     <label>Calories:</label>
-                    <input type="number" name="calories" value={formData.calories} onChange={handleChange} />
+                    <input type="number" name="calories" value={formData.calories} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
                   {formData.servingSizeUnit === 'lb_oz' ? (
                     <>
                       <div className="form-group" style={{ flex: '1' }}>
                         <label>Serving size: (lbs)</label>
-                        <input type="number" name="servingSizePounds" value={formData.servingSizePounds} onChange={handleChange} />
+                        <input type="number" name="servingSizePounds" value={formData.servingSizePounds} onChange={handleChange} onKeyDown={handleKeyDown} />
                       </div>
                       <div className="form-group" style={{ flex: '1' }}>
                         <label>Serving size: (oz)</label>
-                        <input type="number" name="servingSizeOunces" value={formData.servingSizeOunces} onChange={handleChange} />
+                        <input type="number" name="servingSizeOunces" value={formData.servingSizeOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
                       </div>
                     </>
                   ) : (
                     <div className="form-group" style={{ flex: '1' }}>
                       <label>Serving size:</label>
-                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} required />
+                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} onKeyDown={handleKeyDown} required />
                     </div>
                   )}
                   <div className="form-group" style={{ flex: '1' }}>
@@ -194,32 +201,32 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>Fat (g):</label>
-                  <input type="number" name="fat" value={formData.fat} onChange={handleChange} required />
+                  <input type="number" name="fat" value={formData.fat} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   <label>Carbs (g):</label>
-                  <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} required />
+                  <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} onKeyDown={handleKeyDown} required />
                 </div>
                 <div className="form-group">
                   <div className="form-group half-width">
                     <label>Fiber (g):</label>
-                    <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} />
+                    <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
                   <div className="form-group half-width">
                     <label>Sugar Alcohol (g):</label>
-                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} />
+                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Protein (g):</label>
-                  <input type="number" name="protein" value={formData.protein} onChange={handleChange} required />
+                  <input type="number" name="protein" value={formData.protein} onChange={handleChange} onKeyDown={handleKeyDown} required />
                 </div>
                 <div className="form-group">
                   <div className="form-group half-width">
                     <label>Sodium (mg):</label>
-                    <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} />
+                    <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
                   <div className="form-group half-width">
                     <label>Cholesterol (mg):</label>
-                    <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} />
+                    <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
                 </div>
               </fieldset>
