@@ -167,10 +167,6 @@ function App() {
               <fieldset>
                 <legend>Nutrition Label Information:</legend>
                 <div className="form-group">
-                  <div className="form-group" style={{ flex: '2' }}>
-                    <label>Calories:</label>
-                    <input type="number" name="calories" value={formData.calories} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
                   {formData.servingSizeUnit === 'lb_oz' ? (
                     <>
                       <div className="form-group" style={{ flex: '1' }}>
