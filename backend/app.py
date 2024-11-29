@@ -3,7 +3,9 @@ from flask_cors import CORS
 from decimal import Decimal, getcontext
 
 app = Flask(__name__)
-CORS(app)
+# Specifying the domain (currently just localhost) we'll be receiving request from to avoid CORS issues.
+# When we move to prod, this will have to be updated to whatever the domain name ends up being.
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 getcontext().prec = 10
 
 def to_float(value, default=0.0):
