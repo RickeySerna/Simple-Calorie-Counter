@@ -156,6 +156,7 @@ function App() {
                       <option value="lb_oz">lb & oz</option>
                       <option value="mL">mL</option>
                       <option value="kg">Kg</option>
+                      <option value="mg">mg</option>
                     </select>
                   </div>
                 </div>
@@ -192,6 +193,7 @@ function App() {
                       <option value="lb_oz">lb & oz</option>
                       <option value="mL">mL</option>
                       <option value="kg">Kg</option>
+                      <option value="mg">mg</option>
                     </select>
                   </div>
                 </div>

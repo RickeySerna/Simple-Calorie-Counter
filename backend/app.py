@@ -32,7 +32,8 @@ def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0'
         "kg": Decimal("1000"),
         "oz": Decimal("28.3495"),
         "lb": Decimal("453.592"),
-        "mL": Decimal("1")
+        "mL": Decimal("1"),
+        "mg": Decimal("0.001")
     }
     # For most units, we just return weight * the conversion factor passed on the function call.
     if unit in conversion_factors:
