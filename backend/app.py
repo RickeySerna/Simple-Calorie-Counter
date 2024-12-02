@@ -63,7 +63,7 @@ def calculate_macros():
 
     # Defining all of the different bits of info we got from the frontend.
     food_name = data.get('foodName')
-    subclass = data.get('subclass')
+    subclass = data.get('subclass').strip()
     weight = to_decimal(data.get('weight'))
     weight_unit = data.get('weightUnit')
     serving_size = to_decimal(data.get('servingSize'))
