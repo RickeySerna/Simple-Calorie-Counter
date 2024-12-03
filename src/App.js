@@ -127,40 +127,32 @@ function App() {
               <fieldset>
                 <legend>Food Item Information:</legend>
                 <div className="form-group">
-                  <div className="form-group" style={{ flex: '2' }}>
-                    <label>Item:</label>
-                    <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
-                  </div>
-                  {formData.weightUnit === 'lb_oz' ? (
-                    <>
-                      <div className="form-group" style={{ flex: '1' }}>
-                        <label>Weight: (lbs)</label>
-                        <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} />
-                      </div>
-                      <div className="form-group" style={{ flex: '1' }}>
-                        <label>Weight: (oz)</label>
-                        <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
-                      </div>
-                    </>
-                  ) : (
-                    <div className="form-group" style={{ flex: '1' }}>
-                      <label>Weight:</label>
-                      <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
-                    </div>
-                  )}
-                  <div className="form-group" style={{ flex: '1' }}>
-                    <label>Unit:</label>
-                    <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
-                      <option value="g">g</option>
-                      <option value="oz">oz</option>
-                      <option value="lb_oz">lb & oz</option>
-                      <option value="mL">mL</option>
-                      <option value="kg">Kg</option>
-                      <option value="mg">mg</option>
-                    </select>
-                  </div>
+                  <label>Item:</label>
+                  <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
+                  <label>Weight:</label>
+                  {formData.weightUnit === 'lb_oz' ? (
+                    <>
+                      <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="lbs" />
+                      <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="oz" />
+                    </>
+                  ) : (
+                    <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>Unit:</label>
+                  <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
+                    <option value="g">g</option>
+                    <option value="oz">oz</option>
+                    <option value="lb_oz">lb & oz</option>
+                    <option value="mL">mL</option>
+                    <option value="kg">Kg</option>
+                    <option value="mg">mg</option>
+                  </select>
+                </div>
+                <div className="form-group full-width">
                   <label>Sub-description:</label>
                   <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
                 </div>
@@ -168,64 +160,54 @@ function App() {
               <fieldset>
                 <legend>Nutrition Label Information:</legend>
                 <div className="form-group">
+                  <label>Serving size:</label>
                   {formData.servingSizeUnit === 'lb_oz' ? (
                     <>
-                      <div className="form-group" style={{ flex: '1' }}>
-                        <label>Serving size: (lbs)</label>
-                        <input type="number" name="servingSizePounds" value={formData.servingSizePounds} onChange={handleChange} onKeyDown={handleKeyDown} />
-                      </div>
-                      <div className="form-group" style={{ flex: '1' }}>
-                        <label>Serving size: (oz)</label>
-                        <input type="number" name="servingSizeOunces" value={formData.servingSizeOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
-                      </div>
+                      <input type="number" name="servingSizePounds" value={formData.servingSizePounds} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="lbs" />
+                      <input type="number" name="servingSizeOunces" value={formData.servingSizeOunces} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="oz" />
                     </>
                   ) : (
-                    <div className="form-group" style={{ flex: '1' }}>
-                      <label>Serving size:</label>
-                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} onKeyDown={handleKeyDown} required />
-                    </div>
+                    <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   )}
-                  <div className="form-group" style={{ flex: '1' }}>
-                    <label>Unit:</label>
-                    <select name="servingSizeUnit" value={formData.servingSizeUnit} onChange={handleChange} required>
-                      <option value="g">g</option>
-                      <option value="oz">oz</option>
-                      <option value="lb_oz">lb & oz</option>
-                      <option value="mL">mL</option>
-                      <option value="kg">Kg</option>
-                      <option value="mg">mg</option>
-                    </select>
-                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Unit:</label>
+                  <select name="servingSizeUnit" value={formData.servingSizeUnit} onChange={handleChange} required>
+                    <option value="g">g</option>
+                    <option value="oz">oz</option>
+                    <option value="lb_oz">lb & oz</option>
+                    <option value="mL">mL</option>
+                    <option value="kg">Kg</option>
+                    <option value="mg">mg</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Fat (g):</label>
                   <input type="number" name="fat" value={formData.fat} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                </div>
+                <div className="form-group">
                   <label>Carbs (g):</label>
                   <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} onKeyDown={handleKeyDown} required />
                 </div>
                 <div className="form-group">
-                  <div className="form-group half-width">
-                    <label>Fiber (g):</label>
-                    <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
-                  <div className="form-group half-width">
-                    <label>Sugar Alcohol (g):</label>
-                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
+                  <label>Fiber (g):</label>
+                  <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} onKeyDown={handleKeyDown} />
+                </div>
+                <div className="form-group">
+                  <label>Sugar Alcohol (g):</label>
+                  <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
                 </div>
                 <div className="form-group">
                   <label>Protein (g):</label>
                   <input type="number" name="protein" value={formData.protein} onChange={handleChange} onKeyDown={handleKeyDown} required />
                 </div>
                 <div className="form-group">
-                  <div className="form-group half-width">
-                    <label>Sodium (mg):</label>
-                    <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
-                  <div className="form-group half-width">
-                    <label>Cholesterol (mg):</label>
-                    <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
+                  <label>Sodium (mg):</label>
+                  <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} onKeyDown={handleKeyDown} />
+                </div>
+                <div className="form-group">
+                  <label>Cholesterol (mg):</label>
+                  <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} onKeyDown={handleKeyDown} />
                 </div>
               </fieldset>
               <button type="submit">Submit</button>
