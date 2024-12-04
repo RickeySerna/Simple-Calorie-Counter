@@ -126,35 +126,39 @@ function App() {
             <form onSubmit={handleSubmit}>
               <fieldset>
                 <legend>Food Item Information:</legend>
-                <div className="form-group">
-                  <label>Item:</label>
-                  <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Weight:</label>
-                  {formData.weightUnit === 'lb_oz' ? (
-                    <>
-                      <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="lbs" />
-                      <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="oz" />
-                    </>
-                  ) : (
-                    <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
-                  )}
-                </div>
-                <div className="form-group">
-                  <label>Unit:</label>
-                  <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
-                    <option value="g">g</option>
-                    <option value="oz">oz</option>
-                    <option value="lb_oz">lb & oz</option>
-                    <option value="mL">mL</option>
-                    <option value="kg">Kg</option>
-                    <option value="mg">mg</option>
-                  </select>
-                </div>
-                <div className="form-group full-width">
-                  <label>Sub-description:</label>
-                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
+                <div className="form-group grid-container">
+                  <div className="grid-item item">
+                    <label>Item:</label>
+                    <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
+                  </div>
+                  <div className="grid-item weight-unit">
+                    <div className="weight">
+                      <label>Weight:</label>
+                      {formData.weightUnit === 'lb_oz' ? (
+                        <>
+                          <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="lbs" />
+                          <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} placeholder="oz" />
+                        </>
+                      ) : (
+                        <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                      )}
+                    </div>
+                    <div className="unit">
+                      <label>Unit:</label>
+                      <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
+                        <option value="g">g</option>
+                        <option value="oz">oz</option>
+                        <option value="lb_oz">lb & oz</option>
+                        <option value="mL">mL</option>
+                        <option value="kg">Kg</option>
+                        <option value="mg">mg</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid-item full-width">
+                    <label>Sub-description:</label>
+                    <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
+                  </div>
                 </div>
               </fieldset>
               <fieldset>

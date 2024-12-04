@@ -28,36 +28,58 @@ form {
   align-items: center;
 }
 
-.form-group {
-  display: flex;
+.grid-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 10px;
   align-items: center;
-  margin: 10px 0;
+  justify-content: flex-start;
 }
 
-.form-group label {
-  flex: 1;
+.grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.grid-item.item {
+  grid-column: span 2;
+}
+
+.grid-item.weight-unit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.weight,
+.unit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.weight label,
+.unit label {
   margin-right: 10px;
   font-weight: bold;
   text-align: right;
 }
 
-.form-group input,
-.form-group select {
-  flex: 2;
+.weight input,
+.unit select {
+  flex: 1;
   padding: 5px;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
 
-.form-group.full-width {
-  flex-direction: column;
-  width: 100%;
-}
-
-.form-group.half-width {
-  width: 48%;
+.grid-item.full-width {
+  grid-column: span 3;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 fieldset {
@@ -123,10 +145,7 @@ button:hover {
   background-color: #21a1f1;
 }
 
-.date-navigation .react-datepicker-wrapper {
-  display: inline-block;
-}
-
+.date-navigation .react-datepicker-wrapper,
 .date-navigation .react-datepicker__input-container {
   display: inline-block;
 }
@@ -143,8 +162,4 @@ button:hover {
 .totals {
   margin-top: 20px;
   font-weight: bold;
-}
-
-.form-group > .form-group {
-  margin-right: 10px;
 }
