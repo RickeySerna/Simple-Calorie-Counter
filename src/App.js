@@ -14,9 +14,12 @@ function App() {
     servingSize: '',
     servingSizeUnit: 'g',
     fat: '',
-    protein: '',
+    saturatedFat: '',
+    transFat: '',
     carbs: '',
     fiber: '',
+    sugarAlcohol: '',
+    protein: '',
     sodium: '',
     cholesterol: '',
     weightPounds: '',
@@ -196,37 +199,43 @@ function App() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <div className="form-group" style={{ flex: '1' }}>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Fat (g):</label>
                     <input type="number" name="fat" value={formData.fat} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
-                  <div className="form-group" style={{ flex: '1' }}>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Carbs (g):</label>
                     <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
-                  <div className="form-group" style={{ flex: '1' }}>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Protein (g):</label>
                     <input type="number" name="protein" value={formData.protein} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
                 </div>
                 <div className="form-group">
-                  <div className="form-group half-width">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Saturated Fat (g):</label>
+                    <input type="number" name="saturatedFat" value={formData.saturatedFat} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Fiber (g):</label>
                     <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
-                  <div className="form-group half-width">
-                    <label>Sugar Alcohol (g):</label>
-                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
-                  </div>
-                </div>
-                <div className="form-group">
-                </div>
-                <div className="form-group">
-                  <div className="form-group half-width">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Sodium (mg):</label>
                     <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
-                  <div className="form-group half-width">
+                </div>
+                <div className="form-group">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Trans Fat (g):</label>
+                    <input type="number" name="transFat" value={formData.transFat} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Sugar Alcohol (g):</label>
+                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Cholesterol (mg):</label>
                     <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} onKeyDown={handleKeyDown} />
                   </div>
