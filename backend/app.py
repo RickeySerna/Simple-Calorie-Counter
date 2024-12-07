@@ -1,12 +1,23 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 from decimal import Decimal, getcontext
+from models import db
+from controllers import food_item_bp
 
 app = Flask(__name__)
 # Specifying the domain (currently just localhost) we'll be receiving request from to avoid CORS issues.
 # When we move to prod, this will have to be updated to whatever the domain name ends up being.
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 getcontext().prec = 10
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fooditems.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+
+app.register_blueprint(food_item_bp)
+
+with app.app_context():
+    db.create_all()
 
 def to_float(value, default=0.0):
     try:
