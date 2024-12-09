@@ -82,7 +82,7 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const { carbs, fiber, sugarAlcohol } = formData;
     const fiberValue = parseFloat(fiber) || 0;
     const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
@@ -92,8 +92,8 @@ function App() {
       alert("Fiber and sugar alcohols together cannot exceed total carbs.");
       return;
     }
-
-    fetch('http://127.0.0.1:5000/api/calories', {
+  
+    fetch('http://127.0.0.1:5000/api/fooditems', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
