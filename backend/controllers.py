@@ -28,23 +28,6 @@ def add_food_item():
 
     return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"]}), 201
 
-@food_item_bp.route('/api/fooditems', methods=['GET'])
-def get_food_items():
-    food_items = FoodItem.query.all()
-    result = []
-    for item in food_items:
-        food_data = {
-            'id': item.id,
-            'name': item.name,
-            'sub_description': item.sub_description,
-            'calories': item.calories,
-            'protein': item.protein,
-            'carbs': item.carbs,
-            'fat': item.fat
-        }
-        result.append(food_data)
-    return jsonify(result)
-
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['GET'])
 def get_food_item(id):
     item = FoodItem.query.get_or_404(id)
