@@ -15,11 +15,13 @@ def add_food_item():
     new_food_item = FoodItem(
         name=macros["food_name"],
         sub_description=macros["subclass"],
+        weight=macros["weight"],
         calories=macros["calories"],
         protein=macros["protein"],
         carbs=macros["carbs"],
         fat=macros["fat"],
     )
+
     db.session.add(new_food_item)
     db.session.commit()
     print("Added new food item:", new_food_item)

@@ -106,16 +106,20 @@ def calculate_macros(data):
     # Create the result string that will be passed back to the client.
     if weight_unit == 'lb_oz':
         result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+        weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
     else:
         if weight_unit in ['g', 'kg']:
             result_string = f"{formatted_weight}{weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+            weight_string = f"{formatted_weight}{weight_unit}"
         else:
             result_string = f"{formatted_weight} {weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+            weight_string = f"{formatted_weight} {weight_unit}"
 
     macros_dict = {
         "result_string": result_string,
         "food_name": food_name,
         "subclass": subclass,
+        "weight": weight_string,
         "calories": calories,
         "protein": formatted_protein,
         "carbs": formatted_net_carbs,
