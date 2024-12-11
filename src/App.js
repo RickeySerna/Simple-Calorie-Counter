@@ -106,11 +106,33 @@ function App() {
       const dateKey = format(currentDate, 'yyyy-MM-dd');
       setEntriesByDate(prevEntries => ({
         ...prevEntries,
-        [dateKey]: [...(prevEntries[dateKey] || []), data.result]
+        [dateKey]: [...(prevEntries[dateKey] || []), data]
       }));
     })
     .catch(error => {
       console.error('Error:', error);
+    });
+  };
+
+  const handleDelete = (id) => {
+    console.log(`The ID to delete: ${id}`);
+    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Successfully deleted:', data);
+      const dateKey = format(currentDate, 'yyyy-MM-dd');
+      setEntriesByDate(prevEntries => ({
+        ...prevEntries,
+        [dateKey]: prevEntries[dateKey].filter(entry => entry.id !== id)
+      }));
+    })
+    .catch(error => {
+      console.error('Error while deleting:', error);
     });
   };
 
@@ -256,8 +278,11 @@ function App() {
             </div>
             <h2>Food Log</h2>
             <ul>
-              {currentEntries.map((result, index) => (
-                <li key={index}>{result}</li>
+              {currentEntries.map((result) => (
+                <li key={result.id}>
+                  {result.result}
+                  <button onClick={() => handleDelete(result.id)}>X</button>
+                </li>
               ))}
             </ul>
             <div className="totals">

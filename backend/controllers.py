@@ -26,7 +26,7 @@ def add_food_item():
     db.session.commit()
     print("Added new food item:", new_food_item)
 
-    return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"]}), 201
+    return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"], 'id': new_food_item.id}), 201
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['GET'])
 def get_food_item(id):
