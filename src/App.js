@@ -43,7 +43,7 @@ function App() {
     const newTotals = currentEntries.reduce(
       (acc, entry) => {
         const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
-        const matches = entry.match(regex);
+        const matches = entry.result.match(regex);
         if (matches) {
           const [, calories, , protein, , carbs, , fat] = matches.map(Number);
           return {
@@ -278,8 +278,8 @@ function App() {
             </div>
             <h2>Food Log</h2>
             <ul>
-              {currentEntries.map((result) => (
-                <li key={result.id}>
+              {currentEntries.map((result, index) => (
+                <li key={index}>
                   {result.result}
                   <button onClick={() => handleDelete(result.id)}>X</button>
                 </li>
