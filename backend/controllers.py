@@ -29,9 +29,10 @@ def add_food_item():
     return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"], 'id': new_food_item.id}), 201
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['GET'])
-def get_food_item(id):
-    item = FoodItem.query.get_or_404(id)
-    food_data = {
+def get_food_items_by_date():
+    date = request.args.get('date')
+    items = FoodItem.query.filter_by(date=date).all()
+    food_data = [{
         'id': item.id,
         'name': item.name,
         'sub_description': item.sub_description,
@@ -39,7 +40,7 @@ def get_food_item(id):
         'protein': item.protein,
         'carbs': item.carbs,
         'fat': item.fat
-    }
+    } for item in items]
     return jsonify(food_data)
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PUT'])

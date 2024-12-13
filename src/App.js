@@ -39,30 +39,43 @@ function App() {
 
   useEffect(() => {
     const dateKey = format(currentDate, 'yyyy-MM-dd');
-    const currentEntries = entriesByDate[dateKey] || [];
-    const newTotals = currentEntries.reduce(
-      (acc, entry) => {
-        const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
-        const matches = entry.result.match(regex);
-        if (matches) {
-          const [, calories, , protein, , carbs, , fat] = matches.map(Number);
-          return {
-            calories: acc.calories + (calories || 0),
-            protein: acc.protein + (protein || 0),
-            carbs: acc.carbs + (carbs || 0),
-            fat: acc.fat + (fat || 0)
-          };
-        }
-        return acc;
-      },
-      { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-    setTotals({
-      calories: Math.round(newTotals.calories * 100) / 100,
-      protein: Math.round(newTotals.protein * 100) / 100,
-      carbs: Math.round(newTotals.carbs * 100) / 100,
-      fat: Math.round(newTotals.fat * 100) / 100
-    });
+
+    // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
+    fetch(`http://127.0.0.1:5000/api/fooditems?date=${dateKey}`)
+      .then(response => response.json())
+      .then(data => {
+        setEntriesByDate(prevEntries => ({
+          ...prevEntries,
+          [dateKey]: data
+        }));
+
+        const newTotals = data.reduce(
+          (acc, entry) => {
+            const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
+            const matches = entry.result.match(regex);
+            if (matches) {
+              const [, calories, , protein, , carbs, , fat] = matches.map(Number);
+              return {
+                calories: acc.calories + (calories || 0),
+                protein: acc.protein + (protein || 0),
+                carbs: acc.carbs + (carbs || 0),
+                fat: acc.fat + (fat || 0)
+              };
+            }
+            return acc;
+          },
+          { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        );
+        setTotals({
+          calories: Math.round(newTotals.calories * 100) / 100,
+          protein: Math.round(newTotals.protein * 100) / 100,
+          carbs: Math.round(newTotals.carbs * 100) / 100,
+          fat: Math.round(newTotals.fat * 100) / 100
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching food items:', error);
+      });
   }, [currentDate, entriesByDate]);
 
   const handleChange = (e) => {
