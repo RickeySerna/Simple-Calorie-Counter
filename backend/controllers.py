@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 from models import db, FoodItem
 from utils import *
 
@@ -13,6 +14,7 @@ def add_food_item():
     print(f"Macros in add_food_item: ", macros)
 
     new_food_item = FoodItem(
+        date=datetime.today().date(),
         name=macros["food_name"],
         sub_description=macros["subclass"],
         weight=macros["weight"],
