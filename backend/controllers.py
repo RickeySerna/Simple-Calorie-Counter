@@ -14,7 +14,7 @@ def add_food_item():
     print(f"Macros in add_food_item: ", macros)
 
     new_food_item = FoodItem(
-        date=datetime.today().date(),
+        date=datetime.strptime(macros["date"], '%Y-%m-%d').date(),
         name=macros["food_name"],
         sub_description=macros["subclass"],
         weight=macros["weight"],

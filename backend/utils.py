@@ -50,6 +50,7 @@ def format_macros(macro: Decimal) -> str:
 
 def calculate_macros(data):
     # Defining all of the different bits of info we got from the frontend.
+    date = data.get('date')
     food_name = data.get('foodName')
     subclass = data.get('subclass').strip()
     weight = to_decimal(data.get('weight'))
@@ -117,6 +118,7 @@ def calculate_macros(data):
 
     macros_dict = {
         "result_string": result_string,
+        "date": date,
         "food_name": food_name,
         "subclass": subclass,
         "weight": weight_string,

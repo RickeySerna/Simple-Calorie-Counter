@@ -6,6 +6,7 @@ import './App.css';
 
 function App() {
   const [formData, setFormData] = useState({
+    date: format(new Date(), 'yyyy-MM-dd'),
     foodName: '',
     subclass: '',
     weight: '',
@@ -150,6 +151,7 @@ function App() {
   };
 
   const handleDateChange = (date) => {
+    formData.date = format(date, 'yyyy-MM-dd');
     setCurrentDate(date);
   };
 
