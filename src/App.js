@@ -39,12 +39,15 @@ function App() {
   });
 
   useEffect(() => {
-    const dateKey = format(currentDate, 'yyyy-MM-dd');
+    const dateKey = formData.date;
+
+    console.log("Date key to send to the server: ", dateKey);
 
     // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
     fetch(`http://127.0.0.1:5000/api/fooditems?date=${dateKey}`)
       .then(response => response.json())
       .then(data => {
+        console.log('Data received from server:', data);
         setEntriesByDate(prevEntries => ({
           ...prevEntries,
           [dateKey]: data

@@ -3,9 +3,9 @@ from datetime import datetime
 from models import db, FoodItem
 from utils import *
 
-food_item_bp = Blueprint('food_item_bp', __name__)
+food_item_bp = Blueprint('food_item_bp', __name__, url_prefix='/api')
 
-@food_item_bp.route('/api/fooditems', methods=['POST'])
+@food_item_bp.route('/fooditems', methods=['POST'])
 def add_food_item():
     data = request.get_json()
     print("Received data:", data)
@@ -30,10 +30,17 @@ def add_food_item():
 
     return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"], 'id': new_food_item.id}), 201
 
-@food_item_bp.route('/api/fooditems/<int:id>', methods=['GET'])
+@food_item_bp.route('/fooditems', methods=['GET'])
 def get_food_items_by_date():
-    date = request.args.get('date')
-    items = FoodItem.query.filter_by(date=date).all()
+    date_str = request.args.get('date')
+    print(f"Date in server: {date_str}")
+    
+    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+    items = FoodItem.query.filter_by(date=date_obj).all()
+    
+    if not items:
+        return jsonify([])
+    
     food_data = [{
         'id': item.id,
         'name': item.name,
@@ -43,6 +50,7 @@ def get_food_items_by_date():
         'carbs': item.carbs,
         'fat': item.fat
     } for item in items]
+    
     return jsonify(food_data)
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PUT'])
