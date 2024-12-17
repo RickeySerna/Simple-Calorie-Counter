@@ -80,7 +80,7 @@ function App() {
       .catch(error => {
         console.error('Error fetching food items:', error);
       });
-  }, [currentDate, entriesByDate]);
+  }, [currentDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

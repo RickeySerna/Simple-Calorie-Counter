@@ -6,11 +6,10 @@ from decimal import Decimal, getcontext
 from models import db
 from controllers import food_item_bp
 
-
 # Specifying the domain (currently just localhost) we'll be receiving request from to avoid CORS issues.
 # When we move to prod, this will have to be updated to whatever the domain name ends up being.
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000", "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'fooditems.db')
