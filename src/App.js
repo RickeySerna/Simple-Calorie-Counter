@@ -29,8 +29,8 @@ function App() {
     servingSizeOunces: ''
   });
 
-  const [entriesByDate, setEntriesByDate] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentEntries, setCurrentEntries] = useState([]);
   const [totals, setTotals] = useState({
     calories: 0,
     protein: 0,
@@ -48,10 +48,7 @@ function App() {
       .then(response => response.json())
       .then(data => {
         console.log('Data received from server:', data);
-        setEntriesByDate(prevEntries => ({
-          ...prevEntries,
-          [dateKey]: data
-        }));
+        setCurrentEntries(data);
 
         const newTotals = data.reduce(
           (acc, entry) => {
@@ -118,13 +115,13 @@ function App() {
       body: JSON.stringify(formData)
     })
     .then(response => response.json())
-    .then(data => {
+    .then(data => {/*
       console.log('Success:', data);
       const dateKey = format(currentDate, 'yyyy-MM-dd');
       setEntriesByDate(prevEntries => ({
         ...prevEntries,
         [dateKey]: [...(prevEntries[dateKey] || []), data]
-      }));
+      }));*/
     })
     .catch(error => {
       console.error('Error:', error);
@@ -140,13 +137,13 @@ function App() {
       }
     })
     .then(response => response.json())
-    .then(data => {
+    .then(data => {/*
       console.log('Successfully deleted:', data);
       const dateKey = format(currentDate, 'yyyy-MM-dd');
       setEntriesByDate(prevEntries => ({
         ...prevEntries,
         [dateKey]: prevEntries[dateKey].filter(entry => entry.id !== id)
-      }));
+      }));*/
     })
     .catch(error => {
       console.error('Error while deleting:', error);
@@ -158,7 +155,7 @@ function App() {
     setCurrentDate(date);
   };
 
-  const currentEntries = entriesByDate[format(currentDate, 'yyyy-MM-dd')] || [];
+  console.log("currentEntries object after GET call: ", currentEntries);
 
   return (
     <div className="App">
