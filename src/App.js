@@ -43,6 +43,13 @@ function App() {
 
     console.log("Date key to send to the server: ", dateKey);
 
+    fetchFoodItems(dateKey);
+
+  }, [currentDate]);
+
+  // Moving the fetching logic into it's own function call.
+  // This allows us to readily call this function in more places, like right after the POST call to update the food log right after a new food item is added.
+  const fetchFoodItems = (dateKey) => {
     // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
     fetch(`http://127.0.0.1:5000/api/fooditems?date=${dateKey}`)
       .then(response => response.json())
@@ -77,7 +84,7 @@ function App() {
       .catch(error => {
         console.error('Error fetching food items:', error);
       });
-  }, [currentDate]);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,13 +122,11 @@ function App() {
       body: JSON.stringify(formData)
     })
     .then(response => response.json())
-    .then(data => {/*
-      console.log('Success:', data);
-      const dateKey = format(currentDate, 'yyyy-MM-dd');
-      setEntriesByDate(prevEntries => ({
-        ...prevEntries,
-        [dateKey]: [...(prevEntries[dateKey] || []), data]
-      }));*/
+    .then(data => {
+      console.log('Success: ', data);
+
+      // Now that a new a food item is successfully created, immediately update the log which now includes said new item.
+      fetchFoodItems(formData.date);
     })
     .catch(error => {
       console.error('Error:', error);
