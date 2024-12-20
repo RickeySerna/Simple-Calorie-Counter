@@ -160,8 +160,6 @@ function App() {
     setCurrentDate(date);
   };
 
-  console.log("currentEntries object after GET call: ", currentEntries);
-
   return (
     <div className="App">
       <header className="App-header">
