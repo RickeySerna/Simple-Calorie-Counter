@@ -28,7 +28,7 @@ def add_food_item():
     db.session.commit()
     print("Added new food item:", new_food_item)
 
-    return jsonify({'message': 'Food item added successfully', 'result': macros["result_string"], 'id': new_food_item.id}), 201
+    return jsonify({'message': 'Food item added successfully', 'id': new_food_item.id}), 201
 
 @food_item_bp.route('/fooditems', methods=['GET'])
 def get_food_items_by_date():
@@ -45,10 +45,12 @@ def get_food_items_by_date():
         'id': item.id,
         'name': item.name,
         'sub_description': item.sub_description,
+        'weight': item.weight,
         'calories': item.calories,
         'protein': item.protein,
         'carbs': item.carbs,
-        'fat': item.fat
+        'fat': item.fat,
+        'result': generate_result_string(item)
     } for item in items]
     
     return jsonify(food_data)
