@@ -1,4 +1,4 @@
-from decimal import Decimal, getcontext
+from decimal import Decimal, getcontext, ROUND_HALF_UP
 import re
 
 def to_float(value, default=0.0):
@@ -9,6 +9,9 @@ def to_float(value, default=0.0):
 
 # Using Decimal to avoid any long floating points where they don't belong.
 ## For example, if a computation should come out to 58.0, it can become 57.99999999 using normal floats. Decimal avoids that.
+
+# Set precision
+getcontext().prec = 10  # Adjust precision as needed
 def to_decimal(value, default=Decimal('0.0')):
     try:
         # Checking if the var is empty to avoid conversion errors.
@@ -43,11 +46,17 @@ def format_weight(weight):
     return weight_str if '.' in weight_str else str(int(weight))
 
 def format_macros(macro: Decimal) -> str:
-    rounded_macro = str(round(macro, 2))
-    if rounded_macro.endswith('.00'):
-        return str(int(macro))
+    # For better precision, now using the quantize and ROUND_HALF_UP methods from Decimal for rounding. Basically rounds to the nearest hundreths place.
+    rounded_macro = macro.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    
+    # Now go back to the original logic; convert to a str and check if it ends with .00.
+    rounded_str = str(rounded_macro)
+    if rounded_str.endswith('.00'):
+        # If so, strip those zeros by converting to an int and then back to the string.
+        return str(int(rounded_macro))
     else:
-        return rounded_macro.rstrip('0').rstrip('.')
+        # Otherwise, just get rid of any trailing zeros.
+        return rounded_str.rstrip('0').rstrip('.')
 
 def calculate_macros(data):
     # Defining all of the different bits of info we got from the frontend.
@@ -80,6 +89,10 @@ def calculate_macros(data):
         serving_size_in_grams = convert_to_grams(serving_size_pounds, serving_size_unit, serving_size_ounces)
     else:
         serving_size_in_grams = convert_to_grams(serving_size, serving_size_unit)
+
+    # Making sure the calculation variables are in Decimal too.
+    weight_in_grams = to_decimal(weight_in_grams)
+    serving_size_in_grams = to_decimal(serving_size_in_grams)
 
     # Calculating the main macros.
     fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
@@ -132,6 +145,7 @@ def calculate_macros(data):
     return(macros_dict)
 
 def generate_result_string(item):
+    print(f"Item in generate_result_string: {item}")
     weight = item.weight
     print(f"The weight to split: {weight}")
 
@@ -149,11 +163,12 @@ def generate_result_string(item):
             weight_value, weight_unit = match.groups()
         # In case a string comes in with a bad format, we add this to make sure the whole thing doesn't break. Shouldn't happen, but just in case.
         else:
-            weight_value, weight_unit = "Bad format!", ''
-    
+            weight_value, weight_unit = "Bad format!", ''    
+
+    # The attributes all come in with a .0, so wrapping them all in str(int()) to strip that.
     if weight_unit == 'lbs & oz':
-        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
     elif weight_unit in ['g', 'kg']:
-        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
     else:
-        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
