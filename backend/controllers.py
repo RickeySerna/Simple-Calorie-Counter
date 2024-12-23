@@ -68,9 +68,20 @@ def update_food_item(id):
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
 
-@food_item_bp.route('/api/fooditems/<int:id>', methods=['DELETE'])
+@food_item_bp.route('/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):
+    print(f"Attempting to delete FoodItem with ID: {id}")
+
+    # Grabbing the FoodItem to delete or grabbing a 404 if it's not found.
     item = FoodItem.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
-    return jsonify({'message': 'Food item deleted successfully'})
+
+    # Deleting!
+    if item:
+        db.session.delete(item)
+        db.session.commit()
+        print(f"Deleted FoodItem with ID: {id}")
+        return jsonify({'message': 'Food item deleted successfully'})
+    # Or throwing a 404.
+    else:
+        print(f"FoodItem with ID: {id} not found")
+        return jsonify({'message': 'Food item not found'}), 404

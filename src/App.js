@@ -44,7 +44,6 @@ function App() {
     console.log("Date key to send to the server: ", dateKey);
 
     fetchFoodItems(dateKey);
-
   }, [currentDate]);
 
   // Moving the fetching logic into it's own function call.
@@ -142,13 +141,11 @@ function App() {
       }
     })
     .then(response => response.json())
-    .then(data => {/*
+    .then(data => {
       console.log('Successfully deleted:', data);
-      const dateKey = format(currentDate, 'yyyy-MM-dd');
-      setEntriesByDate(prevEntries => ({
-        ...prevEntries,
-        [dateKey]: prevEntries[dateKey].filter(entry => entry.id !== id)
-      }));*/
+
+      // FoodItem was successfully deleted, now update the result-panel with a new GET call so that the deleted FoodItem doesn't linger.
+      fetchFoodItems(formData.date);
     })
     .catch(error => {
       console.error('Error while deleting:', error);
