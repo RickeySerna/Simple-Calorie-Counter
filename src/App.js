@@ -294,9 +294,9 @@ function App() {
             <h2>Food Log</h2>
             <ul>
               {currentEntries.map((result, index) => (
-                <li key={index}>
-                  {result.result}
-                  <button onClick={() => handleDelete(result.id)}>X</button>
+                <li key={index} className="list-item">
+                  <span className="result-text">{result.result}</span>
+                  <button className="delete-button" onClick={() => handleDelete(result.id)} title="Press to delete this item from the log">X</button>
                 </li>
               ))}
             </ul>

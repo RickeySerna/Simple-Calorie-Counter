@@ -77,29 +77,42 @@ input[type="number"] {
   max-width: 100%;
 }
 
-button {
-  padding: 10px 20px;
+.list-item {
+  position: relative;
+  padding-right: 50px; /* Ensure there's enough space for the button */
+  background-color: #e0e0e0;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-text {
+  flex-grow: 1; /* Allow the text to take up available space */
+  margin-right: 10px; /* Add some space between the text and the button */
+}
+
+.delete-button {
+  padding: 2.5px 5px; /* Adjusted padding to make it smaller */
   background-color: #61dafb;
   border: none;
   cursor: pointer;
-  font-size: 16px;
-  border-radius: 4px;
+  font-size: 8px; /* Smaller font size */
+  border-radius: 3px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
 }
 
-button:hover {
+.delete-button:hover {
   background-color: #21a1f1;
 }
 
 .results-panel ul {
   list-style-type: none;
   padding: 0;
-}
-
-.results-panel li {
-  background-color: #e0e0e0;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 4px;
 }
 
 .date-navigation {
