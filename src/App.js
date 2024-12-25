@@ -296,7 +296,8 @@ function App() {
               {currentEntries.map((result, index) => (
                 <li key={index} className="list-item">
                   <span className="result-text">{result.result}</span>
-                  <button className="delete-button" onClick={() => handleDelete(result.id)} title="Press to delete this item from the log">X</button>
+                  <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press to delete this item from the log">X</button>
+                  <button className="button-common edit-button" /*onClick={() => handleEdit(result.id)}*/ title="Press this button to edit this item">Edit</button>
                 </li>
               ))}
             </ul>
