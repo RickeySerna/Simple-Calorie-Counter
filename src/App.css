@@ -93,6 +93,7 @@ input[type="number"] {
   flex-grow: 1;
   margin-right: 10px;
 }
+
 .button-common {
   padding: 2px 4px;
   background-color: #61dafb;
@@ -112,7 +113,7 @@ input[type="number"] {
   right: 3px;
 }
 
-.edit-button {
+.edit-button, .edit-save-button {
   bottom: 3px;
   right: 3px;
 }

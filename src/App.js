@@ -38,6 +38,21 @@ function App() {
     fat: 0
   });
 
+  // State tracking for the edit functionality.
+  const [editingId, setEditingId] = useState(null);
+  const [initialValues, setInitialValues] = useState({
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: ''
+  });
+  const [editValues, setEditValues] = useState({
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: ''
+  });
+
   useEffect(() => {
     const dateKey = formData.date;
 
@@ -155,6 +170,54 @@ function App() {
   const handleDateChange = (date) => {
     formData.date = format(date, 'yyyy-MM-dd');
     setCurrentDate(date);
+  };
+
+  const handleEdit = (id, item) => {
+    setEditingId(id);
+    setEditValues({
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat
+    });
+  };
+
+  const handleEditSave = (id) => {
+    const changes = {};
+    let isChanged = false;
+  
+    for (const key in initialValues) {
+      if (initialValues[key] !== editValues[key]) {
+        changes[key] = editValues[key];
+        isChanged = true;
+      }
+    }
+  
+    if (!isChanged) {
+      console.log('No changes detected, no request sent.');
+      setEditingId(null);
+      return;
+    }
+  
+    const method = Object.keys(changes).length === Object.keys(initialValues).length ? 'PUT' : 'PATCH';
+  
+    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(changes)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Successfully updated:', data);
+      // Update the state to reflect the changes
+      setEditingId(null);
+      fetchFoodItems(currentDate); // Refresh the list
+    })
+    .catch(error => {
+      console.error('Error while updating:', error);
+    });
   };
 
   return (
@@ -295,9 +358,44 @@ function App() {
             <ul>
               {currentEntries.map((result, index) => (
                 <li key={index} className="list-item">
-                  <span className="result-text">{result.result}</span>
-                  <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press to delete this item from the log">X</button>
-                  <button className="button-common edit-button" /*onClick={() => handleEdit(result.id)}*/ title="Press this button to edit this item">Edit</button>
+                {editingId === result.id ? (
+                  <>
+                    <span className="result-text">
+                      {result.weight} of {result.name} ({result.sub_description}): 
+                      <input
+                        type="text"
+                        name="calories"
+                        value={editValues.calories}
+                        onChange={handleChange}
+                      /> calories, 
+                      <input
+                        type="text"
+                        name="protein"
+                        value={editValues.protein}
+                        onChange={handleChange}
+                      />g of protein, 
+                      <input
+                        type="text"
+                        name="carbs"
+                        value={editValues.carbs}
+                        onChange={handleChange}
+                      />g of carbs, 
+                      <input
+                        type="text"
+                        name="fat"
+                        value={editValues.fat}
+                        onChange={handleChange}
+                      />g of fat
+                    </span>
+                    <button className="button-common edit-save-button" onClick={() => handleEditSave(result.id)}>Save</button>
+                  </>
+                ) : (
+                  <>
+                    <span className="result-text">{result.result}</span>
+                    <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press this button to delete this item from the log">X</button>
+                    <button className="button-common edit-button" onClick={() => handleEdit(result.id, result)} title="Press this button to edit this item">Edit</button>
+                  </>
+                )}
                 </li>
               ))}
             </ul>
