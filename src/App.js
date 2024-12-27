@@ -172,8 +172,18 @@ function App() {
     setCurrentDate(date);
   };
 
+  // Handler function for clicking the edit button.
+  // Immediately sets the state for the initialValues and editValues and captures the ID of the FoodItem we're editing.
   const handleEdit = (id, item) => {
     setEditingId(id);
+
+    setInitialValues({
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat
+    });
+
     setEditValues({
       calories: item.calories,
       protein: item.protein,
@@ -182,25 +192,53 @@ function App() {
     });
   };
 
+  // Handler function for any changes to the edit fields that are rendered.
+  // initialValues ALWAYS remains the same, but this one changes editValues to whatever the user changed them to.
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditValues((prevValues) => ({
+      ...prevValues,
+      [name]: value < 0 ? 0 : value
+    }));
+  };
+
+  // Handler function for clicking the save button on the edit feature.
   const handleEditSave = (id) => {
     const changes = {};
     let isChanged = false;
-  
+
+    console.log("Item ID to edit: ", id);
+    console.log("initialValues when save button clicked: ", initialValues);
+    console.log("editValues when save button clicked: ", editValues);
+
+    // initialValues were save right when the edit button was click, along with the editValues.
+    // editValues may or may not have been updated by any change in the edit fields by handleEditChange.
+    // We compare each value with this for loop.
     for (const key in initialValues) {
+      // If any value does not match, we determine changes have been made and log the changes.
       if (initialValues[key] !== editValues[key]) {
         changes[key] = editValues[key];
         isChanged = true;
       }
     }
-  
+
+    console.log("changes object: ", changes)
+
+    // If no changes, we just log that and do not send any requests.
     if (!isChanged) {
       console.log('No changes detected, no request sent.');
+      // Set the editingId back to null so that it renders in the result panel with the normal format.
       setEditingId(null);
       return;
     }
-  
+
+    // Determining which HTTP verb to send based on the number of changes made.
+    // If changes and initialValues have the same number of properties, that means the user changed everything so we send a PUT.
+    // Otherwise, the user only made some changes and so PATCH is the appropriate verb to send.
     const method = Object.keys(changes).length === Object.keys(initialValues).length ? 'PUT' : 'PATCH';
-  
+    console.log("HTTP verb = ", method);
+
+    // Send the request to the server.
     fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
       method: method,
       headers: {
@@ -210,13 +248,16 @@ function App() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Successfully updated:', data);
-      // Update the state to reflect the changes
+      console.log('Successfully updated: ', data);
+      
+      // Set the editingId back to null so that it renders in the result panel with the normal format.
       setEditingId(null);
-      fetchFoodItems(currentDate); // Refresh the list
+
+      // Update the list to display the updated values.
+      fetchFoodItems(currentDate);
     })
     .catch(error => {
-      console.error('Error while updating:', error);
+      console.error('Error while updating: ', error);
     });
   };
 
@@ -363,28 +404,32 @@ function App() {
                     <span className="result-text">
                       {result.weight} of {result.name} ({result.sub_description}): 
                       <input
-                        type="text"
+                        type="number"
                         name="calories"
                         value={editValues.calories}
-                        onChange={handleChange}
+                        onChange={handleEditChange}
+                        className="small-input"
                       /> calories, 
                       <input
-                        type="text"
+                        type="number"
                         name="protein"
                         value={editValues.protein}
-                        onChange={handleChange}
+                        onChange={handleEditChange}
+                        className="small-input"
                       />g of protein, 
                       <input
-                        type="text"
+                        type="number"
                         name="carbs"
                         value={editValues.carbs}
-                        onChange={handleChange}
+                        onChange={handleEditChange}
+                        className="small-input"
                       />g of carbs, 
                       <input
-                        type="text"
+                        type="number"
                         name="fat"
                         value={editValues.fat}
-                        onChange={handleChange}
+                        onChange={handleEditChange}
+                        className="small-input"
                       />g of fat
                     </span>
                     <button className="button-common edit-save-button" onClick={() => handleEditSave(result.id)}>Save</button>

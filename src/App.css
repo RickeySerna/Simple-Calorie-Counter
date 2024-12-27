@@ -169,3 +169,18 @@ input[type="number"] {
 .form-group > .form-group {
   margin-right: 10px;
 }
+
+.small-input {
+  width: 40px;
+  padding: 2px;
+  margin: 0 5px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  text-align: center;
+}
+
+.small-input:focus {
+  border-color: #61dafb;
+  outline: none;
+}
