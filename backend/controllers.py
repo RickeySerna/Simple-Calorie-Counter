@@ -55,18 +55,39 @@ def get_food_items_by_date():
     
     return jsonify(food_data)
 
-@food_item_bp.route('/api/fooditems/<int:id>', methods=['PUT'])
+@food_item_bp.route('/fooditems/<int:id>', methods=['PUT'])
 def update_food_item(id):
     data = request.get_json()
     item = FoodItem.query.get_or_404(id)
-    item.name = data['name']
-    item.sub_description = data.get('sub_description', item.sub_description)
-    item.calories = data['calories']
-    item.protein = data['protein']
-    item.carbs = data['carbs']
-    item.fat = data['fat']
+    print(f"Data with update values: {data}")
+    print(f"Item to update: {item}")
+
+    item.calories = data.get('calories', item.calories)
+    item.protein = data.get('protein', item.protein)
+    item.carbs = data.get('carbs', item.carbs)
+    item.fat = data.get('fat', item.fat)
+
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
+
+@food_item_bp.route('/fooditems/<int:id>', methods=['PATCH'])
+def update_food_item_partially(id):
+    data = request.get_json()
+    item = FoodItem.query.get_or_404(id)
+    print(f"Data with update values: {data}")
+    print(f"Item to update: {item}")
+
+    if 'calories' in data:
+        item.calories = data['calories']
+    if 'protein' in data:
+        item.protein = data['protein']
+    if 'carbs' in data:
+        item.carbs = data['carbs']
+    if 'fat' in data:
+        item.fat = data['fat']
+    
+    db.session.commit()
+    return jsonify({'message': 'Food item partially updated successfully'})
 
 @food_item_bp.route('/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):

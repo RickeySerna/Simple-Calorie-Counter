@@ -249,12 +249,12 @@ function App() {
     .then(response => response.json())
     .then(data => {
       console.log('Successfully updated: ', data);
-      
+
       // Set the editingId back to null so that it renders in the result panel with the normal format.
       setEditingId(null);
 
       // Update the list to display the updated values.
-      fetchFoodItems(currentDate);
+      fetchFoodItems(formData.date);
     })
     .catch(error => {
       console.error('Error while updating: ', error);
