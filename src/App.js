@@ -195,6 +195,7 @@ function App() {
   // Handler function for any changes to the edit fields that are rendered.
   // initialValues ALWAYS remains the same, but this one changes editValues to whatever the user changed them to.
   const handleEditChange = (e) => {
+    console.log("triggered")
     const { name, value } = e.target;
     setEditValues((prevValues) => ({
       ...prevValues,
@@ -210,13 +211,20 @@ function App() {
     console.log("Item ID to edit: ", id);
     console.log("initialValues when save button clicked: ", initialValues);
     console.log("editValues when save button clicked: ", editValues);
+    console.log("Type of initialValues items: ", (typeof initialValues.calories))
+    console.log("Type of editValues items: ", (typeof editValues.calories))
 
     // initialValues were save right when the edit button was click, along with the editValues.
     // editValues may or may not have been updated by any change in the edit fields by handleEditChange.
     // We compare each value with this for loop.
     for (const key in initialValues) {
+      console.log("initialValues key being compared: ", initialValues[key])
+      console.log("editValues key being compared: ", Number(editValues[key]))
       // If any value does not match, we determine changes have been made and log the changes.
-      if (initialValues[key] !== editValues[key]) {
+      // When values are changed, they come back in editValues as strings. This can lead to false positives here;
+      // For example, if the field detects input, but the input ends up being the same as the initial value, this condition will still trigger since it's then comparing a Number to a string.
+      // To avoid that, we cast the editValue being compared as a Number. This way, it's always comparing a Number object to a Number object. No false positives.
+      if (initialValues[key] !== Number(editValues[key])) {
         changes[key] = editValues[key];
         isChanged = true;
       }
