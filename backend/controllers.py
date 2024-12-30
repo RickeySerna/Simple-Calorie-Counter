@@ -62,6 +62,9 @@ def update_food_item(id):
     print(f"Data with update values: {data}")
     print(f"Item to update: {item}")
 
+    item.name = data.get('name', item.name)
+    item.sub_description = data.get('sub_description', item.sub_description)
+    item.weight = data.get('weight', item.weight)
     item.calories = data.get('calories', item.calories)
     item.protein = data.get('protein', item.protein)
     item.carbs = data.get('carbs', item.carbs)

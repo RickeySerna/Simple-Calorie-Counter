@@ -41,12 +41,20 @@ function App() {
   // State tracking for the edit functionality.
   const [editingId, setEditingId] = useState(null);
   const [initialValues, setInitialValues] = useState({
+    weight: '',
+    weightUnit: '',
+    name: '',
+    sub_description: '',
     calories: '',
     protein: '',
     carbs: '',
     fat: ''
   });
   const [editValues, setEditValues] = useState({
+    weight: '',
+    weightUnit: '',
+    name: '',
+    sub_description: '',
     calories: '',
     protein: '',
     carbs: '',
@@ -177,7 +185,12 @@ function App() {
   const handleEdit = (id, item) => {
     setEditingId(id);
 
+    // TODO: The weight from the DB is attached to the unit. Need to separate them.
     setInitialValues({
+      weight: "todo",
+      weightUnit: "todo",
+      name: item.name,
+      sub_description: item.sub_description,
       calories: item.calories,
       protein: item.protein,
       carbs: item.carbs,
@@ -185,6 +198,10 @@ function App() {
     });
 
     setEditValues({
+      weight: "todo",
+      weightUnit: "todo",
+      name: item.name,
+      sub_description: item.sub_description,
       calories: item.calories,
       protein: item.protein,
       carbs: item.carbs,
@@ -410,7 +427,40 @@ function App() {
                 {editingId === result.id ? (
                   <>
                     <span className="result-text">
-                      {result.weight} of {result.name} ({result.sub_description}): 
+                      <input
+                        type="number"
+                        name="weight"
+                        value={editValues.weight}
+                        onChange={handleEditChange}
+                        className="small-input"
+                        placeholder="Weight"
+                      />
+                      <select
+                        name="weight_unit"
+                        value={editValues.weightUnit}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      >
+                        <option value="g">g</option>
+                        <option value="oz">oz</option>
+                        <option value="lb_oz">lb & oz</option>
+                        <option value="mL">mL</option>
+                        <option value="kg">Kg</option>
+                      </select> of
+                      <input
+                        type="text"
+                        name="sub_description"
+                        value={editValues.name}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      /> (
+                      <input
+                        type="text"
+                        name="sub_description"
+                        value={editValues.sub_description}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      />)
                       <input
                         type="number"
                         name="calories"
