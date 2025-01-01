@@ -41,6 +41,12 @@ def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0'
     else:
         return weight
 
+# Now that weight_value is sent as a separate function, we need a method to send lb_oz values as a single value.
+# For that, we're converting the value into a single lbs value. That'll get converted back later where needed.
+def convert_lboz_to_lbs(pounds: Decimal, ounces: Decimal) -> Decimal:
+    total_pounds = pounds + (ounces / Decimal('16'))
+    return total_pounds
+
 def format_weight(weight):
     weight_str = str(weight).rstrip('0').rstrip('.')
     return weight_str if '.' in weight_str else str(int(weight))
@@ -122,20 +128,23 @@ def calculate_macros(data):
     if weight_unit == 'lb_oz':
         #result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
         weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
+        weight_string = convert_lboz_to_lbs(formatted_weight_pounds, formatted_weight_ounces)
     else:
-        if weight_unit in ['g', 'kg']:
-            #result_string = f"{formatted_weight}{weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-            weight_string = f"{formatted_weight}{weight_unit}"
-        else:
-            #result_string = f"{formatted_weight} {weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-            weight_string = f"{formatted_weight} {weight_unit}"
+        weight_string = formatted_weight
+        # if weight_unit in ['g', 'kg']:
+        #     #result_string = f"{formatted_weight}{weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+        #     weight_string = f"{formatted_weight}{weight_unit}"
+        # else:
+        #     #result_string = f"{formatted_weight} {weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
+        #     weight_string = f"{formatted_weight} {weight_unit}"
 
     macros_dict = {
         #"result_string": result_string,
         "date": date,
         "food_name": food_name,
         "subclass": subclass,
-        "weight": weight_string,
+        "weight_value": formatted_weight,
+        "weight_unit": weight_unit,
         "calories": calories,
         "protein": formatted_protein,
         "carbs": formatted_net_carbs,
@@ -146,29 +155,48 @@ def calculate_macros(data):
 
 def generate_result_string(item):
     print(f"Item in generate_result_string: {item}")
-    weight = item.weight
-    print(f"The weight to split: {weight}")
+    
+    weight_value = item.weight_value
+    weight_unit = item.weight_unit
 
-    # Using a regular expression to get the unit and thus the correct formatting for the result string.
-    # In the simplest case, we just see if the user used lbs & oz format. If the did, just set the weight value as the entire string from the object.
-    if 'lbs &' in weight:
-        weight_value = weight
-        # Still set this so we know when to use this weight_value.
-        weight_unit = 'lbs & oz'
-    # Other wise, the regular expression comes in.
-    else:
-        # The match function captures two groups; the weight and the weight unit. Weight is numeric, weight unit is non-numeric.
-        match = re.match(r"([0-9.]+)\s*(\D+)", weight)
-        if match:
-            weight_value, weight_unit = match.groups()
-        # In case a string comes in with a bad format, we add this to make sure the whole thing doesn't break. Shouldn't happen, but just in case.
-        else:
-            weight_value, weight_unit = "Bad format!", ''    
+    print(f"The weight to split: {weight_value}")
+    print(f"The item's weight unit: {weight_unit}")
 
-    # The attributes all come in with a .0, so wrapping them all in str(int()) to strip that.
-    if weight_unit == 'lbs & oz':
+    # The past logic is mostly not needed anymore now that weight_value and weight_unit come in split already.
+    # All that needs to be done is to convert the weight_value back to lbs&oz format if that's the format it was chosen in.
+    if weight_unit == 'lb_oz':
+        pounds = int(weight_value)
+        ounces = round((weight_value - pounds) * 16)
+        weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
+
+    # Create the result string based on the weight unit
+    if weight_unit in ['lb_oz']:
         return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
     elif weight_unit in ['g', 'kg']:
         return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
     else:
         return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
+
+    # # Using a regular expression to get the unit and thus the correct formatting for the result string.
+    # # In the simplest case, we just see if the user used lbs & oz format. If the did, just set the weight value as the entire string from the object.
+    # if 'lbs &' in weight:
+    #     weight_value = weight
+    #     # Still set this so we know when to use this weight_value.
+    #     weight_unit = 'lbs & oz'
+    # # Other wise, the regular expression comes in.
+    # else:
+    #     # The match function captures two groups; the weight and the weight unit. Weight is numeric, weight unit is non-numeric.
+    #     match = re.match(r"([0-9.]+)\s*(\D+)", weight)
+    #     if match:
+    #         weight_value, weight_unit = match.groups()
+    #     # In case a string comes in with a bad format, we add this to make sure the whole thing doesn't break. Shouldn't happen, but just in case.
+    #     else:
+    #         weight_value, weight_unit = "Bad format!", ''    
+
+    # # The attributes all come in with a .0, so wrapping them all in str(int()) to strip that.
+    # if weight_unit == 'lbs & oz':
+    #     return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
+    # elif weight_unit in ['g', 'kg']:
+    #     return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
+    # else:
+    #     return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
