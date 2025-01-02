@@ -43,7 +43,12 @@ def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0'
 
 # Now that weight_value is sent as a separate function, we need a method to send lb_oz values as a single value.
 # For that, we're converting the value into a single lbs value. That'll get converted back later where needed.
-def convert_lboz_to_lbs(pounds: Decimal, ounces: Decimal) -> Decimal:
+def convert_lboz_to_lbs(pounds: str, ounces: str) -> Decimal:
+    # Convert strings to Decimal
+    pounds = Decimal(pounds)
+    ounces = Decimal(ounces)
+    
+    # Convert ounces to pounds and add to the pounds value
     total_pounds = pounds + (ounces / Decimal('16'))
     return total_pounds
 
@@ -88,8 +93,11 @@ def calculate_macros(data):
     # Convert weight and serving size to grams
     if weight_unit == 'lb_oz':
         weight_in_grams = convert_to_grams(weight_pounds, weight_unit, weight_ounces)
+        print("hello we are in lboz flow")
+        print(f"weight_in_grams in lboz flow: {weight_in_grams}")
     else:
         weight_in_grams = convert_to_grams(weight, weight_unit)
+        print("WE ARE NOT IN LBOZ FLOW")
 
     if serving_size_unit == 'lb_oz':
         serving_size_in_grams = convert_to_grams(serving_size_pounds, serving_size_unit, serving_size_ounces)
@@ -127,7 +135,7 @@ def calculate_macros(data):
     # Create the result string that will be passed back to the client.
     if weight_unit == 'lb_oz':
         #result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-        weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
+        #weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
         weight_string = convert_lboz_to_lbs(formatted_weight_pounds, formatted_weight_ounces)
     else:
         weight_string = formatted_weight
@@ -138,12 +146,13 @@ def calculate_macros(data):
         #     #result_string = f"{formatted_weight} {weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
         #     weight_string = f"{formatted_weight} {weight_unit}"
 
+    print(f"weight_string to be stored: {weight_string}")
+
     macros_dict = {
-        #"result_string": result_string,
         "date": date,
         "food_name": food_name,
         "subclass": subclass,
-        "weight_value": formatted_weight,
+        "weight_value": weight_string,
         "weight_unit": weight_unit,
         "calories": calories,
         "protein": formatted_protein,
@@ -168,6 +177,8 @@ def generate_result_string(item):
         pounds = int(weight_value)
         ounces = round((weight_value - pounds) * 16)
         weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
+
+    print(f"Weight value after the lboz if statement: {weight_value}")
 
     # Create the result string based on the weight unit
     if weight_unit in ['lb_oz']:
