@@ -187,8 +187,8 @@ function App() {
 
     // TODO: The weight from the DB is attached to the unit. Need to separate them.
     setInitialValues({
-      weight: "todo",
-      weightUnit: "todo",
+      weight: item.weight_value,
+      weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
       calories: item.calories,
@@ -198,8 +198,8 @@ function App() {
     });
 
     setEditValues({
-      weight: "todo",
-      weightUnit: "todo",
+      weight: item.weight_value,
+      weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
       calories: item.calories,
@@ -212,12 +212,26 @@ function App() {
   // Handler function for any changes to the edit fields that are rendered.
   // initialValues ALWAYS remains the same, but this one changes editValues to whatever the user changed them to.
   const handleEditChange = (e) => {
-    console.log("triggered")
+    console.log("triggered");
     const { name, value } = e.target;
-    setEditValues((prevValues) => ({
-      ...prevValues,
-      [name]: value < 0 ? 0 : value
-    }));
+  
+    setEditValues((prevValues) => {
+      let newValue;
+  
+      // To ensure that no type mismatches occur between initialValues and editValues, we set the type based on the field.
+      // Calories, carbs, fat, protein, and weight are cast as Numbers if that's the field edited.
+      if (['calories', 'carbs', 'fat', 'protein', 'weight'].includes(name)) {
+        newValue = value === '' ? '' : Number(value) < 0 ? 0 : Number(value);
+      } else {
+        // If it's another, then it can become a string and that's fine because those fields are also strings in initialValues.
+        newValue = value;
+      }
+  
+      return {
+        ...prevValues,
+        [name]: newValue
+      };
+    });
   };
 
   // Handler function for clicking the save button on the edit feature.
@@ -236,12 +250,14 @@ function App() {
     // We compare each value with this for loop.
     for (const key in initialValues) {
       console.log("initialValues key being compared: ", initialValues[key])
-      console.log("editValues key being compared: ", Number(editValues[key]))
+      console.log("editValues key being compared: ", editValues[key])
       // If any value does not match, we determine changes have been made and log the changes.
       // When values are changed, they come back in editValues as strings. This can lead to false positives here;
       // For example, if the field detects input, but the input ends up being the same as the initial value, this condition will still trigger since it's then comparing a Number to a string.
       // To avoid that, we cast the editValue being compared as a Number. This way, it's always comparing a Number object to a Number object. No false positives.
-      if (initialValues[key] !== Number(editValues[key])) {
+
+      // UPDATE: We now explicitly set the type when editing, so no need to cast here anymore
+      if (initialValues[key] !== editValues[key]) {
         changes[key] = editValues[key];
         isChanged = true;
       }
@@ -436,7 +452,7 @@ function App() {
                         placeholder="Weight"
                       />
                       <select
-                        name="weight_unit"
+                        name="weightUnit"
                         value={editValues.weightUnit}
                         onChange={handleEditChange}
                         className="small-input"
@@ -449,7 +465,7 @@ function App() {
                       </select> of
                       <input
                         type="text"
-                        name="sub_description"
+                        name="name"
                         value={editValues.name}
                         onChange={handleEditChange}
                         className="small-input"
