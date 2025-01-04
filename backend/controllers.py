@@ -64,13 +64,14 @@ def update_food_item(id):
     print(f"Data with update values: {data}")
     print(f"Item to update: {item}")
 
-    item.name = data.get('name', item.name)
-    item.sub_description = data.get('sub_description', item.sub_description)
-    item.weight = data.get('weight', item.weight)
-    item.calories = data.get('calories', item.calories)
-    item.protein = data.get('protein', item.protein)
-    item.carbs = data.get('carbs', item.carbs)
-    item.fat = data.get('fat', item.fat)
+    item.name = data['name']
+    item.sub_description = data['sub_description']
+    item.weight_value = data['weight']
+    item.weight_unit = data['weightUnit']
+    item.calories = data['calories']
+    item.protein = data['protein']
+    item.carbs = data['carbs']
+    item.fat = data['fat']
 
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
@@ -82,6 +83,14 @@ def update_food_item_partially(id):
     print(f"Data with update values: {data}")
     print(f"Item to update: {item}")
 
+    if 'name' in data:
+        item.name = data['name']
+    if 'sub_description' in data:
+        item.sub_description = data['sub_description']
+    if 'weight' in data:
+        item.weight_value = data['weight']
+    if 'weightUnit' in data:
+        item.weight_unit = data['weightUnit']
     if 'calories' in data:
         item.calories = data['calories']
     if 'protein' in data:
