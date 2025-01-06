@@ -8,7 +8,7 @@ class FoodItem(db.Model):
     date = db.Column(db.Date, nullable=False, default=date.today)
     name = db.Column(db.String(100), nullable=False)
     sub_description = db.Column(db.String(200))
-    weight_value = db.Column(db.Float, nullable=False)
+    weight_value = db.Column(db.String(100), nullable=False)
     weight_unit = db.Column(db.String(10), nullable=False)
     calories = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)

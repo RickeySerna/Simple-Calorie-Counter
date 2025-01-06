@@ -43,14 +43,15 @@ def convert_to_grams(weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0'
 
 # Now that weight_value is sent as a separate function, we need a method to send lb_oz values as a single value.
 # For that, we're converting the value into a single lbs value. That'll get converted back later where needed.
-def convert_lboz_to_lbs(pounds: str, ounces: str) -> Decimal:
-    # Convert strings to Decimal
-    pounds = Decimal(pounds)
-    ounces = Decimal(ounces)
+# UPDATE: Changing the way we handle lb & oz flow. I want to give the ability to add decimal place values into the lbs and oz fields if they want.
+# As such, no more calculations here; just slap the values as we got them (after formatting) and return that to be added to the DB.
+# It'll be split and broken up later when generating the result string, with decimal places preserved.
+def handle_lboz_flow(pounds, ounces):
+
+    # Just slap them together with an "&" in the middle. This will be used to split them later.
+    lbozString = f"{pounds}&{ounces}"
     
-    # Convert ounces to pounds and add to the pounds value
-    total_pounds = pounds + (ounces / Decimal('16'))
-    return total_pounds
+    return lbozString
 
 def format_weight(weight):
     weight_str = str(weight).rstrip('0').rstrip('.')
@@ -134,13 +135,18 @@ def calculate_macros(data):
     formatted_weight_pounds = format_weight(weight_pounds)
     formatted_weight_ounces = format_weight(weight_ounces)
 
+    print(f"formatted weight pounds: {formatted_weight_pounds}")
+    print(f"formatted weight ounces: {formatted_weight_ounces}")
+
     # Create the result string that will be passed back to the client.
     if weight_unit == 'lb_oz':
         #result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
         #weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
-        weight_string = convert_lboz_to_lbs(formatted_weight_pounds, formatted_weight_ounces)
+        weight_string = handle_lboz_flow(formatted_weight_pounds, formatted_weight_ounces)
+        print(f"Weight string in lb oz flow: {weight_string}")
     else:
         weight_string = formatted_weight
+        print(f"Weight string in non-lb oz flow: {weight_string}")
         # if weight_unit in ['g', 'kg']:
         #     #result_string = f"{formatted_weight}{weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
         #     weight_string = f"{formatted_weight}{weight_unit}"
@@ -175,9 +181,15 @@ def generate_result_string(item):
 
     # The past logic is mostly not needed anymore now that weight_value and weight_unit come in split already.
     # All that needs to be done is to convert the weight_value back to lbs&oz format if that's the format it was chosen in.
+    # UPDATE: Lb&oz flow is handled differently now. All that we're going to get here is a string like: "lb&oz"
+    # So all we need to do is split the string based on the "&" and create the weight_value string from that.
     if weight_unit == 'lb_oz':
-        pounds = int(weight_value)
-        ounces = round((weight_value - pounds) * 16)
+        print(f"lboz weight string in generate_result_string: {weight_value}")
+        poundsAndOunces = weight_value.split("&")
+        pounds = poundsAndOunces[0]
+        ounces = poundsAndOunces[1]
+        print(f"Pounds after splitting in generate_result_string: {pounds}")
+        print(f"Ounces after splitting in generate_result_string: {ounces}")
         weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
     else:
         weight_value = format_weight(weight_value)
