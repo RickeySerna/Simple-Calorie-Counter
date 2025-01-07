@@ -10,10 +10,10 @@ class FoodItem(db.Model):
     sub_description = db.Column(db.String(200))
     weight_value = db.Column(db.String(100), nullable=False)
     weight_unit = db.Column(db.String(10), nullable=False)
-    calories = db.Column(db.Float, nullable=False)
-    protein = db.Column(db.Float, nullable=False)
-    carbs = db.Column(db.Float, nullable=False)
-    fat = db.Column(db.Float, nullable=False)
+    calories = db.Column(db.String(100), nullable=False)
+    protein = db.Column(db.String(100), nullable=False)
+    carbs = db.Column(db.String(100), nullable=False)
+    fat = db.Column(db.String(100), nullable=False)
 
     def __init__(self, date, name, sub_description, weight_value, weight_unit, calories, protein, carbs, fat):
         self.date = date

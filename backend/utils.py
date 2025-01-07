@@ -162,10 +162,10 @@ def calculate_macros(data):
         "subclass": subclass,
         "weight_value": weight_string,
         "weight_unit": weight_unit,
-        "calories": calories,
-        "protein": formatted_protein,
-        "carbs": formatted_net_carbs,
-        "fat": formatted_fat,
+        "calories": str(calories),
+        "protein": str(formatted_protein),
+        "carbs": str(formatted_net_carbs),
+        "fat": str(formatted_fat),
     }
 
     return(macros_dict)
@@ -191,24 +191,16 @@ def generate_result_string(item):
         print(f"Pounds after splitting in generate_result_string: {pounds}")
         print(f"Ounces after splitting in generate_result_string: {ounces}")
         weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
-    else:
-        weight_value = format_weight(weight_value)
 
     print(f"Weight value after the lboz if statement: {weight_value}")
 
-    # Formatting the final macros.
-    formatted_fat = format_macros(to_decimal(item.fat))
-    formatted_protein = format_macros(to_decimal(item.protein))
-    formatted_carbs = format_macros(to_decimal(item.carbs))
-    calories = round(item.calories)
-
     # Create the result string based on the weight unit
     if weight_unit in ['lb_oz']:
-        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_carbs}g of carbs, {formatted_fat}g of fat"
+        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
     elif weight_unit in ['g', 'kg']:
-        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_carbs}g of carbs, {formatted_fat}g of fat"
+        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
     else:
-        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_carbs}g of carbs, {formatted_fat}g of fat"
+        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
 
     # # Using a regular expression to get the unit and thus the correct formatting for the result string.
     # # In the simplest case, we just see if the user used lbs & oz format. If the did, just set the weight value as the entire string from the object.
