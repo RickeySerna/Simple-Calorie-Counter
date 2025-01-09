@@ -1,0 +1,531 @@
+import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import { format, addDays } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+import './App.css';
+
+function App() {
+  const [formData, setFormData] = useState({
+    date: format(new Date(), 'yyyy-MM-dd'),
+    foodName: '',
+    subclass: '',
+    weight: '',
+    weightUnit: 'g',
+    calories: '',
+    servingSize: '',
+    servingSizeUnit: 'g',
+    fat: '',
+    saturatedFat: '',
+    transFat: '',
+    carbs: '',
+    fiber: '',
+    sugarAlcohol: '',
+    protein: '',
+    sodium: '',
+    cholesterol: '',
+    weightPounds: '',
+    weightOunces: '',
+    servingSizePounds: '',
+    servingSizeOunces: ''
+  });
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentEntries, setCurrentEntries] = useState([]);
+  const [totals, setTotals] = useState({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0
+  });
+
+  // State tracking for the edit functionality.
+  const [editingId, setEditingId] = useState(null);
+  const [initialValues, setInitialValues] = useState({
+    weight: '',
+    weightUnit: '',
+    name: '',
+    sub_description: '',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: ''
+  });
+  const [editValues, setEditValues] = useState({
+    weight: '',
+    weightUnit: '',
+    name: '',
+    sub_description: '',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: ''
+  });
+
+  useEffect(() => {
+    const dateKey = formData.date;
+
+    console.log("Date key to send to the server: ", dateKey);
+
+    fetchFoodItems(dateKey);
+  }, [currentDate]);
+
+  // Moving the fetching logic into it's own function call.
+  // This allows us to readily call this function in more places, like right after the POST call to update the food log right after a new food item is added.
+  const fetchFoodItems = (dateKey) => {
+    // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
+    fetch(`http://127.0.0.1:5000/api/fooditems?date=${dateKey}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data received from server:', data);
+        setCurrentEntries(data);
+
+        const newTotals = data.reduce(
+          (acc, entry) => {
+            const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
+            const matches = entry.result.match(regex);
+            if (matches) {
+              const [, calories, , protein, , carbs, , fat] = matches.map(Number);
+              return {
+                calories: acc.calories + (calories || 0),
+                protein: acc.protein + (protein || 0),
+                carbs: acc.carbs + (carbs || 0),
+                fat: acc.fat + (fat || 0)
+              };
+            }
+            return acc;
+          },
+          { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        );
+        setTotals({
+          calories: Math.round(newTotals.calories * 100) / 100,
+          protein: Math.round(newTotals.protein * 100) / 100,
+          carbs: Math.round(newTotals.carbs * 100) / 100,
+          fat: Math.round(newTotals.fat * 100) / 100
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching food items:', error);
+      });
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value < 0 ? 0 : value
+    }));
+  };
+
+  const handleKeyDown = (e) => {
+    const invalidChars = ['e', 'E', '+', '-'];
+    if (invalidChars.includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  
+    const { carbs, fiber, sugarAlcohol } = formData;
+    const fiberValue = parseFloat(fiber) || 0;
+    const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
+    const carbsValue = parseFloat(carbs) || 0;
+  
+    if (fiberValue + sugarAlcoholValue > carbsValue) {
+      alert("Fiber and sugar alcohols together cannot exceed total carbs.");
+      return;
+    }
+  
+    fetch('http://127.0.0.1:5000/api/fooditems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success: ', data);
+
+      // Now that a new a food item is successfully created, immediately update the log which now includes said new item.
+      fetchFoodItems(formData.date);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  };
+
+  const handleDelete = (id) => {
+    console.log(`The ID to delete: ${id}`);
+    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Successfully deleted:', data);
+
+      // FoodItem was successfully deleted, now update the result-panel with a new GET call so that the deleted FoodItem doesn't linger.
+      fetchFoodItems(formData.date);
+    })
+    .catch(error => {
+      console.error('Error while deleting:', error);
+    });
+  };
+
+  const handleDateChange = (date) => {
+    formData.date = format(date, 'yyyy-MM-dd');
+    setCurrentDate(date);
+  };
+
+  // Handler function for clicking the edit button.
+  // Immediately sets the state for the initialValues and editValues and captures the ID of the FoodItem we're editing.
+  const handleEdit = (id, item) => {
+    setEditingId(id);
+
+    // TODO: The weight from the DB is attached to the unit. Need to separate them.
+    setInitialValues({
+      weight: item.weight_value,
+      weightUnit: item.weight_unit,
+      name: item.name,
+      sub_description: item.sub_description,
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat
+    });
+
+    setEditValues({
+      weight: item.weight_value,
+      weightUnit: item.weight_unit,
+      name: item.name,
+      sub_description: item.sub_description,
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat
+    });
+  };
+
+  // Handler function for any changes to the edit fields that are rendered.
+  // initialValues ALWAYS remains the same, but this one changes editValues to whatever the user changed them to.
+  const handleEditChange = (e) => {
+    console.log("triggered");
+    const { name, value } = e.target;
+  
+    setEditValues((prevValues) => {
+      let newValue;
+  
+      // To ensure that no type mismatches occur between initialValues and editValues, we set the type based on the field.
+      // Calories, carbs, fat, protein, and weight are cast as Numbers if that's the field edited.
+      if (['calories', 'carbs', 'fat', 'protein', 'weight'].includes(name)) {
+        newValue = value === '' ? '' : Number(value) < 0 ? 0 : Number(value);
+      } else {
+        // If it's another, then it can become a string and that's fine because those fields are also strings in initialValues.
+        newValue = value;
+      }
+  
+      return {
+        ...prevValues,
+        [name]: newValue
+      };
+    });
+  };
+
+  // Handler function for clicking the save button on the edit feature.
+  const handleEditSave = (id) => {
+    const changes = {};
+    let isChanged = false;
+
+    console.log("Item ID to edit: ", id);
+    console.log("initialValues when save button clicked: ", initialValues);
+    console.log("editValues when save button clicked: ", editValues);
+    console.log("Type of initialValues items: ", (typeof initialValues.calories))
+    console.log("Type of editValues items: ", (typeof editValues.calories))
+
+    // initialValues were save right when the edit button was click, along with the editValues.
+    // editValues may or may not have been updated by any change in the edit fields by handleEditChange.
+    // We compare each value with this for loop.
+    for (const key in initialValues) {
+      console.log("initialValues key being compared: ", initialValues[key])
+      console.log("editValues key being compared: ", editValues[key])
+      // If any value does not match, we determine changes have been made and log the changes.
+      // When values are changed, they come back in editValues as strings. This can lead to false positives here;
+      // For example, if the field detects input, but the input ends up being the same as the initial value, this condition will still trigger since it's then comparing a Number to a string.
+      // To avoid that, we cast the editValue being compared as a Number. This way, it's always comparing a Number object to a Number object. No false positives.
+
+      // UPDATE: We now explicitly set the type when editing, so no need to cast here anymore
+      if (initialValues[key] !== editValues[key]) {
+        changes[key] = editValues[key];
+        isChanged = true;
+      }
+    }
+
+    console.log("changes object: ", changes)
+
+    // If no changes, we just log that and do not send any requests.
+    if (!isChanged) {
+      console.log('No changes detected, no request sent.');
+      // Set the editingId back to null so that it renders in the result panel with the normal format.
+      setEditingId(null);
+      return;
+    }
+
+    // Determining which HTTP verb to send based on the number of changes made.
+    // If changes and initialValues have the same number of properties, that means the user changed everything so we send a PUT.
+    // Otherwise, the user only made some changes and so PATCH is the appropriate verb to send.
+    const method = Object.keys(changes).length === Object.keys(initialValues).length ? 'PUT' : 'PATCH';
+    console.log("HTTP verb = ", method);
+
+    // Send the request to the server.
+    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(changes)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Successfully updated: ', data);
+
+      // Set the editingId back to null so that it renders in the result panel with the normal format.
+      setEditingId(null);
+
+      // Update the list to display the updated values.
+      fetchFoodItems(formData.date);
+    })
+    .catch(error => {
+      console.error('Error while updating: ', error);
+    });
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Simple Calorie Counter</h1>
+        <div className="container">
+          <div className="form-panel">
+            <form onSubmit={handleSubmit}>
+              <fieldset>
+                <legend>Food Item Information:</legend>
+                <div className="form-group">
+                  <div className="form-group" style={{ flex: '2' }}>
+                    <label>Item:</label>
+                    <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
+                  </div>
+                  {formData.weightUnit === 'lb_oz' ? (
+                    <>
+                      <div className="form-group" style={{ flex: '1' }}>
+                        <label>Weight: (lbs)</label>
+                        <input type="number" name="weightPounds" value={formData.weightPounds} onChange={handleChange} onKeyDown={handleKeyDown} />
+                      </div>
+                      <div className="form-group" style={{ flex: '1' }}>
+                        <label>Weight: (oz)</label>
+                        <input type="number" name="weightOunces" value={formData.weightOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="form-group" style={{ flex: '1' }}>
+                      <label>Weight:</label>
+                      <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                    </div>
+                  )}
+                  <div className="form-group" style={{ flex: '1' }}>
+                    <label>Unit:</label>
+                    <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
+                      <option value="g">g</option>
+                      <option value="oz">oz</option>
+                      <option value="lb_oz">lb & oz</option>
+                      <option value="mL">mL</option>
+                      <option value="kg">Kg</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Sub-description:</label>
+                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Nutrition Label Information:</legend>
+                <div className="form-group">
+                  {formData.servingSizeUnit === 'lb_oz' ? (
+                    <>
+                      <div className="form-group" style={{ flex: '2' }}>
+                        <label>Serving size: (lbs)</label>
+                        <input type="number" name="servingSizePounds" value={formData.servingSizePounds} onChange={handleChange} onKeyDown={handleKeyDown} />
+                      </div>
+                      <div className="form-group" style={{ flex: '2' }}>
+                        <label>Serving size: (oz)</label>
+                        <input type="number" name="servingSizeOunces" value={formData.servingSizeOunces} onChange={handleChange} onKeyDown={handleKeyDown} />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="form-group" style={{ flex: '3' }}>
+                      <label>Serving size:</label>
+                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                    </div>
+                  )}
+                  <div className="form-group" style={{ flex: '1' }}>
+                    <label>Unit:</label>
+                    <select name="servingSizeUnit" value={formData.servingSizeUnit} onChange={handleChange} required>
+                      <option value="g">g</option>
+                      <option value="oz">oz</option>
+                      <option value="lb_oz">lb & oz</option>
+                      <option value="mL">mL</option>
+                      <option value="kg">Kg</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Fat (g):</label>
+                    <input type="number" name="fat" value={formData.fat} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Carbs (g):</label>
+                    <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Protein (g):</label>
+                    <input type="number" name="protein" value={formData.protein} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Saturated Fat (g):</label>
+                    <input type="number" name="saturatedFat" value={formData.saturatedFat} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Fiber (g):</label>
+                    <input type="number" name="fiber" value={formData.fiber} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Sodium (mg):</label>
+                    <input type="number" name="sodium" value={formData.sodium} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Trans Fat (g):</label>
+                    <input type="number" name="transFat" value={formData.transFat} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Sugar Alcohol (g):</label>
+                    <input type="number" name="sugarAlcohol" value={formData.sugarAlcohol} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                  <div className="form-group half-width" style={{ flex: '1' }}>
+                    <label>Cholesterol (mg):</label>
+                    <input type="number" name="cholesterol" value={formData.cholesterol} onChange={handleChange} onKeyDown={handleKeyDown} />
+                  </div>
+                </div>
+              </fieldset>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+          <div className="results-panel">
+            <div className="date-navigation">
+              <button onClick={() => handleDateChange(addDays(currentDate, -1))}>Previous</button>
+              <DatePicker
+                selected={currentDate}
+                onChange={handleDateChange}
+                dateFormat="MMMM dd, yyyy"
+              />
+              <button onClick={() => handleDateChange(addDays(currentDate, 1))}>Next</button>
+            </div>
+            <h2>Food Log</h2>
+            <ul>
+              {currentEntries.map((result, index) => (
+                <li key={index} className="list-item">
+                {editingId === result.id ? (
+                  <>
+                    <span className="result-text">
+                      <input
+                        type="number"
+                        name="weight"
+                        value={editValues.weight}
+                        onChange={handleEditChange}
+                        className="small-input"
+                        placeholder="Weight"
+                      />
+                      <select
+                        name="weightUnit"
+                        value={editValues.weightUnit}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      >
+                        <option value="g">g</option>
+                        <option value="oz">oz</option>
+                        <option value="lb_oz">lb & oz</option>
+                        <option value="mL">mL</option>
+                        <option value="kg">Kg</option>
+                      </select> of
+                      <input
+                        type="text"
+                        name="name"
+                        value={editValues.name}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      /> (
+                      <input
+                        type="text"
+                        name="sub_description"
+                        value={editValues.sub_description}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      />)
+                      <input
+                        type="number"
+                        name="calories"
+                        value={editValues.calories}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      /> calories, 
+                      <input
+                        type="number"
+                        name="protein"
+                        value={editValues.protein}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      />g of protein, 
+                      <input
+                        type="number"
+                        name="carbs"
+                        value={editValues.carbs}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      />g of carbs, 
+                      <input
+                        type="number"
+                        name="fat"
+                        value={editValues.fat}
+                        onChange={handleEditChange}
+                        className="small-input"
+                      />g of fat
+                    </span>
+                    <button className="button-common edit-save-button" onClick={() => handleEditSave(result.id)}>Save</button>
+                  </>
+                ) : (
+                  <>
+                    <span className="result-text">{result.result}</span>
+                    <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press this button to delete this item from the log">X</button>
+                    <button className="button-common edit-button" onClick={() => handleEdit(result.id, result)} title="Press this button to edit this item">Edit</button>
+                  </>
+                )}
+                </li>
+              ))}
+            </ul>
+            <div className="totals">
+              <p>{totals.calories} total calories, {totals.protein}g total of protein, {totals.carbs}g total of carbs, {totals.fat}g total of fat</p>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+  );
+}
+
+export default App;
