@@ -443,6 +443,35 @@ function App() {
                 {editingId === result.id ? (
                   <>
                     <span className="result-text">
+                    {editValues.weightUnit === "lb_oz" ? (
+                      <>
+                        <input
+                          type="number"
+                          name="weightLbs"
+                          value={editValues.weight.split("&")[0]}
+                          onChange={handleEditChange}
+                          className="small-input"
+                          placeholder="Lbs"
+                        />
+                        <input
+                          type="number"
+                          name="weightOz"
+                          value={editValues.weight.split("&")[1]}
+                          onChange={handleEditChange}
+                          className="small-input"
+                          placeholder="Oz"
+                        />
+                      </>
+                    ) : (
+                      <input
+                        type="number"
+                        name="weight"
+                        value={editValues.weight}
+                        onChange={handleEditChange}
+                        className="small-input"
+                        placeholder="Weight"
+                      />
+                    )}
                       <input
                         type="number"
                         name="weight"
