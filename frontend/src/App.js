@@ -226,6 +226,24 @@ function App() {
         // If it's another, then it can become a string and that's fine because those fields are also strings in initialValues.
         newValue = value;
       }
+      
+      // Lb&oz flow provides a bit of a different case since that turns into two fields when editing.
+      // So first we check if the field being edited is either of those fields.
+      if (name === 'weightLbs' || name === 'weightOz') {
+
+        // Now we dynamically set both weightLbs and weightOz; we check for the field we're editing first.
+        // If the condition comes back as true (which means it's the field they're editing), the newValue will be set (what the user entered).
+        // If the condition comes back as false, it gets the previous/existing value (which means they were editing the other field).
+        const weightLbs = name === 'weightLbs' ? newValue : prevValues.weight.split('&')[0];
+        const weightOz = name === 'weightOz' ? newValue : prevValues.weight.split('&')[1];
+
+        // Now we've got our new lb&oz value, slap 'em back together and set that string as the weight value!
+        newValue = `${weightLbs}&${weightOz}`;
+        return {
+          ...prevValues,
+          weight: newValue
+        };
+      }
   
       return {
         ...prevValues,
@@ -472,14 +490,6 @@ function App() {
                         placeholder="Weight"
                       />
                     )}
-                      <input
-                        type="number"
-                        name="weight"
-                        value={editValues.weight}
-                        onChange={handleEditChange}
-                        className="small-input"
-                        placeholder="Weight"
-                      />
                       <select
                         name="weightUnit"
                         value={editValues.weightUnit}
