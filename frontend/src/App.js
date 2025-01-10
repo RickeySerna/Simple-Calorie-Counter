@@ -185,7 +185,6 @@ function App() {
   const handleEdit = (id, item) => {
     setEditingId(id);
 
-    // TODO: The weight from the DB is attached to the unit. Need to separate them.
     setInitialValues({
       weight: item.weight_value,
       weightUnit: item.weight_unit,
@@ -226,7 +225,24 @@ function App() {
         // If it's another, then it can become a string and that's fine because those fields are also strings in initialValues.
         newValue = value;
       }
-      
+
+      if (name === 'weightUnit') {
+        if (value === 'lb_oz') {
+          return {
+            ...prevValues,
+            weight: '',
+            weightUnit: value
+          };
+        }
+        else {
+          return {
+            ...prevValues,
+            weight: initialValues.weight,
+            weightUnit: value
+          };
+        }
+      }
+
       // Lb&oz flow provides a bit of a different case since that turns into two fields when editing.
       // So first we check if the field being edited is either of those fields.
       if (name === 'weightLbs' || name === 'weightOz') {
@@ -466,7 +482,7 @@ function App() {
                         <input
                           type="number"
                           name="weightLbs"
-                          value={editValues.weight.split("&")[0]}
+                          value={editValues.weight.split("&")[0] || ""}
                           onChange={handleEditChange}
                           className="small-input"
                           placeholder="Lbs"
@@ -474,7 +490,7 @@ function App() {
                         <input
                           type="number"
                           name="weightOz"
-                          value={editValues.weight.split("&")[1]}
+                          value={editValues.weight.split("&")[1] || ""}
                           onChange={handleEditChange}
                           className="small-input"
                           placeholder="Oz"

@@ -91,10 +91,9 @@ def calculate_macros(data):
     serving_size_pounds = to_decimal(data.get('servingSizePounds'))
     serving_size_ounces = to_decimal(data.get('servingSizeOunces'))
 
-    # Convert weight and serving size to grams
+    # Convert weight and serving size to grams.
     if weight_unit == 'lb_oz':
         weight_in_grams = convert_to_grams(weight_pounds, weight_unit, weight_ounces)
-        print("hello we are in lboz flow")
         print(f"weight_in_grams in lboz flow: {weight_in_grams}")
     else:
         weight_in_grams = convert_to_grams(weight, weight_unit)
@@ -123,10 +122,10 @@ def calculate_macros(data):
     print(f"type of fat before formatting: {type(fat)}")
 
     # Formatting the final macros.
-    formatted_fat = format_macros(fat)
-    formatted_protein = format_macros(protein)
-    formatted_net_carbs = format_macros(net_carbs)
-    calories = round(calories)
+    formatted_fat = str(format_macros(fat))
+    formatted_protein = str(format_macros(protein))
+    formatted_net_carbs = str(format_macros(net_carbs))
+    calories = str(round(calories))
 
     print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
 
@@ -138,21 +137,13 @@ def calculate_macros(data):
     print(f"formatted weight pounds: {formatted_weight_pounds}")
     print(f"formatted weight ounces: {formatted_weight_ounces}")
 
-    # Create the result string that will be passed back to the client.
+    # Create the weight value based on the unit used.
     if weight_unit == 'lb_oz':
-        #result_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-        #weight_string = f"{formatted_weight_pounds} lbs & {formatted_weight_ounces} oz"
         weight_string = handle_lboz_flow(formatted_weight_pounds, formatted_weight_ounces)
         print(f"Weight string in lb oz flow: {weight_string}")
     else:
         weight_string = formatted_weight
         print(f"Weight string in non-lb oz flow: {weight_string}")
-        # if weight_unit in ['g', 'kg']:
-        #     #result_string = f"{formatted_weight}{weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-        #     weight_string = f"{formatted_weight}{weight_unit}"
-        # else:
-        #     #result_string = f"{formatted_weight} {weight_unit} of {food_name}{f' ({subclass})' if subclass else ''}: {calories} calories, {formatted_protein}g of protein, {formatted_net_carbs}g of carbs, {formatted_fat}g of fat"
-        #     weight_string = f"{formatted_weight} {weight_unit}"
 
     print(f"weight_string to be stored: {weight_string}")
 
@@ -162,10 +153,10 @@ def calculate_macros(data):
         "subclass": subclass,
         "weight_value": weight_string,
         "weight_unit": weight_unit,
-        "calories": str(calories),
-        "protein": str(formatted_protein),
-        "carbs": str(formatted_net_carbs),
-        "fat": str(formatted_fat),
+        "calories": calories,
+        "protein": formatted_protein,
+        "carbs": formatted_net_carbs,
+        "fat": formatted_fat
     }
 
     return(macros_dict)
@@ -194,34 +185,10 @@ def generate_result_string(item):
 
     print(f"Weight value after the lboz if statement: {weight_value}")
 
-    # Create the result string based on the weight unit
+    # Create the result string based on the weight unit.
     if weight_unit in ['lb_oz']:
         return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
     elif weight_unit in ['g', 'kg']:
         return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
     else:
         return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
-
-    # # Using a regular expression to get the unit and thus the correct formatting for the result string.
-    # # In the simplest case, we just see if the user used lbs & oz format. If the did, just set the weight value as the entire string from the object.
-    # if 'lbs &' in weight:
-    #     weight_value = weight
-    #     # Still set this so we know when to use this weight_value.
-    #     weight_unit = 'lbs & oz'
-    # # Other wise, the regular expression comes in.
-    # else:
-    #     # The match function captures two groups; the weight and the weight unit. Weight is numeric, weight unit is non-numeric.
-    #     match = re.match(r"([0-9.]+)\s*(\D+)", weight)
-    #     if match:
-    #         weight_value, weight_unit = match.groups()
-    #     # In case a string comes in with a bad format, we add this to make sure the whole thing doesn't break. Shouldn't happen, but just in case.
-    #     else:
-    #         weight_value, weight_unit = "Bad format!", ''    
-
-    # # The attributes all come in with a .0, so wrapping them all in str(int()) to strip that.
-    # if weight_unit == 'lbs & oz':
-    #     return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
-    # elif weight_unit in ['g', 'kg']:
-    #     return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
-    # else:
-    #     return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {str(int(item.calories))} calories, {str(int(item.protein))}g of protein, {str(int(item.carbs))}g of carbs, {str(int(item.fat))}g of fat"
