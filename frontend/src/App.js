@@ -226,21 +226,18 @@ function App() {
         newValue = value;
       }
 
+      // To make sure that the user doesn't save mismatched weight and weight unit values, we clear the weight field when switching between values here.
+      // This is so they don't do something like switch from g to kg, forget to change the weight value, then save the FoodItem as 350kg instead of 350g. Big difference there.
+      // So first identify that the change happened to the weight unit.
       if (name === 'weightUnit') {
-        if (value === 'lb_oz') {
-          return {
-            ...prevValues,
-            weight: '',
-            weightUnit: value
-          };
-        }
-        else {
-          return {
-            ...prevValues,
-            weight: initialValues.weight,
-            weightUnit: value
-          };
-        }
+        // Now we return a new object composed of the values before editing with the new weightUnit and weight set as an empty string.
+        return {
+          // Use the spread operator to break apart prevValues are return all of it's attributes.
+          ...prevValues,
+          // BUT with these two explicitly set. So basically, keep everything else, but change these two.
+          weight: '',
+          weightUnit: value
+        };
       }
 
       // Lb&oz flow provides a bit of a different case since that turns into two fields when editing.
@@ -278,6 +275,29 @@ function App() {
     console.log("editValues when save button clicked: ", editValues);
     console.log("Type of initialValues items: ", (typeof initialValues.calories))
     console.log("Type of editValues items: ", (typeof editValues.calories))
+
+    // Ensuring that the weight field(s) are filled out.
+    // First check what the user set as the weightUnit.
+    if (editValues.weightUnit === 'lb_oz') {
+      // If they chose lb_oz, then we split weight into the two separate lb & oz values.
+      const [weightLbs, weightOz] = editValues.weight.split('&');
+      // Then we check that they're both filled.
+      if (!weightLbs || !weightOz) {
+        // If not, throw an error, reset the edit ID to bring the field back to nornal, and return - no HTTP request sent whatsoever.
+        console.log('Weight fields must be filled when editing.');
+        setEditingId(null);
+        return;
+      }
+    }
+    else {
+      // Same deal the other weight units, just don't have to do the splitting then.
+      // So just check if weight is empty and throw an error and return if so.
+      if (!editValues.weight) {
+        console.log('Weight field must be filled when editing.');
+        setEditingId(null);
+        return;
+      }
+    }
 
     // initialValues were save right when the edit button was click, along with the editValues.
     // editValues may or may not have been updated by any change in the edit fields by handleEditChange.
