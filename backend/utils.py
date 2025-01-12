@@ -177,11 +177,19 @@ def generate_result_string(item):
     if weight_unit == 'lb_oz':
         print(f"lboz weight string in generate_result_string: {weight_value}")
         poundsAndOunces = weight_value.split("&")
-        pounds = poundsAndOunces[0]
-        ounces = poundsAndOunces[1]
-        print(f"Pounds after splitting in generate_result_string: {pounds}")
-        print(f"Ounces after splitting in generate_result_string: {ounces}")
-        weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
+
+        # Checking that the split actually resulted in two objects.
+        if len(poundsAndOunces) == 2:
+            pounds = poundsAndOunces[0]
+            ounces = poundsAndOunces[1]
+            print(f"Pounds after splitting in generate_result_string: {pounds}")
+            print(f"Ounces after splitting in generate_result_string: {ounces}")
+            weight_value = f"{pounds} lb{'s' if pounds != 1 else ''} & {ounces} oz"
+        # If not, then the weight format was not in a format that was expected.
+        # To make sure the GET call still works, we just set the weight_value to an error message.
+        else:
+            print(f"Unexpected weight_value format for lb_oz: {weight_value}")
+            weight_value = "Invalid weight format"
 
     print(f"Weight value after the lboz if statement: {weight_value}")
 
