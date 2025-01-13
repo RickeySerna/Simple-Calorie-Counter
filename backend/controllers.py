@@ -10,24 +10,29 @@ def add_food_item():
     data = request.get_json()
     print("Received data:", data)
 
-    macros = calculate_macros(data)
-    print(f"Macros in add_food_item: ", macros)
-
-    new_food_item = FoodItem(
-        date=datetime.strptime(macros["date"], '%Y-%m-%d').date(),
-        name=macros["food_name"],
-        sub_description=macros["subclass"],
-        weight_value=macros["weight_value"],
-        weight_unit=macros["weight_unit"],
-        calories=macros["calories"],
-        protein=macros["protein"],
-        carbs=macros["carbs"],
-        fat=macros["fat"],
-    )
-
+    new_food_item = FoodItem(data)
     db.session.add(new_food_item)
     db.session.commit()
     print("Added new food item:", new_food_item)
+
+    # macros = calculate_macros(data)
+    # print(f"Macros in add_food_item: ", macros)
+
+    # new_food_item = FoodItem(
+    #     date=datetime.strptime(macros["date"], '%Y-%m-%d').date(),
+    #     name=macros["food_name"],
+    #     sub_description=macros["subclass"],
+    #     weight_value=macros["weight_value"],
+    #     weight_unit=macros["weight_unit"],
+    #     calories=macros["calories"],
+    #     protein=macros["protein"],
+    #     carbs=macros["carbs"],
+    #     fat=macros["fat"],
+    # )
+
+    # db.session.add(new_food_item)
+    # db.session.commit()
+    # print("Added new food item:", new_food_item)
 
     return jsonify({'message': 'Food item added successfully', 'id': new_food_item.id}), 201
 
