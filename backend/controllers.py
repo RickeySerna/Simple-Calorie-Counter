@@ -12,7 +12,6 @@ def add_food_item():
 
     new_food_item = FoodItem(data)
     db.session.add(new_food_item)
-    db.session.add(new_food_item.macros)
     db.session.commit()
     print("Added new food item:", new_food_item)
 
@@ -35,10 +34,12 @@ def get_food_items_by_date():
         'sub_description': item.sub_description,
         'weight_value': item.weight_value,
         'weight_unit': item.weight_unit,
-        'calories': item.calories,
-        'protein': item.protein,
-        'carbs': item.carbs,
-        'fat': item.fat,
+        'macros': {
+            'calories': item.macros.calories,
+            'protein': item.macros.protein,
+            'carbs': item.macros.carbs,
+            'fat': item.macros.fat
+        } if item.macros else None,
         'result': generate_result_string(item)
     } for item in items]
     

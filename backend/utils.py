@@ -195,8 +195,8 @@ def generate_result_string(item):
 
     # Create the result string based on the weight unit.
     if weight_unit in ['lb_oz']:
-        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.macros.calories} calories, {item.macros.protein}g of protein, {item.macros.carbs}g of carbs, {item.macros.fat}g of fat"
     elif weight_unit in ['g', 'kg']:
-        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.macros.calories} calories, {item.macros.protein}g of protein, {item.macros.carbs}g of carbs, {item.macros.fat}g of fat"
     else:
-        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.calories} calories, {item.protein}g of protein, {item.carbs}g of carbs, {item.fat}g of fat"
+        return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.macros.calories} calories, {item.macros.protein}g of protein, {item.macros.carbs}g of carbs, {item.macros.fat}g of fat"
