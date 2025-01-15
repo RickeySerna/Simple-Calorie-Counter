@@ -14,6 +14,7 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}}, supports_
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'fooditems.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 
 app.register_blueprint(food_item_bp)
