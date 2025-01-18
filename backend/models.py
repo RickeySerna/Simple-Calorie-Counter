@@ -68,6 +68,12 @@ class FoodItem(db.Model):
             # Convert weight and serving size to grams.
             weights_in_grams = FoodItem.Macros.convert_to_grams(data)
 
+            weight_in_grams = weights_in_grams["weight_in_grams"]
+            serving_size_in_grams = weights_in_grams["serving_size_in_grams"]
+
+            print(f"Converted weight from convert_to_grams in model: {weight_in_grams}")
+            print(f"Converted serving size from convert_to_grams in model: {serving_size_in_grams}")
+
             # if weight_unit == 'lb_oz':
             #     weight_in_grams = convert_to_grams(weight_pounds, weight_unit, weight_ounces)
             #     print(f"weight_in_grams in lboz flow: {weight_in_grams}")
@@ -81,8 +87,6 @@ class FoodItem(db.Model):
             #     serving_size_in_grams = convert_to_grams(serving_size, serving_size_unit)
 
             # Making sure the calculation variables are in Decimal too.
-            weight_in_grams = to_decimal(weight_in_grams)
-            serving_size_in_grams = to_decimal(serving_size_in_grams)
 
             # Calculating the main macros.
             fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
@@ -147,20 +151,20 @@ class FoodItem(db.Model):
 
             # For most units, we just return weight * the conversion factor passed on the function call.
             if data.get('weightUnit') in conversion_factors:
-                weight_in_grams = data.get('weight') * conversion_factors[data.get('weightUnit')]
+                weight_in_grams = Decimal(data.get('weight')) * conversion_factors[data.get('weightUnit')]
             # Lbs and oz is a slightly special case so we call those explicitly here.
             elif data.get('weightUnit') == "lb_oz":
-                weight_in_grams = (data.get('weightPounds') * conversion_factors["lb"]) + (data.get('weightOunces') * conversion_factors["oz"])
+                weight_in_grams = Decimal((data.get('weightPounds')) * conversion_factors["lb"]) + Decimal((data.get('weightOunces')) * conversion_factors["oz"])
             # This is triggered is the unit is "g" as that is not in conversion_factors. In that case, just return the weight.
             else:
-                weight_in_grams = data.get('weight')
+                weight_in_grams = Decimal(data.get('weight'))
 
             if data.get('servingSizeUnit') in conversion_factors:
-                serving_size_in_grams = data.get('servingSize') * conversion_factors[data.get('servingSizeUnit')]
+                serving_size_in_grams = Decimal(data.get('servingSize')) * conversion_factors[data.get('servingSizeUnit')]
             elif data.get('servingSizeUnit') == "lb_oz":
-                serving_size_in_grams = (data.get('servingSizePounds') * conversion_factors["lb"]) + (data.get('servingSizeOunces') * conversion_factors["oz"])
+                serving_size_in_grams = Decimal((data.get('servingSizePounds')) * conversion_factors["lb"]) + Decimal((data.get('servingSizeOunces')) * conversion_factors["oz"])
             else:
-                serving_size_in_grams = data.get('servingSize')
+                serving_size_in_grams = Decimal(data.get('servingSize'))
 
             weights = {
                 "weight_in_grams": weight_in_grams,
