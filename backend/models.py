@@ -25,7 +25,7 @@ class FoodItem(db.Model):
         self.sub_description = data.get("subclass")
         self.weight_value = data.get("weight")
         self.weight_unit = data.get("weightUnit")
-        self.macros = self.Macros.calculate_macros(data)
+        self.macros = self.Macros.Macro_construction(data)
 
     class Macros(db.Model):
         id = db.Column(db.Integer, primary_key=True)
@@ -42,8 +42,8 @@ class FoodItem(db.Model):
             self.fat = fat
 
         @staticmethod
-        def calculate_macros(data):
-            print("Data from frontend in calculate_macros: ", data)
+        def Macro_construction(data):
+            print("Data from frontend in Macro_construction: ", data)
 
             # Defining all of the different bits of info we got from the frontend.
             date = data.get('date')
@@ -68,36 +68,8 @@ class FoodItem(db.Model):
             # Convert weight and serving size to grams.
             weights_in_grams = FoodItem.Macros.convert_to_grams(data)
 
-            weight_in_grams = weights_in_grams["weight_in_grams"]
-            serving_size_in_grams = weights_in_grams["serving_size_in_grams"]
-
-            print(f"Converted weight from convert_to_grams in model: {weight_in_grams}")
-            print(f"Converted serving size from convert_to_grams in model: {serving_size_in_grams}")
-
-            # if weight_unit == 'lb_oz':
-            #     weight_in_grams = convert_to_grams(weight_pounds, weight_unit, weight_ounces)
-            #     print(f"weight_in_grams in lboz flow: {weight_in_grams}")
-            # else:
-            #     weight_in_grams = convert_to_grams(weight, weight_unit)
-            #     print("WE ARE NOT IN LBOZ FLOW")
-
-            # if serving_size_unit == 'lb_oz':
-            #     serving_size_in_grams = convert_to_grams(serving_size_pounds, serving_size_unit, serving_size_ounces)
-            # else:
-            #     serving_size_in_grams = convert_to_grams(serving_size, serving_size_unit)
-
-            # Making sure the calculation variables are in Decimal too.
-
-            # Calculating the main macros.
-            fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
-            protein = (protein_per_serving / serving_size_in_grams) * weight_in_grams
-            net_carbs_per_serving = carbs_per_serving - fiber_per_serving - sugar_alcohol_per_serving
-            net_carbs = (net_carbs_per_serving / serving_size_in_grams) * weight_in_grams
-
-            # Calculating the calories from the macros we just calculated.
-            calories = (fat * Decimal('9')) + (protein * Decimal('4')) + (net_carbs * Decimal('4'))
-
-            print(f"Macros before rounding: fat - {fat}, protein - {protein}, carbs - {net_carbs}, and calories - {calories}")
+            # Run macro calculation.
+            calculated_macros = FoodItem.Macros.calculate_macros(data, weights_in_grams)
 
             print(f"type of fat before formatting: {type(fat)}")
 
@@ -174,3 +146,44 @@ class FoodItem(db.Model):
             print(f"weights being returned in convert_to_grams in model: {weights}")
 
             return weights
+        
+        @staticmethod
+        def calculate_macros(data, weights):
+
+            # Grabbing the weights calculated in convert_to_grams and passed into this function.
+            weight_in_grams = weights["weight_in_grams"]
+            serving_size_in_grams = weights["serving_size_in_grams"]
+
+            # Grabbing the macros we need from the data object.
+            fat_per_serving = Decimal(data.get('fat'))
+            protein_per_serving = Decimal(data.get('protein'))
+            carbs_per_serving = Decimal(data.get('carbs'))
+            fiber_per_serving = Decimal(data.get('fiber'))
+            sugar_alcohol_per_serving = Decimal(data.get('sugarAlcohol'))
+
+            print(f"Converted weight from convert_to_grams in calculate_macros: {weight_in_grams}")
+            print(f"Converted serving size from convert_to_grams in calculate_macros: {serving_size_in_grams}")
+
+            # Making sure the calculation variables are in Decimal too.
+
+            # Calculating the main macros.
+            fat = (fat_per_serving / serving_size_in_grams) * weight_in_grams
+            protein = (protein_per_serving / serving_size_in_grams) * weight_in_grams
+            net_carbs_per_serving = carbs_per_serving - fiber_per_serving - sugar_alcohol_per_serving
+            net_carbs = (net_carbs_per_serving / serving_size_in_grams) * weight_in_grams
+
+            # Calculating the calories from the macros we just calculated.
+            calories = (fat * Decimal('9')) + (protein * Decimal('4')) + (net_carbs * Decimal('4'))
+
+            print(f"Macros as calculated in calculate_macros: fat - {fat}, protein - {protein}, carbs - {net_carbs}, and calories - {calories}")
+
+            calculated_macros = {
+                "fat": fat,
+                "protein": protein,
+                "carbs": net_carbs,
+                "calories": calories
+            }
+
+            print(f"calculated_macros being returned in calculate_macros in model: {calculated_macros}")
+
+            return calculated_macros
