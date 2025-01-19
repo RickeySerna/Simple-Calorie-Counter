@@ -71,13 +71,15 @@ class FoodItem(db.Model):
             # Run macro calculation.
             calculated_macros = FoodItem.Macros.calculate_macros(data, weights_in_grams)
 
-            print(f"type of fat before formatting: {type(fat)}")
+            # Now that the macros are calculated, pass them into format_macros to be formatted properly.
+            formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
+            print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
 
             # Formatting the final macros.
-            formatted_fat = str(format_macros(fat))
-            formatted_protein = str(format_macros(protein))
-            formatted_net_carbs = str(format_macros(net_carbs))
-            calories = str(round(calories))
+            # formatted_fat = str(format_macros(fat))
+            # formatted_protein = str(format_macros(protein))
+            # formatted_net_carbs = str(format_macros(net_carbs))
+            # calories = str(round(calories))
 
             print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
 
@@ -187,3 +189,31 @@ class FoodItem(db.Model):
             print(f"calculated_macros being returned in calculate_macros in model: {calculated_macros}")
 
             return calculated_macros
+        
+        @staticmethod
+        def format_macros(macros):
+            print(f"calculated_macros passed into format_macros in the model: {macros}")
+
+            # Creating an empty dictionary which the updated values from macros will be added into.
+            formatted_macros = {}
+
+            for key, value in macros.items():
+                # We round calories differently from the rest; just get it to the nearest whole number, cast it as a string, and that's it.
+                if key == 'calories':
+                    rounded_value = str(round(value))
+                else:
+                    # For the other macros, we keep the same logic that was in the utils function; just going through the dict and applying it to each one.
+                    # For better precision, now using the quantize and ROUND_HALF_UP methods from Decimal for rounding.
+                    rounded_value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                    rounded_str = str(rounded_value)
+                    if rounded_str.endswith('.00'):
+                        # If so, strip those zeros by converting to an int and then back to the string.
+                        rounded_value = str(int(rounded_value))
+                    else:
+                        # Otherwise, just get rid of any trailing zeros.
+                        rounded_value = rounded_str.rstrip('0').rstrip('.')
+
+                # Now the formatting is done, add the value to the new dictionary.
+                formatted_macros[key] = rounded_value
+
+            return formatted_macros

@@ -57,18 +57,18 @@ def format_weight(weight):
     weight_str = str(weight).rstrip('0').rstrip('.')
     return weight_str if '.' in weight_str else str(int(weight))
 
-def format_macros(macro: Decimal) -> str:
-    # For better precision, now using the quantize and ROUND_HALF_UP methods from Decimal for rounding. Basically rounds to the nearest hundreths place.
-    rounded_macro = macro.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+# def format_macros(macro: Decimal) -> str:
+#     # For better precision, now using the quantize and ROUND_HALF_UP methods from Decimal for rounding. Basically rounds to the nearest hundreths place.
+#     rounded_macro = macro.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     
-    # Now go back to the original logic; convert to a str and check if it ends with .00.
-    rounded_str = str(rounded_macro)
-    if rounded_str.endswith('.00'):
-        # If so, strip those zeros by converting to an int and then back to the string.
-        return str(int(rounded_macro))
-    else:
-        # Otherwise, just get rid of any trailing zeros.
-        return rounded_str.rstrip('0').rstrip('.')
+#     # Now go back to the original logic; convert to a str and check if it ends with .00.
+#     rounded_str = str(rounded_macro)
+#     if rounded_str.endswith('.00'):
+#         # If so, strip those zeros by converting to an int and then back to the string.
+#         return str(int(rounded_macro))
+#     else:
+#         # Otherwise, just get rid of any trailing zeros.
+#         return rounded_str.rstrip('0').rstrip('.')
 
 # def calculate_macros(data):
 #     # Defining all of the different bits of info we got from the frontend.
