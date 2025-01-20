@@ -75,18 +75,20 @@ class FoodItem(db.Model):
             formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
             print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
 
-            # Formatting the final macros.
-            # formatted_fat = str(format_macros(fat))
-            # formatted_protein = str(format_macros(protein))
-            # formatted_net_carbs = str(format_macros(net_carbs))
-            # calories = str(round(calories))
+            weights_to_format = {
+                "weight": to_decimal(data.get('weight')),
+                "weight_pounds": to_decimal(data.get('weightPounds')),
+                "weight_ounces": to_decimal(data.get('weightOunces'))
+            }
 
-            print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
+            formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
+
+            #print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
 
             # Format the weight for the result string.
-            formatted_weight = format_weight(weight)
-            formatted_weight_pounds = format_weight(weight_pounds)
-            formatted_weight_ounces = format_weight(weight_ounces)
+            # formatted_weight = format_weight(weight)
+            # formatted_weight_pounds = format_weight(weight_pounds)
+            # formatted_weight_ounces = format_weight(weight_ounces)
 
             print(f"formatted weight pounds: {formatted_weight_pounds}")
             print(f"formatted weight ounces: {formatted_weight_ounces}")
@@ -217,3 +219,22 @@ class FoodItem(db.Model):
                 formatted_macros[key] = rounded_value
 
             return formatted_macros
+
+        @staticmethod
+        def format_weights(weights):
+            print(f"weights dictionary in format_weights: {weights}")
+
+            formatted_weights = {}
+
+            for key, value in weights.items():
+                weight_str = str(value).rstrip('0').rstrip('.')
+                if ('.' in weight_str):
+                    final_weight = weight_str
+                else:
+                    final_weight = str(int(value))
+                
+                formatted_weights[key] = final_weight
+
+            print(f"weights dictionary being returned by format_weights: {formatted_weights}")
+
+            return formatted_weights
