@@ -46,24 +46,24 @@ class FoodItem(db.Model):
             print("Data from frontend in Macro_construction: ", data)
 
             # Defining all of the different bits of info we got from the frontend.
-            date = data.get('date')
-            food_name = data.get('foodName')
-            subclass = data.get('subclass').strip()
-            weight = to_decimal(data.get('weight'))
-            weight_unit = data.get('weightUnit')
-            serving_size = to_decimal(data.get('servingSize'))
-            serving_size_unit = data.get('servingSizeUnit')
-            fat_per_serving = to_decimal(data.get('fat'))
-            protein_per_serving = to_decimal(data.get('protein'))
-            carbs_per_serving = to_decimal(data.get('carbs'))
-            fiber_per_serving = to_decimal(data.get('fiber'))
-            sugar_alcohol_per_serving = to_decimal(data.get('sugarAlcohol'))
-            sodium = to_decimal(data.get('sodium'))
-            cholesterol = to_decimal(data.get('cholesterol'))
-            weight_pounds = to_decimal(data.get('weightPounds'))
-            weight_ounces = to_decimal(data.get('weightOunces'))
-            serving_size_pounds = to_decimal(data.get('servingSizePounds'))
-            serving_size_ounces = to_decimal(data.get('servingSizeOunces'))
+            # date = data.get('date')
+            # food_name = data.get('foodName')
+            # subclass = data.get('subclass').strip()
+            # weight = to_decimal(data.get('weight'))
+            # weight_unit = data.get('weightUnit')
+            # serving_size = to_decimal(data.get('servingSize'))
+            # serving_size_unit = data.get('servingSizeUnit')
+            # fat_per_serving = to_decimal(data.get('fat'))
+            # protein_per_serving = to_decimal(data.get('protein'))
+            # carbs_per_serving = to_decimal(data.get('carbs'))
+            # fiber_per_serving = to_decimal(data.get('fiber'))
+            # sugar_alcohol_per_serving = to_decimal(data.get('sugarAlcohol'))
+            # sodium = to_decimal(data.get('sodium'))
+            # cholesterol = to_decimal(data.get('cholesterol'))
+            # weight_pounds = to_decimal(data.get('weightPounds'))
+            # weight_ounces = to_decimal(data.get('weightOunces'))
+            # serving_size_pounds = to_decimal(data.get('servingSizePounds'))
+            # serving_size_ounces = to_decimal(data.get('servingSizeOunces'))
 
             # Convert weight and serving size to grams.
             weights_in_grams = FoodItem.Macros.convert_to_grams(data)
@@ -76,9 +76,9 @@ class FoodItem(db.Model):
             print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
 
             weights_to_format = {
-                "weight": to_decimal(data.get('weight')),
-                "weight_pounds": to_decimal(data.get('weightPounds')),
-                "weight_ounces": to_decimal(data.get('weightOunces'))
+                "weight": Decimal(data.get('weight') or '0.0'),
+                "weight_pounds": Decimal(data.get('weightPounds') or '0.0'),
+                "weight_ounces": Decimal(data.get('weightOunces') or '0.0')
             }
 
             formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
@@ -162,8 +162,9 @@ class FoodItem(db.Model):
             fat_per_serving = Decimal(data.get('fat'))
             protein_per_serving = Decimal(data.get('protein'))
             carbs_per_serving = Decimal(data.get('carbs'))
-            fiber_per_serving = Decimal(data.get('fiber'))
-            sugar_alcohol_per_serving = Decimal(data.get('sugarAlcohol'))
+            fiber_per_serving = Decimal(data.get('fiber') or '0.0')
+            sugar_alcohol_per_serving = Decimal(data.get('sugarAlcohol') or '0')
+            print(f"fiber after formatting with conditional: {fiber_per_serving}")
 
             print(f"Converted weight from convert_to_grams in calculate_macros: {weight_in_grams}")
             print(f"Converted serving size from convert_to_grams in calculate_macros: {serving_size_in_grams}")
