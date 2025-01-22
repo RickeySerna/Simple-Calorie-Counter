@@ -45,26 +45,6 @@ class FoodItem(db.Model):
         def Macro_construction(data):
             print("Data from frontend in Macro_construction: ", data)
 
-            # Defining all of the different bits of info we got from the frontend.
-            # date = data.get('date')
-            # food_name = data.get('foodName')
-            # subclass = data.get('subclass').strip()
-            # weight = to_decimal(data.get('weight'))
-            # weight_unit = data.get('weightUnit')
-            # serving_size = to_decimal(data.get('servingSize'))
-            # serving_size_unit = data.get('servingSizeUnit')
-            # fat_per_serving = to_decimal(data.get('fat'))
-            # protein_per_serving = to_decimal(data.get('protein'))
-            # carbs_per_serving = to_decimal(data.get('carbs'))
-            # fiber_per_serving = to_decimal(data.get('fiber'))
-            # sugar_alcohol_per_serving = to_decimal(data.get('sugarAlcohol'))
-            # sodium = to_decimal(data.get('sodium'))
-            # cholesterol = to_decimal(data.get('cholesterol'))
-            # weight_pounds = to_decimal(data.get('weightPounds'))
-            # weight_ounces = to_decimal(data.get('weightOunces'))
-            # serving_size_pounds = to_decimal(data.get('servingSizePounds'))
-            # serving_size_ounces = to_decimal(data.get('servingSizeOunces'))
-
             # Convert weight and serving size to grams.
             weights_in_grams = FoodItem.Macros.convert_to_grams(data)
 
@@ -75,39 +55,23 @@ class FoodItem(db.Model):
             formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
             print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
 
+            # Creating the weights dictionary to be passed into the helper function.
             weights_to_format = {
+                # At LEAST one of these will be empty/None so we do the "or" statement to avoid any conversion errors.
                 "weight": Decimal(data.get('weight') or '0.0'),
                 "weight_pounds": Decimal(data.get('weightPounds') or '0.0'),
                 "weight_ounces": Decimal(data.get('weightOunces') or '0.0')
             }
 
+            # Generating the weight formatting.
+            # TODO: As is, these formatted weights don't actually get used. Need to find a better place to do this.
             formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
 
-            #print(f"Macros after rounding: fat - {formatted_fat}, protein - {formatted_protein}, carbs - {formatted_net_carbs}, and calories - {calories}")
-
-            # Format the weight for the result string.
-            # formatted_weight = format_weight(weight)
-            # formatted_weight_pounds = format_weight(weight_pounds)
-            # formatted_weight_ounces = format_weight(weight_ounces)
-
-            print(f"formatted weight pounds: {formatted_weight_pounds}")
-            print(f"formatted weight ounces: {formatted_weight_ounces}")
-
-            # Create the weight value based on the unit used.
-            if weight_unit == 'lb_oz':
-                weight_string = handle_lboz_flow(formatted_weight_pounds, formatted_weight_ounces)
-                print(f"Weight string in lb oz flow: {weight_string}")
-            else:
-                weight_string = formatted_weight
-                print(f"Weight string in non-lb oz flow: {weight_string}")
-
-            print(f"weight_string to be stored: {weight_string}")
-
             return FoodItem.Macros(
-                calories=calories,
-                protein=formatted_protein,
-                carbs=formatted_net_carbs,
-                fat=formatted_fat
+                calories = formatted_macros["calories"],
+                protein = formatted_macros["protein"],
+                carbs = formatted_macros["carbs"],
+                fat = formatted_macros["fat"]
             )
         
         # Formula to convert food weight and serving size form whatever unit the user used to grams.
