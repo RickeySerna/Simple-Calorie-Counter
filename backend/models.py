@@ -25,7 +25,7 @@ class FoodItem(db.Model):
         self.sub_description = data.get("subclass")
         self.weight_value = data.get("weight")
         self.weight_unit = data.get("weightUnit")
-        self.macros = self.Macros.Macro_construction(data)
+        self.macros = self.Macros(data)
 
     class Macros(db.Model):
         id = db.Column(db.Integer, primary_key=True)
@@ -35,24 +35,18 @@ class FoodItem(db.Model):
         carbs = db.Column(db.String(100), nullable=False)
         fat = db.Column(db.String(100), nullable=False)
 
-        def __init__(self, calories, protein, carbs, fat):
-            self.calories = calories
-            self.protein = protein
-            self.carbs = carbs
-            self.fat = fat
+        def __init__(self, data):
 
-        @staticmethod
-        def Macro_construction(data):
-            print("Data from frontend in Macro_construction: ", data)
+            print("Data from frontend in __init__: ", data)
 
             # Convert weight and serving size to grams.
-            weights_in_grams = FoodItem.Macros.convert_to_grams(data)
+            weights_in_grams = self.__convert_to_grams(data)
 
             # Run macro calculation.
-            calculated_macros = FoodItem.Macros.calculate_macros(data, weights_in_grams)
+            calculated_macros = self.__calculate_macros(data, weights_in_grams)
 
             # Now that the macros are calculated, pass them into format_macros to be formatted properly.
-            formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
+            formatted_macros = self.__format_macros(calculated_macros)
             print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
 
             # Creating the weights dictionary to be passed into the helper function.
@@ -65,18 +59,47 @@ class FoodItem(db.Model):
 
             # Generating the weight formatting.
             # TODO: As is, these formatted weights don't actually get used. Need to find a better place to do this.
-            formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
+            formatted_weights = self.__format_weights(weights_to_format)
+            
+            self.calories = formatted_macros["calories"]
+            self.protein = formatted_macros["protein"]
+            self.carbs = formatted_macros["carbs"]
+            self.fat = formatted_macros["fat"]
 
-            return FoodItem.Macros(
-                calories = formatted_macros["calories"],
-                protein = formatted_macros["protein"],
-                carbs = formatted_macros["carbs"],
-                fat = formatted_macros["fat"]
-            )
+        # def Macro_construction(self, data):
+        #     print("Data from frontend in Macro_construction: ", data)
+
+        #     # Convert weight and serving size to grams.
+        #     weights_in_grams = FoodItem.Macros.convert_to_grams(data)
+
+        #     # Run macro calculation.
+        #     calculated_macros = self.calculate_macros(data, weights_in_grams)
+
+        #     # Now that the macros are calculated, pass them into format_macros to be formatted properly.
+        #     formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
+        #     print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
+
+        #     # Creating the weights dictionary to be passed into the helper function.
+        #     weights_to_format = {
+        #         # At LEAST one of these will be empty/None so we do the "or" statement to avoid any conversion errors.
+        #         "weight": Decimal(data.get('weight') or '0.0'),
+        #         "weight_pounds": Decimal(data.get('weightPounds') or '0.0'),
+        #         "weight_ounces": Decimal(data.get('weightOunces') or '0.0')
+        #     }
+
+        #     # Generating the weight formatting.
+        #     # TODO: As is, these formatted weights don't actually get used. Need to find a better place to do this.
+        #     formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
+
+        #     return FoodItem.Macros(
+        #         calories = formatted_macros["calories"],
+        #         protein = formatted_macros["protein"],
+        #         carbs = formatted_macros["carbs"],
+        #         fat = formatted_macros["fat"]
+        #     )
         
         # Formula to convert food weight and serving size form whatever unit the user used to grams.
-        @staticmethod
-        def convert_to_grams(data):
+        def __convert_to_grams(self, data):
 
             #weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0')) -> Decimal:
 
@@ -115,8 +138,7 @@ class FoodItem(db.Model):
 
             return weights
         
-        @staticmethod
-        def calculate_macros(data, weights):
+        def __calculate_macros(self, data, weights):
 
             # Grabbing the weights calculated in convert_to_grams and passed into this function.
             weight_in_grams = weights["weight_in_grams"]
@@ -157,8 +179,7 @@ class FoodItem(db.Model):
 
             return calculated_macros
         
-        @staticmethod
-        def format_macros(macros):
+        def __format_macros(self, macros):
             print(f"calculated_macros passed into format_macros in the model: {macros}")
 
             # Creating an empty dictionary which the updated values from macros will be added into.
@@ -185,19 +206,30 @@ class FoodItem(db.Model):
 
             return formatted_macros
 
-        @staticmethod
-        def format_weights(weights):
+        def __format_weights(self, weights):
             print(f"weights dictionary in format_weights: {weights}")
 
+            # Pretty much using the same logic as the previous function here.
+            # Create an empty dictionary which the formatted weights will be thrown into.
             formatted_weights = {}
 
+            # Loop over the weights dict that was passed into this function.
             for key, value in weights.items():
+                # First create a weight_str string out of the value we're looking at right now.
+                # With that, use rstrip
                 weight_str = str(value).rstrip('0').rstrip('.')
+                print(f"weight_str before if statement: {weight_str}")
+
+                # Now if there's a decimal in it, just set final_weight as is.
                 if ('.' in weight_str):
                     final_weight = weight_str
+                # If not, cast it as an int first, then back to a string, then set that to final_weight.
                 else:
                     final_weight = str(int(value))
+
+                print(f"final_weight after if statement: {final_weight}")
                 
+                # Whichever path it went down, add the final_weight to the above dictionary with the corresponding key we were looking at.
                 formatted_weights[key] = final_weight
 
             print(f"weights dictionary being returned by format_weights: {formatted_weights}")
