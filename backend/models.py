@@ -32,9 +32,14 @@ class FoodItem(db.Model):
 
         weight_unit = data.get("weightUnit")
 
-        # TODO: Get the logic down for the lb_oz flow too.
         if weight_unit == "lb_oz":
-            return
+            weightLbs = str(Decimal(data.get("weightPounds"))).rstrip('0').rstrip('.')
+            weightOz = str(Decimal(data.get("weightOunces"))).rstrip('0').rstrip('.')
+
+            weight_str = f"{weightLbs}&{weightOz}"
+            print(f"weight string to be returned in the lb oz flow: {weight_str}")
+            
+            return weight_str
         else:
             weight = Decimal(data.get("weight"))
             weight_str = str(weight).rstrip('0').rstrip('.')
