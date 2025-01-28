@@ -185,15 +185,17 @@ function App() {
   const handleEdit = (id, item) => {
     setEditingId(id);
 
+    console.log("The item we're editing: ", item);
+
     setInitialValues({
       weight: item.weight_value,
       weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat
+      calories: item.macros.calories,
+      protein: item.macros.protein,
+      carbs: item.macros.carbs,
+      fat: item.macros.fat
     });
 
     setEditValues({
@@ -201,10 +203,10 @@ function App() {
       weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat
+      calories: item.macros.calories,
+      protein: item.macros.protein,
+      carbs: item.macros.carbs,
+      fat: item.macros.fat
     });
   };
 
