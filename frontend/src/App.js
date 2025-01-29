@@ -135,7 +135,19 @@ function App() {
       alert("Fiber and sugar alcohols together cannot exceed total carbs.");
       return;
     }
-  
+
+    // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
+    if (formData.weightUnit === "lb_oz") {
+      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/\.?0+$/, '');
+      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/\.?0+$/, '');
+      console.log("Formatted weightPounds: ", formData.weightPounds);
+      console.log("Formatted weightOunces: ", formData.weightOunces);
+    }
+    else {
+      formData.weight = parseFloat(formData.weight).toString().replace(/\.?0+$/, '');
+      console.log("Formatted weight: ", formData.weight);
+    }
+    
     fetch('http://127.0.0.1:5000/api/fooditems', {
       method: 'POST',
       headers: {
