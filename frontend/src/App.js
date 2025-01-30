@@ -140,8 +140,14 @@ function App() {
     if (formData.weightUnit === "lb_oz") {
       formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/\.?0+$/, '');
       formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/\.?0+$/, '');
+
+      // Also going to create the "&" string here as a template literal.
+      // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
+      formData.weight = (`${formData.weightPounds}&${formData.weightOunces}`)
+      
       console.log("Formatted weightPounds: ", formData.weightPounds);
       console.log("Formatted weightOunces: ", formData.weightOunces);
+      console.log("Formatted weight: ", formData.weight);
     }
     else {
       formData.weight = parseFloat(formData.weight).toString().replace(/\.?0+$/, '');

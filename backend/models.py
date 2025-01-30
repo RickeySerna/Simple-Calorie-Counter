@@ -23,7 +23,7 @@ class FoodItem(db.Model):
         self.date = datetime.strptime(data.get("date", date.today().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
         self.name = data.get("foodName")
         self.sub_description = data.get("subclass")
-        self.weight_value = self.__format_weight(data)
+        self.weight_value = data.get("weight")#self.__format_weight(data)
         self.weight_unit = data.get("weightUnit")
         self.macros = self.Macros(data)
 
