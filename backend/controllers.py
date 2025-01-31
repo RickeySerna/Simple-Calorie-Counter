@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from models import db, FoodItem
+from Models.FoodItem import FoodItem
 from utils import *
 
 food_item_bp = Blueprint('food_item_bp', __name__, url_prefix='/api')
