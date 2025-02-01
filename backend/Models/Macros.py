@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 from utils import *
+from Models import db
 
-db = SQLAlchemy()
+#db = SQLAlchemy()
 
 class Macros(db.Model):
     id = db.Column(db.Integer, primary_key=True)

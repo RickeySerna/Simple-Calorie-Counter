@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 from utils import *
-from Models.Macros import Macros
+from Models import db
+#from Models.Macros import Macros
 
-db = SQLAlchemy()
+#db = SQLAlchemy()
 
 class FoodItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -12,7 +13,7 @@ class FoodItem(db.Model):
     sub_description = db.Column(db.String(200))
     weight_value = db.Column(db.String(100), nullable=False)
     weight_unit = db.Column(db.String(10), nullable=False)
-    macros = db.relationship('Macros', backref='food_item', uselist=False, cascade="all, delete-orphan")
+    #macros = db.relationship('Macros', backref='food_item', uselist=False, cascade="all, delete-orphan")
 
     # calories = db.Column(db.String(100), nullable=False)
     # protein = db.Column(db.String(100), nullable=False)
@@ -20,6 +21,7 @@ class FoodItem(db.Model):
     # fat = db.Column(db.String(100), nullable=False)
 
     def __init__(self, data):
+        from Models.Macros import Macros
         print("Data from frontend in FoodItem constructor: ", data)
         self.date = datetime.strptime(data.get("date", date.today().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
         self.name = data.get("foodName")
