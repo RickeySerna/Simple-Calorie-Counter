@@ -3,7 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from decimal import Decimal, getcontext
-from models import db
+from Models import db
 from controllers import food_item_bp
 
 # Specifying the domain (currently just localhost) we'll be receiving request from to avoid CORS issues.
