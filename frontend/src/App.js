@@ -138,8 +138,8 @@ function App() {
 
     // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
     if (formData.weightUnit === "lb_oz") {
-      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/\.?0+$/, '');
-      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/\.?0+$/, '');
+      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
 
       // Also going to create the "&" string here as a template literal.
       // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
@@ -150,7 +150,7 @@ function App() {
       console.log("Formatted weight: ", formData.weight);
     }
     else {
-      formData.weight = parseFloat(formData.weight).toString().replace(/\.?0+$/, '');
+      formData.weight = parseFloat(formData.weight).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
       console.log("Formatted weight: ", formData.weight);
     }
     
