@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 from utils import *
 from Models import db
+from .Macros import Macros
 #from Models.Macros import Macros
 
 #db = SQLAlchemy()
@@ -21,7 +22,7 @@ class FoodItem(db.Model):
     # fat = db.Column(db.String(100), nullable=False)
 
     def __init__(self, data):
-        from Models.Macros import Macros
+        #from Models.Macros import Macros
         print("Data from frontend in FoodItem constructor: ", data)
         self.date = datetime.strptime(data.get("date", date.today().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
         self.name = data.get("foodName")
