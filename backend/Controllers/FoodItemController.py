@@ -3,9 +3,9 @@ from datetime import datetime
 from Models import *
 from utils import *
 
-food_item_bp = Blueprint('food_item_bp', __name__, url_prefix='/api')
+food_item_bp = Blueprint('food_item_bp', __name__)
 
-@food_item_bp.route('/fooditems', methods=['POST'])
+@food_item_bp.route('/api/fooditems', methods=['POST'])
 def add_food_item():
     data = request.get_json()
     print("Received data:", data)
@@ -17,7 +17,7 @@ def add_food_item():
 
     return jsonify({'message': 'Food item added successfully', 'id': new_food_item.id}), 201
 
-@food_item_bp.route('/fooditems', methods=['GET'])
+@food_item_bp.route('/api/fooditems', methods=['GET'])
 def get_food_items_by_date():
     date_str = request.args.get('date')
     print(f"Date in server: {date_str}")
@@ -45,7 +45,7 @@ def get_food_items_by_date():
     
     return jsonify(food_data)
 
-@food_item_bp.route('/fooditems/<int:id>', methods=['PUT'])
+@food_item_bp.route('/api/fooditems/<int:id>', methods=['PUT'])
 def update_food_item(id):
     data = request.get_json()
     item = FoodItem.query.get_or_404(id)
@@ -64,7 +64,7 @@ def update_food_item(id):
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
 
-@food_item_bp.route('/fooditems/<int:id>', methods=['PATCH'])
+@food_item_bp.route('/api/fooditems/<int:id>', methods=['PATCH'])
 def update_food_item_partially(id):
     data = request.get_json()
     item = FoodItem.query.get_or_404(id)
@@ -91,7 +91,7 @@ def update_food_item_partially(id):
     db.session.commit()
     return jsonify({'message': 'Food item partially updated successfully'})
 
-@food_item_bp.route('/fooditems/<int:id>', methods=['DELETE'])
+@food_item_bp.route('/api/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):
     print(f"Attempting to delete FoodItem with ID: {id}")
 
