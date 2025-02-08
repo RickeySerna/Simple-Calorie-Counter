@@ -135,7 +135,25 @@ function App() {
       alert("Fiber and sugar alcohols together cannot exceed total carbs.");
       return;
     }
-  
+
+    // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
+    if (formData.weightUnit === "lb_oz") {
+      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+
+      // Also going to create the "&" string here as a template literal.
+      // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
+      formData.weight = (`${formData.weightPounds}&${formData.weightOunces}`)
+      
+      console.log("Formatted weightPounds: ", formData.weightPounds);
+      console.log("Formatted weightOunces: ", formData.weightOunces);
+      console.log("Formatted weight: ", formData.weight);
+    }
+    else {
+      formData.weight = parseFloat(formData.weight).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      console.log("Formatted weight: ", formData.weight);
+    }
+    
     fetch('http://127.0.0.1:5000/api/fooditems', {
       method: 'POST',
       headers: {
@@ -185,15 +203,17 @@ function App() {
   const handleEdit = (id, item) => {
     setEditingId(id);
 
+    console.log("The item we're editing: ", item);
+
     setInitialValues({
       weight: item.weight_value,
       weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat
+      calories: item.macros.calories,
+      protein: item.macros.protein,
+      carbs: item.macros.carbs,
+      fat: item.macros.fat
     });
 
     setEditValues({
@@ -201,10 +221,10 @@ function App() {
       weightUnit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat
+      calories: item.macros.calories,
+      protein: item.macros.protein,
+      carbs: item.macros.carbs,
+      fat: item.macros.fat
     });
   };
 
