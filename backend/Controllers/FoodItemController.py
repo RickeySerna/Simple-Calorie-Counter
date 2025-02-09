@@ -40,7 +40,7 @@ def get_food_items_by_date():
             'carbs': item.macros.carbs,
             'fat': item.macros.fat
         } if item.macros else None,
-        'result': generate_result_string(item)
+        'result': item.generate_result_string(item)
     } for item in items]
     
     return jsonify(food_data)
