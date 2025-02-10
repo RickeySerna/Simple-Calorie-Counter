@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
-from utils import *
+from decimal import Decimal, getcontext, ROUND_HALF_UP
+#from utils import *
 from Models import db
+
 
 #db = SQLAlchemy()
 
