@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from Models import *
-from utils import *
 
 food_item_bp = Blueprint('food_item_bp', __name__)
 

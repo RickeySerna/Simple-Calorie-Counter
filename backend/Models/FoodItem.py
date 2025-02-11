@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
-from utils import *
 from Models import db
 from .Macros import Macros
 
