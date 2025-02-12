@@ -23,6 +23,7 @@ def get_food_items_by_date():
     
     date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
     items = FoodItem.query.filter_by(date=date_obj).all()
+    # LOOK THIS UP MORE ^
     
     if not items:
         return jsonify([])
