@@ -6,6 +6,7 @@ food_log_bp = Blueprint('food_log_bp', __name__)
 
 @food_log_bp.route('/api/foodlog', methods=['POST'])
 def add_food_item():
+    print("WE ARE IN THE FOODLOG POST ROUTE")
     data = request.get_json()
     print("Received data:", data)
 

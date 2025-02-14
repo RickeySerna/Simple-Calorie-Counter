@@ -73,7 +73,7 @@ function App() {
   // This allows us to readily call this function in more places, like right after the POST call to update the food log right after a new food item is added.
   const fetchFoodItems = (dateKey) => {
     // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
-    fetch(`http://127.0.0.1:5000/api/fooditems?date=${dateKey}`)
+    fetch(`http://127.0.0.1:5000/api/foodlog?date=${dateKey}`)
       .then(response => response.json())
       .then(data => {
         console.log('Data received from server:', data);
@@ -154,7 +154,7 @@ function App() {
       console.log("Formatted weight: ", formData.weight);
     }
     
-    fetch('http://127.0.0.1:5000/api/fooditems', {
+    fetch('http://127.0.0.1:5000/api/foodlog', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -175,7 +175,7 @@ function App() {
 
   const handleDelete = (id) => {
     console.log(`The ID to delete: ${id}`);
-    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+    fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -354,7 +354,7 @@ function App() {
     console.log("HTTP verb = ", method);
 
     // Send the request to the server.
-    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
+    fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
       method: method,
       headers: {
         'Content-Type': 'application/json'
