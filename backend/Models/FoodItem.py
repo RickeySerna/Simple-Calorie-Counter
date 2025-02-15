@@ -16,7 +16,9 @@ class FoodItem(db.Model):
 
     def __init__(self, data):
         print("Data from frontend in FoodItem constructor: ", data)
-        self.date = datetime.strptime(data.get("date", date.today().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+        self.year = int(data.get("date")[0:4])
+        self.month = int(data.get("date")[5:7])
+        self.day = int(data.get("date")[8:10])
         self.name = data.get("foodName")
         self.sub_description = data.get("subclass")
         self.weight_value = data.get("weight")
