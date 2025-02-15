@@ -5,7 +5,10 @@ from .Macros import Macros
 
 class FoodItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False, default=date.today)
+    food_log_id = db.Column(db.Integer, db.ForeignKey('food_log.id'), nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    month = db.Column(db.Integer, nullable=False)
+    day = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     sub_description = db.Column(db.String(200))
     weight_value = db.Column(db.String(100), nullable=False)
