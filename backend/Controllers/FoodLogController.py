@@ -10,12 +10,26 @@ def add_food_item():
     data = request.get_json()
     print("Received data:", data)
 
-    new_food_item = FoodItem(data)
-    db.session.add(new_food_item)
-    db.session.commit()
-    print("Added new food item:", new_food_item)
+    # Define the year, month, and day from the date attribute in the data object.
+    # TODO: Would probably be better to just do this in the frontend and include it in the data object. Will do that later.
+    year = int(data.get("date")[0:4])
+    month = int(data.get("date")[5:7])
+    day = int(data.get("date")[8:10])
 
-    return jsonify({'message': 'Food item added successfully', 'id': new_food_item.id}), 201
+    # Now use the above vars to query the database to see if this log already exists.
+    food_log = FoodLog.query.filter_by(year=year, month=month, day=day).first()
+    # TODO: If the FoodLog already exists, just add a new FoodItem. Need to add that logic. Should be a PUT or PATCH instead of a POST.
+    if food_log:
+        return
+
+    # If not, create a new FoodLog instance and pass the entire data object in.
+    # It will be initialized with a list in the food_items attribute with a single FoodItem object.
+    new_food_log = FoodLog(data)
+    db.session.add(new_food_log)
+    db.session.commit()
+    print("Added new food item:", new_food_log)
+
+    return jsonify({'message': 'Food log added successfully', 'id': new_food_log.id}), 201
 
 @food_log_bp.route('/api/foodlog', methods=['GET'])
 def get_food_items_by_date():
