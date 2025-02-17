@@ -10,4 +10,4 @@ FoodLog.food_items = db.relationship('FoodItem', backref='food_log', lazy="dynam
 FoodItem.macros = db.relationship('Macros', backref='food_item', uselist=False, cascade="all, delete-orphan")
 
 # Explicitly defining what will be imported from this package from an import * statement.
-__all__ = ['db', 'FoodLog']
+__all__ = ['db', 'FoodItem', 'FoodLog']

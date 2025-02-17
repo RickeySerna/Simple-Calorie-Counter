@@ -18,18 +18,30 @@ def add_food_item():
 
     # Now use the above vars to query the database to see if this log already exists.
     food_log = FoodLog.query.filter_by(year=year, month=month, day=day).first()
-    # TODO: If the FoodLog already exists, just add a new FoodItem. Need to add that logic. Should be a PUT or PATCH instead of a POST.
+
+    # If FoodLog exists, just add a new FoodItem to it
     if food_log:
-        return
+        # Create a new FoodItem object.
+        new_food_item = FoodItem(data)
 
-    # If not, create a new FoodLog instance and pass the entire data object in.
-    # It will be initialized with a list in the food_items attribute with a single FoodItem object.
-    new_food_log = FoodLog(data)
-    db.session.add(new_food_log)
-    db.session.commit()
-    print("Added new food item:", new_food_log)
+        # Set the food_log_id foreign key as the ID from the FoodLog we pulled. 
+        new_food_item.food_log_id = food_log.id
 
-    return jsonify({'message': 'Food log added successfully', 'id': new_food_log.id}), 201
+        db.session.add(new_food_item)
+        db.session.commit()
+        print("Added new food item to the existing FoodLog: ", new_food_item)
+        return jsonify({'message': 'FoodItem added to existing FoodLog successfully', 'id': new_food_item.id}), 201
+        # TODO: This works for now, but there's likely a better way to handle this in the frontend. Gonna make a big update to the frontend later.
+        # The frontend will pull ALL existing FoodLogs for the month right off the bat. Then when the user hits submit, it'll check if that date has a FoodLog already.
+        # If it does, just do a PATCH request to add the new FoodItem. If not, create the FoodLog.
+    else:
+        # If not, create a new FoodLog instance and pass the entire data object in.
+        # It will be initialized with a list in the food_items attribute with a single FoodItem object.
+        new_food_log = FoodLog(data)
+        db.session.add(new_food_log)
+        db.session.commit()
+        print("Added new food item:", new_food_log)
+        return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id}), 201
 
 @food_log_bp.route('/api/foodlog', methods=['GET'])
 def get_food_items_by_date():
