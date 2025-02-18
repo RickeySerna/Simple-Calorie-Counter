@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
+from sqlalchemy import and_
 from Models import *
 
 food_log_bp = Blueprint('food_log_bp', __name__)
@@ -47,30 +48,47 @@ def add_food_item():
 def get_food_items_by_date():
     date_str = request.args.get('date')
     print(f"Date in server: {date_str}")
+
+    year = int(date_str[0:4])
+    month = int(date_str[5:7])
+    day = int(date_str[8:10])
+
+    food_logs = FoodLog.query.filter(
+        and_(
+            FoodLog.year == year,
+            FoodLog.month == month,
+        )
+    ).all()
+
+    food_logs_data = [{
+        'id': log.id,
+        'year': log.year,
+        'month': log.month,
+        'day': log.day,
+        'total_calories': log.total_calories,
+        'total_protein': log.total_protein,
+        'total_carbs': log.total_carbs,
+        'total_fat': log.total_fat,
+        'food_items': [{
+            'id': item.id,
+            'food_log_id': item.food_log_id,
+            'year': item.year,
+            'month': item.month,
+            'day': item.day,
+            'name': item.name,
+            'sub_description': item.sub_description,
+            'weight_value': item.weight_value,
+            'weight_unit': item.weight_unit,
+            'macros': {
+                'calories': item.macros.calories,
+                'protein': item.macros.protein,
+                'carbs': item.macros.carbs,
+                'fat': item.macros.fat
+            } if item.macros else None
+        } for item in log.food_items]
+    } for log in food_logs]
     
-    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-    items = FoodItem.query.filter_by(date=date_obj).all()
-    # LOOK THIS UP MORE ^
-    
-    if not items:
-        return jsonify([])
-    
-    food_data = [{
-        'id': item.id,
-        'name': item.name,
-        'sub_description': item.sub_description,
-        'weight_value': item.weight_value,
-        'weight_unit': item.weight_unit,
-        'macros': {
-            'calories': item.macros.calories,
-            'protein': item.macros.protein,
-            'carbs': item.macros.carbs,
-            'fat': item.macros.fat
-        } if item.macros else None,
-        'result': item.generate_result_string(item)
-    } for item in items]
-    
-    return jsonify(food_data)
+    return jsonify(food_logs_data), 200
 
 @food_log_bp.route('/api/foodlog/<int:id>', methods=['PUT'])
 def update_food_item(id):
