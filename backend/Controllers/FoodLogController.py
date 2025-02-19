@@ -44,7 +44,13 @@ def add_food_item():
         print("Added new food item:", new_food_log)
         return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id}), 201
 
-@food_log_bp.route('/api/foodlog', methods=['GET'])
+@food_log_bp.route('/api/foodlog/search', methods=['GET'])
+def search_for_foodlogs_in_month():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    return jsonify({'start_date': start_date, 'end_date': end_date}), 200
+
+@food_log_bp.route('/api/foodlog/', methods=['GET'])
 def get_food_items_by_date():
     date_str = request.args.get('date')
     print(f"Date in server: {date_str}")
@@ -80,6 +86,7 @@ def get_food_items_by_date():
             'weight_value': item.weight_value,
             'weight_unit': item.weight_unit,
             'macros': {
+                'id': item.macros.id,
                 'calories': item.macros.calories,
                 'protein': item.macros.protein,
                 'carbs': item.macros.carbs,
