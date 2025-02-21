@@ -84,6 +84,13 @@ function App() {
     var end_date = format(endOfMonth(date), 'yyyy-MM-dd');
 
     fetch(`http://127.0.0.1:5000/api/foodlog/search?start_date=${start_date}&end_date=${end_date}`)
+      .then(response => response.json())
+      .then(data => {
+          console.log("FoodLogs pulled from /search endpoint: ", data);
+      })
+      .catch(error => {
+          console.error("Error while attempting to fetch FoodLogs: ", error);
+      });
 
   }
 

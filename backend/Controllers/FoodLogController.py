@@ -48,7 +48,49 @@ def add_food_item():
 def search_for_foodlogs_in_month():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-    return jsonify({'start_date': start_date, 'end_date': end_date}), 200
+
+    year = int(start_date[0:4])
+    month = int(start_date[5:7])
+
+    print(f"Searching for FoodLogs from this month: {month}, in this year: {year}")
+
+    food_logs = FoodLog.query.filter(
+        and_(
+            FoodLog.year == year,
+            FoodLog.month == month,
+        )
+    ).all()
+
+    food_logs_data = [{
+        'id': log.id,
+        'year': log.year,
+        'month': log.month,
+        'day': log.day,
+        'total_calories': log.total_calories,
+        'total_protein': log.total_protein,
+        'total_carbs': log.total_carbs,
+        'total_fat': log.total_fat,
+        'food_items': [{
+            'id': item.id,
+            'food_log_id': item.food_log_id,
+            'year': item.year,
+            'month': item.month,
+            'day': item.day,
+            'name': item.name,
+            'sub_description': item.sub_description,
+            'weight_value': item.weight_value,
+            'weight_unit': item.weight_unit,
+            'macros': {
+                'id': item.macros.id,
+                'calories': item.macros.calories,
+                'protein': item.macros.protein,
+                'carbs': item.macros.carbs,
+                'fat': item.macros.fat
+            } if item.macros else None
+        } for item in log.food_items]
+    } for log in food_logs]
+
+    return jsonify(food_logs_data), 200
 
 @food_log_bp.route('/api/foodlog/', methods=['GET'])
 def get_food_items_by_date():
