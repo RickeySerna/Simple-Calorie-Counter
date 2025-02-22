@@ -46,14 +46,16 @@ def add_food_item():
 
 @food_log_bp.route('/api/foodlog/search', methods=['GET'])
 def search_for_foodlogs_in_month():
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
+    # Grabbing the date string from the query parameters.
+    date = request.args.get('date')
 
-    year = int(start_date[0:4])
-    month = int(start_date[5:7])
+    # Indexing the year and month from the date string. This will be passed into the FoodLog query.
+    year = date[0:4]
+    month = date[5:7]
 
     print(f"Searching for FoodLogs from this month: {month}, in this year: {year}")
 
+    # Using the filter() method from SQLalchemy to grab FoodLog objects with the same month and year as the date we received.
     food_logs = FoodLog.query.filter(
         and_(
             FoodLog.year == year,

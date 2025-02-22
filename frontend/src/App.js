@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
-import { format, addDays, parse, startOfMonth, endOfMonth } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import './App.css';
 
@@ -75,15 +75,8 @@ function App() {
     console.log("Date in fetchFoodLogs: ", dateKey);
     console.log("Type of date in fetchFoodLogs: ", typeof(dateKey));
 
-    // Creating a Date object from the string passed into the function.
-    const date = new Date(dateKey);
-
-    // Get the start and end dates of the month using the methods from date-fns.
-    // Format them into yyyy-MM-dd format using another method from there as well.
-    var start_date = format(startOfMonth(date), 'yyyy-MM-dd');
-    var end_date = format(endOfMonth(date), 'yyyy-MM-dd');
-
-    fetch(`http://127.0.0.1:5000/api/foodlog/search?start_date=${start_date}&end_date=${end_date}`)
+    // The dateKey is a string when it's passed into the function so we pass it directly into the query.
+    fetch(`http://127.0.0.1:5000/api/foodlog/search?date=${dateKey}`)
       .then(response => response.json())
       .then(data => {
           console.log("FoodLogs pulled from /search endpoint: ", data);
