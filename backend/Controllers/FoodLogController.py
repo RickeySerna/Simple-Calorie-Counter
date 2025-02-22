@@ -49,19 +49,27 @@ def search_for_foodlogs_in_month():
     # Grabbing the date string from the query parameters.
     date = request.args.get('date')
 
+    # Error checking to make sure a date string was passed.
+    if not date:
+        return jsonify({"ERROR": "Search endpoint requires a date string."}), 400
+
     # Indexing the year and month from the date string. This will be passed into the FoodLog query.
     year = date[0:4]
     month = date[5:7]
 
     print(f"Searching for FoodLogs from this month: {month}, in this year: {year}")
 
-    # Using the filter() method from SQLalchemy to grab FoodLog objects with the same month and year as the date we received.
-    food_logs = FoodLog.query.filter(
-        and_(
-            FoodLog.year == year,
-            FoodLog.month == month,
-        )
-    ).all()
+    # Wrapping this in a try-except to catch any errors that might come up when querying the database.
+    try:
+        # Using the filter() method from SQLalchemy to grab FoodLog objects with the same month and year as the date we received.
+        food_logs = FoodLog.query.filter(
+            and_(
+                FoodLog.year == year,
+                FoodLog.month == month,
+            )
+        ).all()
+    except Exception as e:
+        return jsonify({"DATABASE ERROR": str(e)}), 400
 
     food_logs_data = [{
         'id': log.id,
