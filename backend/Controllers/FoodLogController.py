@@ -71,34 +71,7 @@ def search_for_foodlogs_in_month():
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
-    food_logs_data = [{
-        'id': log.id,
-        'year': log.year,
-        'month': log.month,
-        'day': log.day,
-        'total_calories': log.total_calories,
-        'total_protein': log.total_protein,
-        'total_carbs': log.total_carbs,
-        'total_fat': log.total_fat,
-        'food_items': [{
-            'id': item.id,
-            'food_log_id': item.food_log_id,
-            'year': item.year,
-            'month': item.month,
-            'day': item.day,
-            'name': item.name,
-            'sub_description': item.sub_description,
-            'weight_value': item.weight_value,
-            'weight_unit': item.weight_unit,
-            'macros': {
-                'id': item.macros.id,
-                'calories': item.macros.calories,
-                'protein': item.macros.protein,
-                'carbs': item.macros.carbs,
-                'fat': item.macros.fat
-            } if item.macros else None
-        } for item in log.food_items]
-    } for log in food_logs]
+    food_logs_data = [log.to_dict() for log in food_logs]
 
     return jsonify(food_logs_data), 200
 

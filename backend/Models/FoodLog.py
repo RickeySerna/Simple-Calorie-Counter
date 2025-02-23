@@ -23,3 +23,16 @@ class FoodLog(db.Model):
         self.total_carbs = "0"
         self.total_fat = "0"
         self.food_items = [FoodItem(data)]
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'year': self.year,
+            'month': self.month,
+            'day': self.day,
+            'total_calories': self.total_calories,
+            'total_protein': self.total_protein,
+            'total_carbs': self.total_carbs,
+            'total_fat': self.total_fat,
+            'food_items': [item.to_dict() for item in self.food_items]
+        }

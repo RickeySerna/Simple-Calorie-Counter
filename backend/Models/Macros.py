@@ -185,3 +185,13 @@ class Macros(db.Model):
             formatted_macros[key] = rounded_value
 
         return formatted_macros
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'food_item_id': self.food_item_id,
+            'calories': self.calories,
+            'protein': self.protein,
+            'carbs': self.carbs,
+            'fat': self.fat
+        }

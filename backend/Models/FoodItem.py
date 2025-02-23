@@ -64,3 +64,17 @@ class FoodItem(db.Model):
             return f"{weight_value}{weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.macros.calories} calories, {item.macros.protein}g of protein, {item.macros.carbs}g of carbs, {item.macros.fat}g of fat"
         else:
             return f"{weight_value} {weight_unit} of {item.name}{f' ({item.sub_description})' if item.sub_description else ''}: {item.macros.calories} calories, {item.macros.protein}g of protein, {item.macros.carbs}g of carbs, {item.macros.fat}g of fat"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'food_log_id': self.food_log_id,
+            'year': self.year,
+            'month': self.month,
+            'day': self.day,
+            'name': self.name,
+            'sub_description': self.sub_description,
+            'weight_value': self.weight_value,
+            'weight_unit': self.weight_unit,
+            'macros': self.macros.to_dict()
+        }
