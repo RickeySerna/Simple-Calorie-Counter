@@ -50,6 +50,7 @@ function App() {
     carbs: '',
     fat: ''
   });
+
   const [editValues, setEditValues] = useState({
     weight: '',
     weightUnit: '',
@@ -61,6 +62,10 @@ function App() {
     fat: ''
   });
 
+  // This state will be used to track all FoodLogs pulled in the fetchFoodLogs function.
+  // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
+  const [existingFoodLogs, setExistingFoodLogs] = useState([]);
+
   useEffect(() => {
     const dateKey = formData.date;
 
@@ -69,6 +74,11 @@ function App() {
     fetchFoodLogs(dateKey);
     //fetchFoodItems(dateKey);
   }, [currentDate]);
+
+  // Just adding a useEffect() to the existingFoodLogs state for logging purposes.
+  useEffect(() => {
+    console.log("Existing FoodLogs this month from the DB: ", existingFoodLogs);
+}, [existingFoodLogs]);
 
   const fetchFoodLogs = (dateKey) => {
 
@@ -80,6 +90,11 @@ function App() {
       .then(response => response.json())
       .then(data => {
           console.log("FoodLogs pulled from /search endpoint: ", data);
+
+          // Creating a new array consisting all of the days in the FoodLog objects that were pulled.
+          const daysPulled = data.map(log => log.day);
+          // Setting that array as the existingFoodLogs state.
+          setExistingFoodLogs(daysPulled);
       })
       .catch(error => {
           console.error("Error while attempting to fetch FoodLogs: ", error);
