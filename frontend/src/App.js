@@ -65,6 +65,10 @@ function App() {
   // This state will be used to track all FoodLogs pulled in the fetchFoodLogs function.
   // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
   const [existingFoodLogs, setExistingFoodLogs] = useState([]);
+  // This const is checking if the day set in the currentDate state is in the existingFoodLogs array.
+  // If True, then the FoodLob object exists. If False, it doesn't. This is used for conditional rendering later.
+  const dayExists = existingFoodLogs.includes(currentDate.getDate());
+
 
   useEffect(() => {
     const dateKey = formData.date;
@@ -530,7 +534,11 @@ function App() {
                   </div>
                 </div>
               </fieldset>
-              <button type="submit">Submit</button>
+              {dayExists ? (
+                <button type="button" /*onClick={onUpdate}*/>Update</button>
+              ) : (
+                <button type="button" /*onClick={onCreate}*/>Create</button>
+              )}
             </form>
           </div>
           <div className="results-panel">
