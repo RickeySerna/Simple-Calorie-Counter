@@ -160,7 +160,34 @@ function App() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const onCreate = (e) => {
+    console.log("We are in the onCreate function!");
+
+    fetch('http://127.0.0.1:5000/api/foodlog', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success: ', data);
+
+      // Now that a new a food item is successfully created, immediately update the log which now includes said new item.
+      //fetchFoodItems(formData.date);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  };
+
+  const onUpdate = (e) => {
+
+
+  };
+
+/*  const handleSubmit = (e) => {
     e.preventDefault();
   
     const { carbs, fiber, sugarAlcohol } = formData;
@@ -208,7 +235,7 @@ function App() {
     .catch(error => {
       console.error('Error:', error);
     });
-  };
+  };*/
 
   const handleDelete = (id) => {
     console.log(`The ID to delete: ${id}`);
@@ -419,7 +446,7 @@ function App() {
         <h1>Simple Calorie Counter</h1>
         <div className="container">
           <div className="form-panel">
-            <form onSubmit={handleSubmit}>
+            <form /*onSubmit={handleSubmit}*/>
               <fieldset>
                 <legend>Food Item Information:</legend>
                 <div className="form-group">
@@ -535,9 +562,9 @@ function App() {
                 </div>
               </fieldset>
               {dayExists ? (
-                <button type="button" /*onClick={onUpdate}*/>Update</button>
+                <button type="button" onClick={onUpdate}>Update</button>
               ) : (
-                <button type="button" /*onClick={onCreate}*/>Create</button>
+                <button type="button" onClick={onCreate}>Create</button>
               )}
             </form>
           </div>
