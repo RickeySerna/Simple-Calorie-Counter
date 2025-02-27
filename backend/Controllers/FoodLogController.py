@@ -141,32 +141,55 @@ def update_food_item(id):
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
 
-@food_log_bp.route('/api/foodlog/<int:id>', methods=['PATCH'])
-def update_food_item_partially(id):
-    data = request.get_json()
-    item = FoodItem.query.get_or_404(id)
-    print(f"Data with update values: {data}")
-    print(f"Item to update: {item}")
+@food_log_bp.route('/api/foodlog/', methods=['PATCH'])
+def add_FoodItem_to_existing_FoodLog():
+    print("About to add FoodItem to existing FoodLog...")
 
-    if 'name' in data:
-        item.name = data['name']
-    if 'sub_description' in data:
-        item.sub_description = data['sub_description']
-    if 'weight' in data:
-        item.weight_value = data['weight']
-    if 'weightUnit' in data:
-        item.weight_unit = data['weightUnit']
-    if 'calories' in data:
-        item.macros.calories = data['calories']
-    if 'protein' in data:
-        item.macros.protein = data['protein']
-    if 'carbs' in data:
-        item.macros.carbs = data['carbs']
-    if 'fat' in data:
-        item.macros.fat = data['fat']
-    
+    data = request.get_json()
+    print(f"Data from frontend in PATCH call: {data}")
+
+    # Grabbing the date from the data.
+    date = data.get('date')
+
+    # Grabbing the date fields we need to pass into the query using indexing.
+    year = int(date[0:4])
+    month = int(date[5:7])
+    day = int(date[8:10])
+
+    print(f"Pulling the FoodLog with this date: year - {year}, month - {month}, day - {day}")
+
+    # Wrapping this in a try-except to catch any errors that might come up when querying the database.
+    try:
+        # Using the filter() method from SQLalchemy to grab the FoodLog object.
+        food_logs = FoodLog.query.filter(
+            and_(
+                FoodLog.year == year,
+                FoodLog.month == month,
+                FoodLog.day == day
+            )
+        ).all()
+    except Exception as e:
+        return jsonify({"DATABASE ERROR": str(e)}), 400
+
+    # Turning our FoodLog into a dictionary using the built-in to_dict() method to access its FoodItem array.
+    FoodLogToUpdate = [log.to_dict() for log in food_logs]
+
+    print(f"Here's the FoodLog object we're adding to: {FoodLogToUpdate}")
+    print(f"ID of the log we're updating: {FoodLogToUpdate[0]["id"]}")
+
+    # Creating the new FoodItem to be added into the FoodLog.
+    new_food_item = FoodItem(data)
+    # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
+    # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
+    new_food_item.food_log_id = FoodLogToUpdate[0]["id"]
+
+    # Adding the new FoodItem to the DB.
+    db.session.add(new_food_item)
     db.session.commit()
-    return jsonify({'message': 'Food item partially updated successfully'})
+
+    print("All done, new FoodItem added.")
+
+    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog'}), 201
 
 @food_log_bp.route('/api/foodlog/<int:id>', methods=['DELETE'])
 def delete_food_item(id):

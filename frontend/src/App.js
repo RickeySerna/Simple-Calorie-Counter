@@ -173,9 +173,6 @@ function App() {
     .then(response => response.json())
     .then(data => {
       console.log('Success: ', data);
-
-      // Now that a new a food item is successfully created, immediately update the log which now includes said new item.
-      //fetchFoodItems(formData.date);
     })
     .catch(error => {
       console.error('Error:', error);
@@ -183,8 +180,22 @@ function App() {
   };
 
   const onUpdate = (e) => {
+    console.log("We are in the onUpdate function!");
 
-
+    fetch('http://127.0.0.1:5000/api/foodlog', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success: ', data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   };
 
 /*  const handleSubmit = (e) => {
