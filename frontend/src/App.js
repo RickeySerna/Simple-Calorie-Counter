@@ -62,12 +62,24 @@ function App() {
     fat: ''
   });
 
+  // This state contains the full set of FoodLog objects for the entire month.
+  // When the fetch call to the /search endpoint is successful, that data is returned and set to this state.
+  const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
+
   // This state will be used to track all FoodLogs pulled in the fetchFoodLogs function.
   // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
   const [existingFoodLogs, setExistingFoodLogs] = useState([]);
+
   // This const is checking if the day set in the currentDate state is in the existingFoodLogs array.
   // If True, then the FoodLob object exists. If False, it doesn't. This is used for conditional rendering later.
-  const dayExists = existingFoodLogs.includes(currentDate.getDate());
+  // UPDATE: Changing this logic a bit! We'll kill two birds with one stone here; get the condition for the conditional rendering and get today's specific FoodLog.
+  // Start by immediatey getting the day part of the currentDate state.
+  // Now use the find() method on the thisMonthsFoodLogs to iterate over each log inside of it and search for a log where the day attribute = the day we just grabbed.
+  // If there exists one, then currentFoodLog will = that specific FoodLog object. If not, then it'll equal null.
+  // Now we have the FoodLog we need to display the FoodItems for the date the user is on and we can also just use that as the condition to render the Create or Update button.
+  const currentDay = currentDate.getDate();
+  const currentFoodLog = thisMonthsFoodLogs.find(log => log.day === currentDay) || null;
+  console.log("Today's FoodLog: ", currentFoodLog);
 
 
   useEffect(() => {
@@ -82,7 +94,11 @@ function App() {
   // Just adding a useEffect() to the existingFoodLogs state for logging purposes.
   useEffect(() => {
     console.log("Existing FoodLogs this month from the DB: ", existingFoodLogs);
-}, [existingFoodLogs]);
+  }, [existingFoodLogs]);
+
+  useEffect(() => {
+    console.log("FoodLogs as they are set in the thisMonthsFoodLogs state: ", thisMonthsFoodLogs);
+  }, [thisMonthsFoodLogs]);
 
   const fetchFoodLogs = (dateKey) => {
 
@@ -94,6 +110,9 @@ function App() {
       .then(response => response.json())
       .then(data => {
           console.log("FoodLogs pulled from /search endpoint: ", data);
+          // Taking the data we got and setting it as the thisMonthsFoodLogs state.
+          // With this, we now have access to all of these FoodLogs throughout the code and can display them in the results panel.
+          setThisMonthsFoodLogs(data);
 
           // Creating a new array consisting all of the days in the FoodLog objects that were pulled.
           const daysPulled = data.map(log => log.day);
@@ -572,7 +591,7 @@ function App() {
                   </div>
                 </div>
               </fieldset>
-              {dayExists ? (
+              {currentFoodLog ? (
                 <button type="button" onClick={onUpdate}>Update</button>
               ) : (
                 <button type="button" onClick={onCreate}>Create</button>
