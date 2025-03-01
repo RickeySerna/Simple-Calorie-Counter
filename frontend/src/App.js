@@ -70,16 +70,17 @@ function App() {
   // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
   const [existingFoodLogs, setExistingFoodLogs] = useState([]);
 
-  // This const is checking if the day set in the currentDate state is in the existingFoodLogs array.
-  // If True, then the FoodLob object exists. If False, it doesn't. This is used for conditional rendering later.
-  // UPDATE: Changing this logic a bit! We'll kill two birds with one stone here; get the condition for the conditional rendering and get today's specific FoodLog.
-  // Start by immediatey getting the day part of the currentDate state.
-  // Now use the find() method on the thisMonthsFoodLogs to iterate over each log inside of it and search for a log where the day attribute = the day we just grabbed.
-  // If there exists one, then currentFoodLog will = that specific FoodLog object. If not, then it'll equal null.
-  // Now we have the FoodLog we need to display the FoodItems for the date the user is on and we can also just use that as the condition to render the Create or Update button.
+  // Here is where we grab the FoodItems array to display in the results panel.
+  // First start by extracting the day from the currentDate state.
   const currentDay = currentDate.getDate();
+  // Now use that day to grab the corresponding FoodLog object from the thisMonthsFoodLogs state. Or set that to null if none exists for this day.
+  // The null bit is important; currentFoodLog is also used for conditional rendering to see what exactly to do with a new FoodItem from the user.
   const currentFoodLog = thisMonthsFoodLogs.find(log => log.day === currentDay) || null;
-  console.log("Today's FoodLog: ", currentFoodLog);
+  // Now try digging into the currentFoodLog object and grab the food_items object within. Or set it to an empty array if currentFoodLog is null.
+  // This is the object we'll be mapping in the <ul> tag. That's why we do the conditional; we need to be able to map SOMETHING.
+  // If it's empty, that's fine, that just means there are no FoodItems to display for this day. No errors, just map and display nothing.
+  const currentFoodItems = currentFoodLog ? currentFoodLog.food_items : [];
+  console.log("Todays FoodItems: ", currentFoodItems);
 
 
   useEffect(() => {
@@ -610,7 +611,7 @@ function App() {
             </div>
             <h2>Food Log</h2>
             <ul>
-              {currentEntries.map((result, index) => (
+              {currentFoodItems.map((result, index) => (
                 <li key={index} className="list-item">
                 {editingId === result.id ? (
                   <>

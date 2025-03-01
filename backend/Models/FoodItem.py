@@ -76,5 +76,6 @@ class FoodItem(db.Model):
             'sub_description': self.sub_description,
             'weight_value': self.weight_value,
             'weight_unit': self.weight_unit,
+            'result': self.generate_result_string(self),
             'macros': self.macros.to_dict()
         }
