@@ -64,42 +64,44 @@ function App() {
 
   // This state contains the full set of FoodLog objects for the entire month.
   // When the fetch call to the /search endpoint is successful, that data is returned and set to this state.
+  // UPDATE: We're not using states to manage ALL of this.
   const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
+  const [currentFoodLog, setCurrentFoodLog] = useState(null);
+  const [currentFoodItems, setCurrentFoodItems] = useState([]);
 
   // This state will be used to track all FoodLogs pulled in the fetchFoodLogs function.
   // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
   const [existingFoodLogs, setExistingFoodLogs] = useState([]);
 
-  // Here is where we grab the FoodItems array to display in the results panel.
-  // First start by extracting the day from the currentDate state.
-  const currentDay = currentDate.getDate();
-  // Now use that day to grab the corresponding FoodLog object from the thisMonthsFoodLogs state. Or set that to null if none exists for this day.
-  // The null bit is important; currentFoodLog is also used for conditional rendering to see what exactly to do with a new FoodItem from the user.
-  const currentFoodLog = thisMonthsFoodLogs.find(log => log.day === currentDay) || null;
-  // Now try digging into the currentFoodLog object and grab the food_items object within. Or set it to an empty array if currentFoodLog is null.
-  // This is the object we'll be mapping in the <ul> tag. That's why we do the conditional; we need to be able to map SOMETHING.
-  // If it's empty, that's fine, that just means there are no FoodItems to display for this day. No errors, just map and display nothing.
-  const currentFoodItems = currentFoodLog ? currentFoodLog.food_items : [];
-  console.log("Todays FoodItems: ", currentFoodItems);
-
-
+  // This is where everything is kicked off.
+  // When a change goes out to the currentDate state, meaning either the page is loaded or the date is changed, we handle the FoodLogs as necessary.
+  // If it's the initial load of the page or the month changes, then fetchFoodLogs() is called.
   useEffect(() => {
     const dateKey = formData.date;
 
     console.log("Date key to send to the server: ", dateKey);
 
     fetchFoodLogs(dateKey);
-    //fetchFoodItems(dateKey);
   }, [currentDate]);
+
+  // fetchFoodLogs() sets thisMonthsFoodLogs which calls this useEffect() hook.
+  // Now that we have all of the FoodLogs for the month, we get the day part of the currentDate state.
+  // Then we use that to grab THAT specific days FoodLog object and set it to the currentFoodLog state.
+  useEffect(() => {
+    console.log("FoodLogs as they are set in the thisMonthsFoodLogs state: ", thisMonthsFoodLogs);
+    const currentDay = currentDate.getDate();
+    setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
+  }, [thisMonthsFoodLogs]);
+
+  // That triggers this useEffect hook where we finally set the currentFoodItems state.
+  useEffect(() => {
+    setCurrentFoodItems(currentFoodLog ? currentFoodLog.food_items : []);
+  }, [currentFoodLog]);
 
   // Just adding a useEffect() to the existingFoodLogs state for logging purposes.
   useEffect(() => {
     console.log("Existing FoodLogs this month from the DB: ", existingFoodLogs);
   }, [existingFoodLogs]);
-
-  useEffect(() => {
-    console.log("FoodLogs as they are set in the thisMonthsFoodLogs state: ", thisMonthsFoodLogs);
-  }, [thisMonthsFoodLogs]);
 
   const fetchFoodLogs = (dateKey) => {
 
@@ -280,8 +282,20 @@ function App() {
     .then(data => {
       console.log('Successfully deleted:', data);
 
-      // FoodItem was successfully deleted, now update the result-panel with a new GET call so that the deleted FoodItem doesn't linger.
-      fetchFoodItems(formData.date);
+      // Because we know the call was successful, we know the FoodItem object was deleted in the DB.
+      // With that, we can just delete the FoodItem from the currentFoodItems state we already have; no need to pull from the DB again.
+      // So create an empty array.
+      const updatedFoodItems = [];
+      // Loop through the currentFoodItems state.
+      for (let i = 0; i < currentFoodItems.length; i++) {
+        // If the object we're looking has an ID that doesn't match the one we delete, add it to the new array.
+        if (currentFoodItems[i].id !== id) {
+          updatedFoodItems.push(currentFoodItems[i]);
+        }
+      }
+      // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
+      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
+      setCurrentFoodItems(updatedFoodItems);
     })
     .catch(error => {
       console.error('Error while deleting:', error);

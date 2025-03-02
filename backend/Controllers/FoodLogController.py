@@ -203,8 +203,8 @@ def delete_food_item(id):
         db.session.delete(item)
         db.session.commit()
         print(f"Deleted FoodItem with ID: {id}")
-        return jsonify({'message': 'Food item deleted successfully'})
+        return jsonify({'message': 'FoodItem deleted successfully'})
     # Or throwing a 404.
     else:
         print(f"FoodItem with ID: {id} not found")
-        return jsonify({'message': 'Food item not found'}), 404
+        return jsonify({'message': 'FoodItem not found'}), 404
