@@ -69,10 +69,6 @@ function App() {
   const [currentFoodLog, setCurrentFoodLog] = useState(null);
   const [currentFoodItems, setCurrentFoodItems] = useState([]);
 
-  // This state will be used to track all FoodLogs pulled in the fetchFoodLogs function.
-  // We'll use this to determine what to do when a new FoodItem is created; either create the new FoodLog altogether or just update an existing one.
-  const [existingFoodLogs, setExistingFoodLogs] = useState([]);
-
   // This is where everything is kicked off.
   // When a change goes out to the currentDate state, meaning either the page is loaded or the date is changed, we handle the FoodLogs as necessary.
   // If it's the initial load of the page or the month changes, then fetchFoodLogs() is called.
@@ -98,11 +94,6 @@ function App() {
     setCurrentFoodItems(currentFoodLog ? currentFoodLog.food_items : []);
   }, [currentFoodLog]);
 
-  // Just adding a useEffect() to the existingFoodLogs state for logging purposes.
-  useEffect(() => {
-    console.log("Existing FoodLogs this month from the DB: ", existingFoodLogs);
-  }, [existingFoodLogs]);
-
   const fetchFoodLogs = (dateKey) => {
 
     console.log("Date in fetchFoodLogs: ", dateKey);
@@ -116,11 +107,6 @@ function App() {
           // Taking the data we got and setting it as the thisMonthsFoodLogs state.
           // With this, we now have access to all of these FoodLogs throughout the code and can display them in the results panel.
           setThisMonthsFoodLogs(data);
-
-          // Creating a new array consisting all of the days in the FoodLog objects that were pulled.
-          const daysPulled = data.map(log => log.day);
-          // Setting that array as the existingFoodLogs state.
-          setExistingFoodLogs(daysPulled);
       })
       .catch(error => {
           console.error("Error while attempting to fetch FoodLogs: ", error);
