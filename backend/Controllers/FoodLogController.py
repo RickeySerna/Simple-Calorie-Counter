@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from sqlalchemy import and_
 from Models import *
+import math
 
 food_log_bp = Blueprint('food_log_bp', __name__)
 
@@ -191,9 +192,18 @@ def add_FoodItem_to_existing_FoodLog():
 
     return jsonify({'message': 'New FoodItem successfully added to existing FoodLog'}), 201
 
-@food_log_bp.route('/api/foodlog/<int:id>', methods=['DELETE'])
+# Removing the int constraint here to allow for better error handling.
+@food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])
 def delete_food_item(id):    
     print(f"Attempting to delete FoodItem with ID: {id}")
+
+    # The endpoint will not take ANY input passed in the URL.
+    # To make sure that value passed is an int, we try casting it to an int.
+    try:
+        id = int(id)
+    # If that fails, which it will for anything but an integer, this is raised and the request just returns a 400 error.
+    except ValueError:
+        return jsonify({"ERROR": "ID passed is not a valid FoodItem ID."}), 400
 
     # Grabbing the FoodItem to delete.
     # UPDATE: No longer using get_or_404() here. That method worked fine, but it would just immediately throw a 404 if no FoodItem was found.
