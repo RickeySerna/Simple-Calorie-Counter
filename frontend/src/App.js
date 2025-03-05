@@ -264,10 +264,20 @@ function App() {
         'Content-Type': 'application/json'
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response from server:', response);
+      
+      // Checking if a 200 level response was received from the server.
+      if (!response.ok) {
+        // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+        return response.json().then(errorData => {
+          // Just returning the HTTP status and the message the server returned.
+          throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
-      console.log('Successfully deleted:', data);
-
       // Because we know the call was successful, we know the FoodItem object was deleted in the DB.
       // With that, we can just delete the FoodItem from the currentFoodItems state we already have; no need to pull from the DB again.
       // So create an empty array.
@@ -282,9 +292,11 @@ function App() {
       // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setCurrentFoodItems(updatedFoodItems);
+
+      console.log('Successful deletion:', data);
     })
     .catch(error => {
-      console.error('Error while deleting:', error);
+      console.error('DELETE ERROR:', error.message);
     });
   };
 
