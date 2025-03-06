@@ -43,7 +43,7 @@ def add_food_item():
         db.session.add(new_food_log)
         db.session.commit()
         print("Added new food item:", new_food_log)
-        return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id}), 201
+        return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id, 'new_food_log': new_food_log.to_dict()}), 201
 
 @food_log_bp.route('/api/foodlog/search', methods=['GET'])
 def search_for_foodlogs_in_month():
