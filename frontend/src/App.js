@@ -91,6 +91,7 @@ function App() {
 
   // That triggers this useEffect hook where we finally set the currentFoodItems state.
   useEffect(() => {
+    console.log("currentFoodLog set as: ", currentFoodLog);
     setCurrentFoodItems(currentFoodLog ? currentFoodLog.food_items : []);
   }, [currentFoodLog]);
 
@@ -178,9 +179,26 @@ function App() {
       },
       body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response from server:', response);
+      
+      // Checking if a 200 level response was received from the server.
+      if (!response.ok) {
+        // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+        return response.json().then(errorData => {
+          // Just returning the HTTP status and the message the server returned.
+          throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
       console.log('Success: ', data);
+
+      // onCreate specifically creates an entirely new FoodLog, meaning that if it's triggered, no FoodLog existed for the day.
+      // So now that we successfully created one, we can set the currentFoodLog state to the FoodLog item that the POST route returns.
+      // This makes sure that on any subsequent FoodItems being added, it's onUpdate being called; NOT onCreate again.
+      setCurrentFoodLog(data.new_food_log);
     })
     .catch(error => {
       console.error('Error:', error);
