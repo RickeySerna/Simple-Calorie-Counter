@@ -215,9 +215,36 @@ function App() {
       },
       body: JSON.stringify(formData),
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response from server:', response);
+      
+      // Checking if a 200 level response was received from the server.
+      if (!response.ok) {
+        // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+        return response.json().then(errorData => {
+          // Just returning the HTTP status and the message the server returned.
+          throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
       console.log('Success: ', data);
+
+      // We're doing something similar here as we did in the DELETE call.
+      // The endpoint will return the new FoodItem that was created so we just have to create a new array from the current one and add the new FoodItem.
+
+      // In this case though, we don't need to loop through the currentFoodItems array.
+      // It already has everything we need, we just need to add one more FoodItem.
+      // So create a new array with all of the elements of currentFoodItems using the spread operator.
+      const updatedFoodItems = [...currentFoodItems];
+
+      // Now just push the new FoodItem into the new array.
+      updatedFoodItems.push(data.new_food_item);
+
+      // And now we have the new array which is exactly what the old one was plus the new FoodItem and we set it to currentFoodItems.
+      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
+      setCurrentFoodItems(updatedFoodItems);
     })
     .catch(error => {
       console.error('Error:', error);
