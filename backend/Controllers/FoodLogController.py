@@ -12,38 +12,13 @@ def add_food_item():
     data = request.get_json()
     print("Received data:", data)
 
-    # Define the year, month, and day from the date attribute in the data object.
-    # TODO: Would probably be better to just do this in the frontend and include it in the data object. Will do that later.
-    year = int(data.get("date")[0:4])
-    month = int(data.get("date")[5:7])
-    day = int(data.get("date")[8:10])
-
-    # Now use the above vars to query the database to see if this log already exists.
-    food_log = FoodLog.query.filter_by(year=year, month=month, day=day).first()
-
-    # If FoodLog exists, just add a new FoodItem to it
-    if food_log:
-        # Create a new FoodItem object.
-        new_food_item = FoodItem(data)
-
-        # Set the food_log_id foreign key as the ID from the FoodLog we pulled. 
-        new_food_item.food_log_id = food_log.id
-
-        db.session.add(new_food_item)
-        db.session.commit()
-        print("Added new food item to the existing FoodLog: ", new_food_item)
-        return jsonify({'message': 'FoodItem added to existing FoodLog successfully', 'id': new_food_item.id}), 201
-        # TODO: This works for now, but there's likely a better way to handle this in the frontend. Gonna make a big update to the frontend later.
-        # The frontend will pull ALL existing FoodLogs for the month right off the bat. Then when the user hits submit, it'll check if that date has a FoodLog already.
-        # If it does, just do a PATCH request to add the new FoodItem. If not, create the FoodLog.
-    else:
-        # If not, create a new FoodLog instance and pass the entire data object in.
-        # It will be initialized with a list in the food_items attribute with a single FoodItem object.
-        new_food_log = FoodLog(data)
-        db.session.add(new_food_log)
-        db.session.commit()
-        print("Added new food item:", new_food_log)
-        return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id, 'new_food_log': new_food_log.to_dict()}), 201
+    # UPDATE: Because this is the POST route, we know we're creating an entirely new FoodLog. With that, no need to search for anything anymore.
+    # Just create the new FoodLog object with the data we got from the frontend and commit it to the DB. Done.
+    new_food_log = FoodLog(data)
+    db.session.add(new_food_log)
+    db.session.commit()
+    print("Added new food item:", new_food_log)
+    return jsonify({'message': 'FoodLog created successfully', 'id': new_food_log.id, 'new_food_log': new_food_log.to_dict()}), 201
 
 @food_log_bp.route('/api/foodlog/search', methods=['GET'])
 def search_for_foodlogs_in_month():
@@ -190,7 +165,7 @@ def add_FoodItem_to_existing_FoodLog():
 
     print("All done, new FoodItem added.")
 
-    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog'}), 201
+    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog', 'new_food_item': new_food_item.to_dict()}), 201
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])
