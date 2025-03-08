@@ -506,7 +506,7 @@ function App() {
     console.log("HTTP verb = ", method);
 
     // Send the request to the server.
-    fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
+    fetch(`http://127.0.0.1:5000/api/fooditems/${id}`, {
       method: method,
       headers: {
         'Content-Type': 'application/json'
@@ -520,8 +520,25 @@ function App() {
       // Set the editingId back to null so that it renders in the result panel with the normal format.
       setEditingId(null);
 
-      // Update the list to display the updated values.
-      fetchFoodItems(formData.date);
+      // The item was updated on the backend, but now we need to update it in the local state too.
+      // Similar to the DELETE call, we create an empty array first.
+      const updatedFoodItems = [];
+      // Loop through the currentFoodItems state.
+      for (let i = 0; i < currentFoodItems.length; i++) {
+        // If the object we're looking at has an ID that doesn't match the one we edited, just add it to the new array and move to the next.
+        if (currentFoodItems[i].id !== id) {
+          updatedFoodItems.push(currentFoodItems[i]);
+        }
+        // Once we find it, we update it with the changes made by user.
+        else {
+          let updatedItem = currentFoodItems[i];
+          console.log("The FoodItem we're updating IN THE FOR LOOP: ", updatedItem);
+          // TODO: Set the logic for changing the individual items in updatedItem to changes in the changes array and push it the updatedFoodItems array.
+        }
+      }
+      // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
+      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
+      setCurrentFoodItems(updatedFoodItems);
     })
     .catch(error => {
       console.error('Error while updating: ', error);
