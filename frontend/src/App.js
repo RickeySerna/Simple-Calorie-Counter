@@ -533,9 +533,37 @@ function App() {
         else {
           let updatedItem = currentFoodItems[i];
           console.log("The FoodItem we're updating IN THE FOR LOOP: ", updatedItem);
-          // TODO: Set the logic for changing the individual items in updatedItem to changes in the changes array and push it the updatedFoodItems array.
+
+          if (changes.hasOwnProperty("calories")) {
+            updatedItem.macros["calories"] = changes["calories"];
+          }
+          if (changes.hasOwnProperty("protein")) {
+            updatedItem.macros["protein"] = changes["protein"];
+          }
+          if (changes.hasOwnProperty("carbs")) {
+            updatedItem.macros["carbs"] = changes["carbs"];
+          }
+          if (changes.hasOwnProperty("fat")) {
+            updatedItem.macros["fat"] = changes["fat"];
+          }
+          if (changes.hasOwnProperty("name")) {
+            updatedItem["name"] = changes["name"];
+          }
+          if (changes.hasOwnProperty("sub_description")) {
+            updatedItem["sub_description"] = changes["sub_description"];
+          }
+          if (changes.hasOwnProperty("weight")) {
+            updatedItem["weight_value"] = changes["weight"];
+          }
+          if (changes.hasOwnProperty("weightUnit")) {
+            updatedItem["weight_unit"] = changes["weightUnit"];
+          }
+
+          // Now done with the updating, add it the updatedFoodItems array and keep moving through the loop.
+          updatedFoodItems.push(updatedItem);
         }
       }
+      
       // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setCurrentFoodItems(updatedFoodItems);
