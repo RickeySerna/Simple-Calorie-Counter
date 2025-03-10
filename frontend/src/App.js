@@ -531,33 +531,23 @@ function App() {
         }
         // Once we find it, we update it with the changes made by user.
         else {
+          // First create a copy of the FoodItem that was edited.
           let updatedItem = currentFoodItems[i];
           console.log("The FoodItem we're updating IN THE FOR LOOP: ", updatedItem);
 
-          if (changes.hasOwnProperty("calories")) {
-            updatedItem.macros["calories"] = changes["calories"];
-          }
-          if (changes.hasOwnProperty("protein")) {
-            updatedItem.macros["protein"] = changes["protein"];
-          }
-          if (changes.hasOwnProperty("carbs")) {
-            updatedItem.macros["carbs"] = changes["carbs"];
-          }
-          if (changes.hasOwnProperty("fat")) {
-            updatedItem.macros["fat"] = changes["fat"];
-          }
-          if (changes.hasOwnProperty("name")) {
-            updatedItem["name"] = changes["name"];
-          }
-          if (changes.hasOwnProperty("sub_description")) {
-            updatedItem["sub_description"] = changes["sub_description"];
-          }
-          if (changes.hasOwnProperty("weight_value")) {
-            updatedItem["weight_value"] = changes["weight_value"];
-          }
-          if (changes.hasOwnProperty("weight_unit")) {
-            updatedItem["weight_unit"] = changes["weight_unit"];
-          }
+          // Now that the attribute names match between the front and back end, we can do this dynamically.
+          // So first loop through the keys in the changes object.
+          for (const key in changes) {
+            // Check if the macros object inside of the FoodItem has the attribute we're looking at.
+            if (updatedItem.macros.hasOwnProperty(key)) {
+              // If it does, replace it with the corresponding value in changes.
+              updatedItem.macros[key] = changes[key];
+            }
+            else {
+              // If it doesn't, replace the value in the toplevel FoodItem object.
+              updatedItem[key] = changes[key];
+            }
+          };
 
           // Now done with the updating, add it the updatedFoodItems array and keep moving through the loop.
           updatedFoodItems.push(updatedItem);

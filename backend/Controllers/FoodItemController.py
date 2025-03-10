@@ -52,17 +52,19 @@ def update_food_item(id):
     print(f"Data with update values: {data}")
     print(f"Item to update: {item}")
 
-    item.name = data['name']
-    item.sub_description = data['sub_description']
-    item.weight_value = data['weight']
-    item.weight_unit = data['weightUnit']
-    item.macros.calories = data['calories']
-    item.macros.protein = data['protein']
-    item.macros.carbs = data['carbs']
-    item.macros.fat = data['fat']
+    # Now that the attribute names match between the front and back end, we can do this dynamically.
+    # So loop through the data dictionary.
+    for key in data:
+        # First check if the macros object inside of the FoodItem has the key we're looking at.
+        if hasattr(item.macros, key):
+            # If it does, replace the replace it's value with the value from the data object.
+            setattr(item.macros, key, data[key])
+        else:
+            # If it doesn't, then replace the value in the toplevel FoodItem object instead.
+            setattr(item, key, data[key])
 
     db.session.commit()
-    return jsonify({'message': 'Food item updated successfully'})
+    return jsonify({'message': 'Food item updated successfully'}), 200
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PATCH'])
 def update_food_item_partially(id):
@@ -71,25 +73,19 @@ def update_food_item_partially(id):
     print(f"Data with update values: {data}")
     print(f"Item to update: {item}")
 
-    if 'name' in data:
-        item.name = data['name']
-    if 'sub_description' in data:
-        item.sub_description = data['sub_description']
-    if 'weight' in data:
-        item.weight_value = data['weight']
-    if 'weightUnit' in data:
-        item.weight_unit = data['weightUnit']
-    if 'calories' in data:
-        item.macros.calories = data['calories']
-    if 'protein' in data:
-        item.macros.protein = data['protein']
-    if 'carbs' in data:
-        item.macros.carbs = data['carbs']
-    if 'fat' in data:
-        item.macros.fat = data['fat']
+    # Now that the attribute names match between the front and back end, we can do this dynamically.
+    # So loop through the data dictionary.
+    for key in data:
+        # First check if the macros object inside of the FoodItem has the key we're looking at.
+        if hasattr(item.macros, key):
+            # If it does, replace the replace it's value with the value from the data object.
+            setattr(item.macros, key, data[key])
+        else:
+            # If it doesn't, then replace the value in the toplevel FoodItem object instead.
+            setattr(item, key, data[key])
     
     db.session.commit()
-    return jsonify({'message': 'Food item partially updated successfully'})
+    return jsonify({'message': 'Food item partially updated successfully'}), 200
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):
