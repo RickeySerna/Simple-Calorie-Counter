@@ -172,6 +172,34 @@ function App() {
   const onCreate = (e) => {
     console.log("We are in the onCreate function!");
 
+    const { carbs, fiber, sugarAlcohol } = formData;
+    const fiberValue = parseFloat(fiber) || 0;
+    const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
+    const carbsValue = parseFloat(carbs) || 0;
+  
+    if (fiberValue + sugarAlcoholValue > carbsValue) {
+      alert("Fiber and sugar alcohols together cannot exceed total carbs.");
+      return;
+    }
+
+    // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
+    if (formData.weight_unit === "lb_oz") {
+      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+
+      // Also going to create the "&" string here as a template literal.
+      // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
+      formData.weight = (`${formData.weightPounds}&${formData.weightOunces}`)
+      
+      console.log("Formatted weightPounds: ", formData.weightPounds);
+      console.log("Formatted weightOunces: ", formData.weightOunces);
+      console.log("Formatted weight: ", formData.weight);
+    }
+    else {
+      formData.weight = parseFloat(formData.weight).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      console.log("Formatted weight: ", formData.weight);
+    }
+
     fetch('http://127.0.0.1:5000/api/foodlog', {
       method: 'POST',
       headers: {
@@ -207,6 +235,34 @@ function App() {
 
   const onUpdate = (e) => {
     console.log("We are in the onUpdate function!");
+
+    const { carbs, fiber, sugarAlcohol } = formData;
+    const fiberValue = parseFloat(fiber) || 0;
+    const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
+    const carbsValue = parseFloat(carbs) || 0;
+  
+    if (fiberValue + sugarAlcoholValue > carbsValue) {
+      alert("Fiber and sugar alcohols together cannot exceed total carbs.");
+      return;
+    }
+
+    // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
+    if (formData.weight_unit === "lb_oz") {
+      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+
+      // Also going to create the "&" string here as a template literal.
+      // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
+      formData.weight_value = (`${formData.weightPounds}&${formData.weightOunces}`)
+      
+      console.log("Formatted weightPounds: ", formData.weightPounds);
+      console.log("Formatted weightOunces: ", formData.weightOunces);
+      console.log("Formatted weight: ", formData.weight_value);
+    }
+    else {
+      formData.weight_value = parseFloat(formData.weight_value).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+      console.log("Formatted weight: ", formData.weight_value);
+    }
 
     fetch('http://127.0.0.1:5000/api/foodlog', {
       method: 'PATCH',
@@ -549,6 +605,9 @@ function App() {
             }
           };
 
+          // Last thing to do is to reset the result string. Have to do this manually since we're not relying on the backend here.
+          updatedItem.result = setNewResultString(updatedItem);
+
           // Now done with the updating, add it the updatedFoodItems array and keep moving through the loop.
           updatedFoodItems.push(updatedItem);
         }
@@ -562,6 +621,49 @@ function App() {
       console.error('Error while updating: ', error);
     });
   };
+
+  // Because we can't rely on a GET request to refresh everything after editing a FoodItem, we have to recreate the result string on the frontend as well.
+  // Which I don't love... but it's the only way to complete the functionality without more GET requests.
+  // This is essentially just a recreation of the generate_result_string() method in the FoodItem model.
+  function setNewResultString(updatedItem) {
+    let weight_value = updatedItem.weight_value;
+    let weight_unit = updatedItem.weight_unit;
+
+    // Just as in the backend, lb_oz is a special case.
+    if (weight_unit === 'lb_oz') {
+      // First split our weight_value based on the & - this will be pounds and ounces respectively.
+      const poundsAndOunces = weight_value.split("&");
+
+      // Check if poundsAndOunces has two values - just error checking. It always should.
+      if (poundsAndOunces.length === 2) {
+        // Now create separate pounds and ounces variables from the split.
+        const pounds = poundsAndOunces[0];
+        const ounces = poundsAndOunces[1];
+        console.log("Pounds after splitting in setNewResultString: ", pounds);
+        console.log("Ounces after splitting in setNewResultString: ", ounces);
+        // And format our weight_value string with those values.
+        weight_value = `${pounds} lb${pounds !== 1 ? 's' : ''} & ${ounces} oz`;
+      }
+      // If the poundsAndOunces split didn't result in two values, format it as an error instead.
+      else {
+        console.log("Unexpected weight_value format for lb_oz: ", weight_value);
+        weight_value = "Invalid weight format";
+      }
+    }
+
+    console.log("Weight value after the lboz if statement: ", weight_value);
+
+    // Now that we have the lb_oz flow covered, format the result string and return it.
+    if (['lb_oz'].includes(weight_unit)) {
+      return `${weight_value} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
+    }
+    else if (['g', 'kg'].includes(weight_unit)) {
+      return `${weight_value}${weight_unit} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
+    }
+    else {
+      return `${weight_value} ${weight_unit} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
+    }
+  }
 
   return (
     <div className="App">
@@ -713,7 +815,7 @@ function App() {
                         <input
                           type="number"
                           name="weightLbs"
-                          value={editValues.weight.split("&")[0] || ""}
+                          value={editValues.weight_value.split("&")[0] || ""}
                           onChange={handleEditChange}
                           className="small-input"
                           placeholder="Lbs"
@@ -721,7 +823,7 @@ function App() {
                         <input
                           type="number"
                           name="weightOz"
-                          value={editValues.weight.split("&")[1] || ""}
+                          value={editValues.weight_value.split("&")[1] || ""}
                           onChange={handleEditChange}
                           className="small-input"
                           placeholder="Oz"

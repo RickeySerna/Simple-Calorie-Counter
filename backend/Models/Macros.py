@@ -93,10 +93,10 @@ class Macros(db.Model):
         }
 
         # For most units, we just return weight * the conversion factor passed on the function call.
-        if data.get('weightUnit') in conversion_factors:
-            weight_in_grams = Decimal(data.get('weight')) * conversion_factors[data.get('weightUnit')]
+        if data.get('weight_unit') in conversion_factors:
+            weight_in_grams = Decimal(data.get('weight')) * conversion_factors[data.get('weight_unit')]
         # Lbs and oz is a slightly special case so we call those explicitly here.
-        elif data.get('weightUnit') == "lb_oz":
+        elif data.get('weight_unit') == "lb_oz":
             weight_in_grams = (Decimal((data.get('weightPounds'))) * conversion_factors["lb"]) + (Decimal((data.get('weightOunces'))) * conversion_factors["oz"])
         # This is triggered is the unit is "g" as that is not in conversion_factors. In that case, just return the weight.
         else:

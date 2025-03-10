@@ -21,8 +21,8 @@ class FoodItem(db.Model):
         self.day = int(data.get("date")[8:10])
         self.name = data.get("foodName")
         self.sub_description = data.get("subclass")
-        self.weight_value = data.get("weight")
-        self.weight_unit = data.get("weightUnit")
+        self.weight_value = data.get("weight_value")
+        self.weight_unit = data.get("weight_unit")
         self.macros = Macros(data)
 
     def generate_result_string(self, item):
