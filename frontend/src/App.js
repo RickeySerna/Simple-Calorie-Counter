@@ -9,8 +9,8 @@ function App() {
     date: format(new Date(), 'yyyy-MM-dd'),
     foodName: '',
     subclass: '',
-    weight: '',
-    weightUnit: 'g',
+    weight_value: '',
+    weight_unit: 'g',
     calories: '',
     servingSize: '',
     servingSizeUnit: 'g',
@@ -41,8 +41,8 @@ function App() {
   // State tracking for the edit functionality.
   const [editingId, setEditingId] = useState(null);
   const [initialValues, setInitialValues] = useState({
-    weight: '',
-    weightUnit: '',
+    weight_value: '',
+    weight_unit: '',
     name: '',
     sub_description: '',
     calories: '',
@@ -52,8 +52,8 @@ function App() {
   });
 
   const [editValues, setEditValues] = useState({
-    weight: '',
-    weightUnit: '',
+    weight_value: '',
+    weight_unit: '',
     name: '',
     sub_description: '',
     calories: '',
@@ -265,7 +265,7 @@ function App() {
     }
 
     // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
-    if (formData.weightUnit === "lb_oz") {
+    if (formData.weight_unit === "lb_oz") {
       formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
       formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
 
@@ -358,8 +358,8 @@ function App() {
     console.log("The item we're editing: ", item);
 
     setInitialValues({
-      weight: item.weight_value,
-      weightUnit: item.weight_unit,
+      weight_value: item.weight_value,
+      weight_unit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
       calories: item.macros.calories,
@@ -369,8 +369,8 @@ function App() {
     });
 
     setEditValues({
-      weight: item.weight_value,
-      weightUnit: item.weight_unit,
+      weight_value: item.weight_value,
+      weight_unit: item.weight_unit,
       name: item.name,
       sub_description: item.sub_description,
       calories: item.macros.calories,
@@ -391,7 +391,7 @@ function App() {
   
       // To ensure that no type mismatches occur between initialValues and editValues, we set the type based on the field.
       // Calories, carbs, fat, protein, and weight are cast as Numbers if that's the field edited.
-      if (['calories', 'carbs', 'fat', 'protein', 'weight'].includes(name)) {
+      if (['calories', 'carbs', 'fat', 'protein', 'weight_value'].includes(name)) {
         newValue = value === '' ? '' : Number(value) < 0 ? 0 : Number(value);
       } else {
         // If it's another, then it can become a string and that's fine because those fields are also strings in initialValues.
@@ -401,14 +401,14 @@ function App() {
       // To make sure that the user doesn't save mismatched weight and weight unit values, we clear the weight field when switching between values here.
       // This is so they don't do something like switch from g to kg, forget to change the weight value, then save the FoodItem as 350kg instead of 350g. Big difference there.
       // So first identify that the change happened to the weight unit.
-      if (name === 'weightUnit') {
-        // Now we return a new object composed of the values before editing with the new weightUnit and weight set as an empty string.
+      if (name === 'weight_unit') {
+        // Now we return a new object composed of the values before editing with the new weight_unit and weight set as an empty string.
         return {
           // Use the spread operator to break apart prevValues are return all of it's attributes.
           ...prevValues,
           // BUT with these two explicitly set. So basically, keep everything else, but change these two.
-          weight: '',
-          weightUnit: value
+          weight_value: '',
+          weight_unit: value
         };
       }
 
@@ -419,14 +419,14 @@ function App() {
         // Now we dynamically set both weightLbs and weightOz; we check for the field we're editing first.
         // If the condition comes back as true (which means it's the field they're editing), the newValue will be set (what the user entered).
         // If the condition comes back as false, it gets the previous/existing value (which means they were editing the other field).
-        const weightLbs = name === 'weightLbs' ? newValue : prevValues.weight.split('&')[0];
-        const weightOz = name === 'weightOz' ? newValue : prevValues.weight.split('&')[1];
+        const weightLbs = name === 'weightLbs' ? newValue : prevValues.weight_value.split('&')[0];
+        const weightOz = name === 'weightOz' ? newValue : prevValues.weight_value.split('&')[1];
 
         // Now we've got our new lb&oz value, slap 'em back together and set that string as the weight value!
         newValue = `${weightLbs}&${weightOz}`;
         return {
           ...prevValues,
-          weight: newValue
+          weight_value: newValue
         };
       }
   
@@ -449,10 +449,10 @@ function App() {
     console.log("Type of editValues items: ", (typeof editValues.calories))
 
     // Ensuring that the weight field(s) are filled out.
-    // First check what the user set as the weightUnit.
-    if (editValues.weightUnit === 'lb_oz') {
+    // First check what the user set as the weight_unit.
+    if (editValues.weight_unit === 'lb_oz') {
       // If they chose lb_oz, then we split weight into the two separate lb & oz values.
-      const [weightLbs, weightOz] = editValues.weight.split('&');
+      const [weightLbs, weightOz] = editValues.weight_value.split('&');
       // Then we check that they're both filled.
       if (!weightLbs || !weightOz) {
         // If not, throw an error, reset the edit ID to bring the field back to nornal, and return - no HTTP request sent whatsoever.
@@ -464,7 +464,7 @@ function App() {
     else {
       // Same deal the other weight units, just don't have to do the splitting then.
       // So just check if weight is empty and throw an error and return if so.
-      if (!editValues.weight) {
+      if (!editValues.weight_value) {
         console.log('Weight field must be filled when editing.');
         setEditingId(null);
         return;
@@ -552,11 +552,11 @@ function App() {
           if (changes.hasOwnProperty("sub_description")) {
             updatedItem["sub_description"] = changes["sub_description"];
           }
-          if (changes.hasOwnProperty("weight")) {
-            updatedItem["weight_value"] = changes["weight"];
+          if (changes.hasOwnProperty("weight_value")) {
+            updatedItem["weight_value"] = changes["weight_value"];
           }
-          if (changes.hasOwnProperty("weightUnit")) {
-            updatedItem["weight_unit"] = changes["weightUnit"];
+          if (changes.hasOwnProperty("weight_unit")) {
+            updatedItem["weight_unit"] = changes["weight_unit"];
           }
 
           // Now done with the updating, add it the updatedFoodItems array and keep moving through the loop.
@@ -587,7 +587,7 @@ function App() {
                     <label>Item:</label>
                     <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
                   </div>
-                  {formData.weightUnit === 'lb_oz' ? (
+                  {formData.weight_unit === 'lb_oz' ? (
                     <>
                       <div className="form-group" style={{ flex: '1' }}>
                         <label>Weight: (lbs)</label>
@@ -601,12 +601,12 @@ function App() {
                   ) : (
                     <div className="form-group" style={{ flex: '1' }}>
                       <label>Weight:</label>
-                      <input type="number" name="weight" value={formData.weight} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                      <input type="number" name="weight_value" value={formData.weight_value} onChange={handleChange} onKeyDown={handleKeyDown} required />
                     </div>
                   )}
                   <div className="form-group" style={{ flex: '1' }}>
                     <label>Unit:</label>
-                    <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} required>
+                    <select name="weight_unit" value={formData.weight_unit} onChange={handleChange} required>
                       <option value="g">g</option>
                       <option value="oz">oz</option>
                       <option value="lb_oz">lb & oz</option>
@@ -718,7 +718,7 @@ function App() {
                 {editingId === result.id ? (
                   <>
                     <span className="result-text">
-                    {editValues.weightUnit === "lb_oz" ? (
+                    {editValues.weight_unit === "lb_oz" ? (
                       <>
                         <input
                           type="number"
@@ -740,16 +740,16 @@ function App() {
                     ) : (
                       <input
                         type="number"
-                        name="weight"
-                        value={editValues.weight}
+                        name="weight_value"
+                        value={editValues.weight_value}
                         onChange={handleEditChange}
                         className="small-input"
                         placeholder="Weight"
                       />
                     )}
                       <select
-                        name="weightUnit"
-                        value={editValues.weightUnit}
+                        name="weight_unit"
+                        value={editValues.weight_unit}
                         onChange={handleEditChange}
                         className="small-input"
                       >
