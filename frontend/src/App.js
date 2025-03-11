@@ -569,7 +569,19 @@ function App() {
       },
       body: JSON.stringify(changes)
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response from server:', response);
+      
+      // Checking if a 200 level response was received from the server.
+      if (!response.ok) {
+        // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+        return response.json().then(errorData => {
+          // Just returning the HTTP status and the message the server returned.
+          throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
       console.log('Successfully updated: ', data);
 

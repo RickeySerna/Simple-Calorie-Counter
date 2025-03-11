@@ -48,44 +48,76 @@ def get_food_items_by_date():
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PUT'])
 def update_food_item(id):
     data = request.get_json()
-    item = FoodItem.query.get_or_404(id)
     print(f"Data with update values: {data}")
-    print(f"Item to update: {item}")
 
-    # Now that the attribute names match between the front and back end, we can do this dynamically.
-    # So loop through the data dictionary.
-    for key in data:
-        # First check if the macros object inside of the FoodItem has the key we're looking at.
-        if hasattr(item.macros, key):
-            # If it does, replace the replace it's value with the value from the data object.
-            setattr(item.macros, key, data[key])
-        else:
-            # If it doesn't, then replace the value in the toplevel FoodItem object instead.
-            setattr(item, key, data[key])
+    # Wrapping this in a try-except to catch any errors that might come up when querying the database.
+    try:
+        # Using the filter() method from SQLalchemy to grab the FoodLog object.
+        item = FoodItem.query.filter(
+            FoodItem.id == id
+        ).first()
+    except Exception as e:
+        return jsonify({"DATABASE ERROR": str(e)}), 400
 
-    db.session.commit()
-    return jsonify({'message': 'Food item updated successfully', 'updated_item': item.to_dict()}), 200
+    print(f"Item to update in fooditems PUT: {item}")
+
+    if item:
+        try:
+            # Now that the attribute names match between the front and back end, we can do this dynamically.
+            # So loop through the data dictionary.
+            for key in data:
+                # First check if the macros object inside of the FoodItem has the key we're looking at.
+                if hasattr(item.macros, key):
+                    # If it does, replace the replace it's value with the value from the data object.
+                    setattr(item.macros, key, data[key])
+                else:
+                    # If it doesn't, then replace the value in the toplevel FoodItem object instead.
+                    setattr(item, key, data[key])
+
+            db.session.commit()
+            return jsonify({'message': 'FoodItem updated successfully', 'updated_item': item.to_dict()}), 200
+        except Exception as e:
+            return jsonify({"ERROR": str(e)}), 400
+    else:
+        print(f"FoodItem with ID: {id} not found")
+        return jsonify({'message': 'FoodItem not found.'}), 404
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PATCH'])
 def update_food_item_partially(id):
     data = request.get_json()
-    item = FoodItem.query.get_or_404(id)
     print(f"Data with update values: {data}")
-    print(f"Item to update: {item}")
 
-    # Now that the attribute names match between the front and back end, we can do this dynamically.
-    # So loop through the data dictionary.
-    for key in data:
-        # First check if the macros object inside of the FoodItem has the key we're looking at.
-        if hasattr(item.macros, key):
-            # If it does, replace the replace it's value with the value from the data object.
-            setattr(item.macros, key, data[key])
-        else:
-            # If it doesn't, then replace the value in the toplevel FoodItem object instead.
-            setattr(item, key, data[key])
-    
-    db.session.commit()
-    return jsonify({'message': 'Food item partially updated successfully', 'updated_item': item.to_dict()}), 200
+    # Wrapping this in a try-except to catch any errors that might come up when querying the database.
+    try:
+        # Using the filter() method from SQLalchemy to grab the FoodLog object.
+        item = FoodItem.query.filter(
+            FoodItem.id == id
+        ).first()
+    except Exception as e:
+        return jsonify({"DATABASE ERROR": str(e)}), 400
+
+    print(f"Item to update in fooditems PUT: {item}")
+
+    if item:
+        try:
+            # Now that the attribute names match between the front and back end, we can do this dynamically.
+            # So loop through the data dictionary.
+            for key in data:
+                # First check if the macros object inside of the FoodItem has the key we're looking at.
+                if hasattr(item.macros, key):
+                    # If it does, replace the replace it's value with the value from the data object.
+                    setattr(item.macros, key, data[key])
+                else:
+                    # If it doesn't, then replace the value in the toplevel FoodItem object instead.
+                    setattr(item, key, data[key])
+
+            db.session.commit()
+            return jsonify({'message': 'FoodItem updated successfully', 'updated_item': item.to_dict()}), 200
+        except Exception as e:
+            return jsonify({"ERROR": str(e)}), 400
+    else:
+        print(f"FoodItem with ID: {id} not found")
+        return jsonify({'message': 'FoodItem not found.'}), 404
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):
