@@ -64,7 +64,7 @@ def update_food_item(id):
             setattr(item, key, data[key])
 
     db.session.commit()
-    return jsonify({'message': 'Food item updated successfully'}), 200
+    return jsonify({'message': 'Food item updated successfully', 'updated_item': item.to_dict()}), 200
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['PATCH'])
 def update_food_item_partially(id):
@@ -85,7 +85,7 @@ def update_food_item_partially(id):
             setattr(item, key, data[key])
     
     db.session.commit()
-    return jsonify({'message': 'Food item partially updated successfully'}), 200
+    return jsonify({'message': 'Food item partially updated successfully', 'updated_item': item.to_dict()}), 200
 
 @food_item_bp.route('/api/fooditems/<int:id>', methods=['DELETE'])
 def delete_food_item(id):

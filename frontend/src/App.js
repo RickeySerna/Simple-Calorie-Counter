@@ -587,29 +587,8 @@ function App() {
         }
         // Once we find it, we update it with the changes made by user.
         else {
-          // First create a copy of the FoodItem that was edited.
-          let updatedItem = currentFoodItems[i];
-          console.log("The FoodItem we're updating IN THE FOR LOOP: ", updatedItem);
-
-          // Now that the attribute names match between the front and back end, we can do this dynamically.
-          // So first loop through the keys in the changes object.
-          for (const key in changes) {
-            // Check if the macros object inside of the FoodItem has the attribute we're looking at.
-            if (updatedItem.macros.hasOwnProperty(key)) {
-              // If it does, replace it with the corresponding value in changes.
-              updatedItem.macros[key] = changes[key];
-            }
-            else {
-              // If it doesn't, replace the value in the toplevel FoodItem object.
-              updatedItem[key] = changes[key];
-            }
-          };
-
-          // Last thing to do is to reset the result string. Have to do this manually since we're not relying on the backend here.
-          updatedItem.result = setNewResultString(updatedItem);
-
-          // Now done with the updating, add it the updatedFoodItems array and keep moving through the loop.
-          updatedFoodItems.push(updatedItem);
+          // The server returns the entire updated FoodItem now. So just grab it from data and push it into the new array.
+          updatedFoodItems.push(data.updated_item);
         }
       }
       
@@ -621,49 +600,6 @@ function App() {
       console.error('Error while updating: ', error);
     });
   };
-
-  // Because we can't rely on a GET request to refresh everything after editing a FoodItem, we have to recreate the result string on the frontend as well.
-  // Which I don't love... but it's the only way to complete the functionality without more GET requests.
-  // This is essentially just a recreation of the generate_result_string() method in the FoodItem model.
-  function setNewResultString(updatedItem) {
-    let weight_value = updatedItem.weight_value;
-    let weight_unit = updatedItem.weight_unit;
-
-    // Just as in the backend, lb_oz is a special case.
-    if (weight_unit === 'lb_oz') {
-      // First split our weight_value based on the & - this will be pounds and ounces respectively.
-      const poundsAndOunces = weight_value.split("&");
-
-      // Check if poundsAndOunces has two values - just error checking. It always should.
-      if (poundsAndOunces.length === 2) {
-        // Now create separate pounds and ounces variables from the split.
-        const pounds = poundsAndOunces[0];
-        const ounces = poundsAndOunces[1];
-        console.log("Pounds after splitting in setNewResultString: ", pounds);
-        console.log("Ounces after splitting in setNewResultString: ", ounces);
-        // And format our weight_value string with those values.
-        weight_value = `${pounds} lb${pounds !== 1 ? 's' : ''} & ${ounces} oz`;
-      }
-      // If the poundsAndOunces split didn't result in two values, format it as an error instead.
-      else {
-        console.log("Unexpected weight_value format for lb_oz: ", weight_value);
-        weight_value = "Invalid weight format";
-      }
-    }
-
-    console.log("Weight value after the lboz if statement: ", weight_value);
-
-    // Now that we have the lb_oz flow covered, format the result string and return it.
-    if (['lb_oz'].includes(weight_unit)) {
-      return `${weight_value} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
-    }
-    else if (['g', 'kg'].includes(weight_unit)) {
-      return `${weight_value}${weight_unit} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
-    }
-    else {
-      return `${weight_value} ${weight_unit} of ${updatedItem.name}${updatedItem.sub_description ? ` (${updatedItem.sub_description})` : ''}: ${updatedItem.macros.calories} calories, ${updatedItem.macros.protein}g of protein, ${updatedItem.macros.carbs}g of carbs, ${updatedItem.macros.fat}g of fat`;
-    }
-  }
 
   return (
     <div className="App">
