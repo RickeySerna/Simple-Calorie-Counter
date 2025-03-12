@@ -29,7 +29,10 @@ function App() {
     servingSizeOunces: ''
   });
 
+  // State tracking for the date we're looking at and a previousDatesMonth that will be used to determine if we need to make another GET request.
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [previousDatesMonth, setPreviousDatesMonth] = useState(null);
+
   const [currentEntries, setCurrentEntries] = useState([]);
   const [totals, setTotals] = useState({
     calories: 0,
@@ -64,7 +67,7 @@ function App() {
 
   // This state contains the full set of FoodLog objects for the entire month.
   // When the fetch call to the /search endpoint is successful, that data is returned and set to this state.
-  // UPDATE: We're not using states to manage ALL of this.
+  // UPDATE: We're now using states to manage ALL of this.
   const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
   const [currentFoodLog, setCurrentFoodLog] = useState(null);
   const [currentFoodItems, setCurrentFoodItems] = useState([]);
@@ -73,11 +76,26 @@ function App() {
   // When a change goes out to the currentDate state, meaning either the page is loaded or the date is changed, we handle the FoodLogs as necessary.
   // If it's the initial load of the page or the month changes, then fetchFoodLogs() is called.
   useEffect(() => {
+    // First get the month value of the date we just switched to.
+    const currentMonth = currentDate.getMonth();
     const dateKey = formData.date;
 
-    console.log("Date key to send to the server: ", dateKey);
+    // Now check if the month has changed. If we're still in the same month, we don't need to do anything.
+    if (currentMonth !== previousDatesMonth) {
+      // If the month changed, we need to get the FoodLogs for that new month.
+      console.log("Running a new GET request with the following dateKey: ", dateKey);
+      fetchFoodLogs(dateKey);
 
-    fetchFoodLogs(dateKey);
+      // Also need to update previousDatesMonth to make sure the next date change checks THIS months date as the previous date's month.
+      setPreviousDatesMonth(currentMonth); // Update the previous month
+    }
+    // If the month didn't change, we don't need to run another GET request, BUT we do need to update the currentFoodLog.
+    else {
+      console.log("Same month; no new GET request needed!");
+      // Same logic as the thisMonthsFoodLogs useEffect; grab the day we're looking at and check the thisMonthsFoodLogs state for a FoodLog with that date, then set it currentFoodLog.
+      const currentDay = currentDate.getDate();
+      setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
+    }
   }, [currentDate]);
 
   // fetchFoodLogs() sets thisMonthsFoodLogs which calls this useEffect() hook.
