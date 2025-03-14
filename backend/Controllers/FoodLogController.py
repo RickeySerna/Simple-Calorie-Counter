@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
+from calendar import monthrange
 from sqlalchemy import and_
 from Models import *
 import math
@@ -24,14 +25,16 @@ def add_food_item():
 def search_for_foodlogs_in_month():
     # Grabbing the date string from the query parameters.
     date = request.args.get('date')
+    print(f"The date string passed to the /search endpoint: {date}")
+    print(f"The type of the date string passed to the /search endpoint: {type(date)}")
 
     # Error checking to make sure a date string was passed.
     if not date:
         return jsonify({"ERROR": "Search endpoint requires a date string."}), 400
 
     # Indexing the year and month from the date string. This will be passed into the FoodLog query.
-    year = date[0:4]
-    month = date[5:7]
+    year = int(date[0:4])
+    month = int(date[5:7])
 
     print(f"Searching for FoodLogs from this month: {month}, in this year: {year}")
 
@@ -47,7 +50,19 @@ def search_for_foodlogs_in_month():
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
-    food_logs_data = [log.to_dict() for log in food_logs]
+    # Using calendar and the date strings we created to get the number of days in the month the user searched in.
+    daysInTheMonth = monthrange(year, month)[1]
+    
+    # Creating an array of the size of daysInTheMonth with all spaces initialized to Nonetypes.
+    food_logs_data = [None] * daysInTheMonth
+
+    # Iterating over the FoodLogs returned by the query.
+    for log in food_logs:
+        # Setting the index where the log will be placed - all FoodLogs will be placed chronologically by the day attribute.
+        # We subtract 1 from the day attribute to account for 0 indexing.
+        index = log.day - 1
+        # Set the index position of the object to the serialized version of the log.
+        food_logs_data[index] = log.to_dict()
 
     return jsonify(food_logs_data), 200
 
