@@ -87,14 +87,13 @@ function App() {
       fetchFoodLogs(dateKey);
 
       // Also need to update previousDatesMonth to make sure the next date change checks THIS months date as the previous date's month.
-      setPreviousDatesMonth(currentMonth); // Update the previous month
+      setPreviousDatesMonth(currentMonth);
     }
     // If the month didn't change, we don't need to run another GET request, BUT we do need to update the currentFoodLog.
     else {
       console.log("Same month; no new GET request needed!");
       // Same logic as the thisMonthsFoodLogs useEffect; grab the day we're looking at and check the thisMonthsFoodLogs state for a FoodLog with that date, then set it currentFoodLog.
-      const currentDay = currentDate.getDate();
-      setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
+      //setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
     }
   }, [currentDate]);
 
@@ -103,8 +102,7 @@ function App() {
   // Then we use that to grab THAT specific days FoodLog object and set it to the currentFoodLog state.
   useEffect(() => {
     console.log("FoodLogs as they are set in the thisMonthsFoodLogs state: ", thisMonthsFoodLogs);
-    const currentDay = currentDate.getDate();
-    setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
+    //setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
   }, [thisMonthsFoodLogs]);
 
   // That triggers this useEffect hook where we finally set the currentFoodItems state.
@@ -752,7 +750,7 @@ function App() {
                   </div>
                 </div>
               </fieldset>
-              {currentFoodLog ? (
+              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
                 <button type="button" onClick={onUpdate}>Update</button>
               ) : (
                 <button type="button" onClick={onCreate}>Create</button>
@@ -771,106 +769,110 @@ function App() {
             </div>
             <h2>Food Log</h2>
             <ul>
-              {currentFoodItems.map((result, index) => (
-                <li key={index} className="list-item">
-                {editingId === result.id ? (
-                  <>
-                    <span className="result-text">
-                    {editValues.weight_unit === "lb_oz" ? (
+              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
+                thisMonthsFoodLogs[currentDate.getDate() - 1].food_items.map((result, index) => (
+                  <li key={index} className="list-item">
+                    {editingId === result.id ? (
                       <>
-                        <input
-                          type="number"
-                          name="weightLbs"
-                          value={editValues.weight_value.split("&")[0] || ""}
-                          onChange={handleEditChange}
-                          className="small-input"
-                          placeholder="Lbs"
-                        />
-                        <input
-                          type="number"
-                          name="weightOz"
-                          value={editValues.weight_value.split("&")[1] || ""}
-                          onChange={handleEditChange}
-                          className="small-input"
-                          placeholder="Oz"
-                        />
+                        <span className="result-text">
+                        {editValues.weight_unit === "lb_oz" ? (
+                          <>
+                            <input
+                              type="number"
+                              name="weightLbs"
+                              value={editValues.weight_value.split("&")[0] || ""}
+                              onChange={handleEditChange}
+                              className="small-input"
+                              placeholder="Lbs"
+                            />
+                            <input
+                              type="number"
+                              name="weightOz"
+                              value={editValues.weight_value.split("&")[1] || ""}
+                              onChange={handleEditChange}
+                              className="small-input"
+                              placeholder="Oz"
+                            />
+                          </>
+                        ) : (
+                          <input
+                            type="number"
+                            name="weight_value"
+                            value={editValues.weight_value}
+                            onChange={handleEditChange}
+                            className="small-input"
+                            placeholder="Weight"
+                          />
+                        )}
+                          <select
+                            name="weight_unit"
+                            value={editValues.weight_unit}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          >
+                            <option value="g">g</option>
+                            <option value="oz">oz</option>
+                            <option value="lb_oz">lb & oz</option>
+                            <option value="mL">mL</option>
+                            <option value="kg">Kg</option>
+                          </select> of
+                          <input
+                            type="text"
+                            name="name"
+                            value={editValues.name}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          /> (
+                          <input
+                            type="text"
+                            name="sub_description"
+                            value={editValues.sub_description}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          />)
+                          <input
+                            type="number"
+                            name="calories"
+                            value={editValues.calories}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          /> calories, 
+                          <input
+                            type="number"
+                            name="protein"
+                            value={editValues.protein}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          />g of protein, 
+                          <input
+                            type="number"
+                            name="carbs"
+                            value={editValues.carbs}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          />g of carbs, 
+                          <input
+                            type="number"
+                            name="fat"
+                            value={editValues.fat}
+                            onChange={handleEditChange}
+                            className="small-input"
+                          />g of fat
+                        </span>
+                        <button className="button-common edit-save-button" onClick={() => handleEditSave(result.id)}>Save</button>
                       </>
                     ) : (
-                      <input
-                        type="number"
-                        name="weight_value"
-                        value={editValues.weight_value}
-                        onChange={handleEditChange}
-                        className="small-input"
-                        placeholder="Weight"
-                      />
+                      <>
+                        <span className="result-text">{result.result}</span>
+                        <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press this button to delete this item from the log">X</button>
+                        <button className="button-common edit-button" onClick={() => handleEdit(result.id, result)} title="Press this button to edit this item">Edit</button>
+                      </>
                     )}
-                      <select
-                        name="weight_unit"
-                        value={editValues.weight_unit}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      >
-                        <option value="g">g</option>
-                        <option value="oz">oz</option>
-                        <option value="lb_oz">lb & oz</option>
-                        <option value="mL">mL</option>
-                        <option value="kg">Kg</option>
-                      </select> of
-                      <input
-                        type="text"
-                        name="name"
-                        value={editValues.name}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      /> (
-                      <input
-                        type="text"
-                        name="sub_description"
-                        value={editValues.sub_description}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      />)
-                      <input
-                        type="number"
-                        name="calories"
-                        value={editValues.calories}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      /> calories, 
-                      <input
-                        type="number"
-                        name="protein"
-                        value={editValues.protein}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      />g of protein, 
-                      <input
-                        type="number"
-                        name="carbs"
-                        value={editValues.carbs}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      />g of carbs, 
-                      <input
-                        type="number"
-                        name="fat"
-                        value={editValues.fat}
-                        onChange={handleEditChange}
-                        className="small-input"
-                      />g of fat
-                    </span>
-                    <button className="button-common edit-save-button" onClick={() => handleEditSave(result.id)}>Save</button>
-                  </>
-                ) : (
-                  <>
-                    <span className="result-text">{result.result}</span>
-                    <button className="button-common delete-button" onClick={() => handleDelete(result.id)} title="Press this button to delete this item from the log">X</button>
-                    <button className="button-common edit-button" onClick={() => handleEdit(result.id, result)} title="Press this button to edit this item">Edit</button>
-                  </>
-                )}
-                </li>
-              ))}
+                  </li>
+                ))
+              ) : (
+                null
+              )}
             </ul>
             <div className="totals">
               <p>{totals.calories} total calories, {totals.protein}g total of protein, {totals.carbs}g total of carbs, {totals.fat}g total of fat</p>
