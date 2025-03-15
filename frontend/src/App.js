@@ -240,9 +240,15 @@ function App() {
       console.log('Success: ', data);
 
       // onCreate specifically creates an entirely new FoodLog, meaning that if it's triggered, no FoodLog existed for the day.
-      // So now that we successfully created one, we can set the currentFoodLog state to the FoodLog item that the POST route returns.
-      // This makes sure that on any subsequent FoodItems being added, it's onUpdate being called; NOT onCreate again.
-      setCurrentFoodLog(data.new_food_log);
+      // Now that one is created, we need to add it to the thisMonthsFoodLogs state.
+      // First create a copy of this state.
+      let updatedFoodLogs = [...thisMonthsFoodLogs];
+
+      // Now index the spot in the array for this day, then set it to the FoodLog returned by the server.
+      updatedFoodLogs[currentDate.getDate() - 1] = data.new_food_log;
+
+      // Set the state to the updated version.
+      setThisMonthsFoodLogs(updatedFoodLogs);
     })
     .catch(error => {
       console.error('Error:', error);
@@ -304,19 +310,15 @@ function App() {
       console.log('Success: ', data);
 
       // We're doing something similar here as we did in the DELETE call.
-      // The endpoint will return the new FoodItem that was created so we just have to create a new array from the current one and add the new FoodItem.
+      // First create a copy of the thisMonthsFoodLogs state.
+      const updatedFoodLogs = [...thisMonthsFoodLogs];
 
-      // In this case though, we don't need to loop through the currentFoodItems array.
-      // It already has everything we need, we just need to add one more FoodItem.
-      // So create a new array with all of the elements of currentFoodItems using the spread operator.
-      const updatedFoodItems = [...currentFoodItems];
-
-      // Now just push the new FoodItem into the new array.
-      updatedFoodItems.push(data.new_food_item);
+      // No need to loop through anything; just index into the food_items array we need and push the new FoodItem into it.
+      updatedFoodLogs[currentDate.getDate() - 1].food_items.push(data.new_food_item);
 
       // And now we have the new array which is exactly what the old one was plus the new FoodItem and we set it to currentFoodItems.
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
-      setCurrentFoodItems(updatedFoodItems);
+      setThisMonthsFoodLogs(updatedFoodLogs);
     })
     .catch(error => {
       console.error('Error:', error);
@@ -395,20 +397,15 @@ function App() {
       return response.json();
     })
     .then(data => {
-      // Because we know the call was successful, we know the FoodItem object was deleted in the DB.
-      // With that, we can just delete the FoodItem from the currentFoodItems state we already have; no need to pull from the DB again.
-      // So create an empty array.
-      const updatedFoodItems = [];
-      // Loop through the currentFoodItems state.
-      for (let i = 0; i < currentFoodItems.length; i++) {
-        // If the object we're looking has an ID that doesn't match the one we delete, add it to the new array.
-        if (currentFoodItems[i].id !== id) {
-          updatedFoodItems.push(currentFoodItems[i]);
-        }
-      }
-      // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
-      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
-      setCurrentFoodItems(updatedFoodItems);
+      // With the update to using thisMonthsFoodLogs, this logic changes.
+      // First create a copy of the entire state.
+      const updatedFoodLogs = [...thisMonthsFoodLogs];
+
+      // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
+      updatedFoodLogs[currentDate.getDate() - 1].food_items = updatedFoodLogs[currentDate.getDate() - 1].food_items.filter(item => item.id != id);
+
+      // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
+      setThisMonthsFoodLogs(updatedFoodLogs);
 
       console.log('Successful deletion:', data);
     })
