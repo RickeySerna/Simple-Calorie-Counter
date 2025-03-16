@@ -29,11 +29,15 @@ function App() {
     servingSizeOunces: ''
   });
 
+  // This state contains the full set of FoodLog objects for the entire month.
+  // When the fetch call to the /search endpoint is successful, that data is returned and set to this state.
+  // It is then used to manage all of the FoodLogs and FoodItems for the month locally and all changes match the database.
+  const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
+
   // State tracking for the date we're looking at and a previousDatesMonth that will be used to determine if we need to make another GET request.
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date(), yyyy-MM-dd);
   const [previousDatesMonth, setPreviousDatesMonth] = useState(null);
 
-  const [currentEntries, setCurrentEntries] = useState([]);
   const [totals, setTotals] = useState({
     calories: 0,
     protein: 0,
@@ -65,15 +69,7 @@ function App() {
     fat: ''
   });
 
-  // This state contains the full set of FoodLog objects for the entire month.
-  // When the fetch call to the /search endpoint is successful, that data is returned and set to this state.
-  // UPDATE: We're now using states to manage ALL of this.
-  const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
-  const [currentFoodLog, setCurrentFoodLog] = useState(null);
-  const [currentFoodItems, setCurrentFoodItems] = useState([]);
-
-  // This is where everything is kicked off.
-  // When a change goes out to the currentDate state, meaning either the page is loaded or the date is changed, we handle the FoodLogs as necessary.
+  // When a change goes out to the currentDate state, meaning either the page is loaded or the date in the result panel is changed, we handle the FoodLogs as necessary.
   // If it's the initial load of the page or the month changes, then fetchFoodLogs() is called.
   useEffect(() => {
     // First get the month value of the date we just switched to.
@@ -89,27 +85,17 @@ function App() {
       // Also need to update previousDatesMonth to make sure the next date change checks THIS months date as the previous date's month.
       setPreviousDatesMonth(currentMonth);
     }
-    // If the month didn't change, we don't need to run another GET request, BUT we do need to update the currentFoodLog.
+    // If the month didn't change, we don't need to run another GET request.
     else {
       console.log("Same month; no new GET request needed!");
-      // Same logic as the thisMonthsFoodLogs useEffect; grab the day we're looking at and check the thisMonthsFoodLogs state for a FoodLog with that date, then set it currentFoodLog.
-      //setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
     }
   }, [currentDate]);
 
   // fetchFoodLogs() sets thisMonthsFoodLogs which calls this useEffect() hook.
-  // Now that we have all of the FoodLogs for the month, we get the day part of the currentDate state.
-  // Then we use that to grab THAT specific days FoodLog object and set it to the currentFoodLog state.
+  // Also changed in the handler functions for the various actions.
   useEffect(() => {
     console.log("FoodLogs as they are set in the thisMonthsFoodLogs state: ", thisMonthsFoodLogs);
-    //setCurrentFoodLog(thisMonthsFoodLogs.find(log => log.day === currentDay) || null);
   }, [thisMonthsFoodLogs]);
-
-  // That triggers this useEffect hook where we finally set the currentFoodItems state.
-  useEffect(() => {
-    console.log("currentFoodLog set as: ", currentFoodLog);
-    setCurrentFoodItems(currentFoodLog ? currentFoodLog.food_items : []);
-  }, [currentFoodLog]);
 
   const fetchFoodLogs = (dateKey) => {
 
@@ -129,45 +115,6 @@ function App() {
           console.error("Error while attempting to fetch FoodLogs: ", error);
       });
 
-  }
-
-  // Moving the fetching logic into it's own function call.
-  // This allows us to readily call this function in more places, like right after the POST call to update the food log right after a new food item is added.
-  const fetchFoodItems = (dateKey) => {
-    // Using the GET method in the controller to pull FoodItem objects in the DB for this date.
-    fetch(`http://127.0.0.1:5000/api/foodlog?date=${dateKey}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log('Data received from server:', data);
-        setCurrentEntries(data);
-
-        const newTotals = data.reduce(
-          (acc, entry) => {
-            const regex = /(\d+(\.\d+)?) calories, (\d+(\.\d+)?)g of protein, (\d+(\.\d+)?)g of carbs, (\d+(\.\d+)?)g of fat/;
-            const matches = entry.result.match(regex);
-            if (matches) {
-              const [, calories, , protein, , carbs, , fat] = matches.map(Number);
-              return {
-                calories: acc.calories + (calories || 0),
-                protein: acc.protein + (protein || 0),
-                carbs: acc.carbs + (carbs || 0),
-                fat: acc.fat + (fat || 0)
-              };
-            }
-            return acc;
-          },
-          { calories: 0, protein: 0, carbs: 0, fat: 0 }
-        );
-        setTotals({
-          calories: Math.round(newTotals.calories * 100) / 100,
-          protein: Math.round(newTotals.protein * 100) / 100,
-          carbs: Math.round(newTotals.carbs * 100) / 100,
-          fat: Math.round(newTotals.fat * 100) / 100
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching food items:', error);
-      });
   }
 
   const handleChange = (e) => {
@@ -316,7 +263,6 @@ function App() {
       // No need to loop through anything; just index into the food_items array we need and push the new FoodItem into it.
       updatedFoodLogs[currentDate.getDate() - 1].food_items.push(data.new_food_item);
 
-      // And now we have the new array which is exactly what the old one was plus the new FoodItem and we set it to currentFoodItems.
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setThisMonthsFoodLogs(updatedFoodLogs);
     })
@@ -324,56 +270,6 @@ function App() {
       console.error('Error:', error);
     });
   };
-
-/*  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    const { carbs, fiber, sugarAlcohol } = formData;
-    const fiberValue = parseFloat(fiber) || 0;
-    const sugarAlcoholValue = parseFloat(sugarAlcohol) || 0;
-    const carbsValue = parseFloat(carbs) || 0;
-  
-    if (fiberValue + sugarAlcoholValue > carbsValue) {
-      alert("Fiber and sugar alcohols together cannot exceed total carbs.");
-      return;
-    }
-
-    // To relieve some pressure from the server, we're doing the weight formatting here before the data is ever sent off.
-    if (formData.weight_unit === "lb_oz") {
-      formData.weightPounds = parseFloat(formData.weightPounds).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
-      formData.weightOunces = parseFloat(formData.weightOunces).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
-
-      // Also going to create the "&" string here as a template literal.
-      // This way the server doesn't have to do any formatting at all. Regardless of flow, formData.weight will have the exact weight in the exact format we need.
-      formData.weight = (`${formData.weightPounds}&${formData.weightOunces}`)
-      
-      console.log("Formatted weightPounds: ", formData.weightPounds);
-      console.log("Formatted weightOunces: ", formData.weightOunces);
-      console.log("Formatted weight: ", formData.weight);
-    }
-    else {
-      formData.weight = parseFloat(formData.weight).toString().replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
-      console.log("Formatted weight: ", formData.weight);
-    }
-    
-    fetch('http://127.0.0.1:5000/api/foodlog', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success: ', data);
-
-      // Now that a new a food item is successfully created, immediately update the log which now includes said new item.
-      fetchFoodItems(formData.date);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  };*/
 
   const handleDelete = (id) => {
     console.log(`The ID to delete: ${id}`);
@@ -638,7 +534,7 @@ function App() {
         <h1>Simple Calorie Counter</h1>
         <div className="container">
           <div className="form-panel">
-            <form /*onSubmit={handleSubmit}*/>
+            <form>
               <fieldset>
                 <legend>Food Item Information:</legend>
                 <div className="form-group">
