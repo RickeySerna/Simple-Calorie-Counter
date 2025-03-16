@@ -601,14 +601,18 @@ function App() {
       // Set the editingId back to null so that it renders in the result panel with the normal format.
       setEditingId(null);
 
+      // Creating a copy of the thisMonthsFoodLogs state.
+      let updatedFoodLogs = [...thisMonthsFoodLogs];
+
       // The item was updated on the backend, but now we need to update it in the local state too.
       // Similar to the DELETE call, we create an empty array first.
       const updatedFoodItems = [];
-      // Loop through the currentFoodItems state.
-      for (let i = 0; i < currentFoodItems.length; i++) {
+
+      // Loop through the food_items array in the FoodLog containing the FoodItem that was updated.
+      for (let i = 0; i < updatedFoodLogs[currentDate.getDate() - 1].food_items.length; i++) {
         // If the object we're looking at has an ID that doesn't match the one we edited, just add it to the new array and move to the next.
-        if (currentFoodItems[i].id !== id) {
-          updatedFoodItems.push(currentFoodItems[i]);
+        if (updatedFoodLogs[currentDate.getDate() - 1].food_items[i].id !== id) {
+          updatedFoodItems.push(updatedFoodLogs[currentDate.getDate() - 1].food_items[i]);
         }
         // Once we find it, we update it with the changes made by user.
         else {
@@ -616,10 +620,12 @@ function App() {
           updatedFoodItems.push(data.updated_item);
         }
       }
+
+      // Instead of setting the array to a separate state as we did previously, now we just set the food_items array to the array we just created.
+      updatedFoodLogs[currentDate.getDate() - 1].food_items = updatedFoodItems;
       
-      // Now we have the newly constructed array WITHOUT the FoodItem that was deleted, set it as the currentFoodItems state.
-      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
-      setCurrentFoodItems(updatedFoodItems);
+      // Now set the thisMonthsFoodLogs state. Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
+      setThisMonthsFoodLogs(updatedFoodLogs);
     })
     .catch(error => {
       console.error('Error while updating: ', error);
