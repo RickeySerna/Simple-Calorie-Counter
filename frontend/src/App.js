@@ -35,7 +35,7 @@ function App() {
   const [thisMonthsFoodLogs, setThisMonthsFoodLogs] = useState([]);
 
   // State tracking for the date we're looking at and a previousDatesMonth that will be used to determine if we need to make another GET request.
-  const [currentDate, setCurrentDate] = useState(new Date(), yyyy-MM-dd);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [previousDatesMonth, setPreviousDatesMonth] = useState(null);
 
   const [totals, setTotals] = useState({
