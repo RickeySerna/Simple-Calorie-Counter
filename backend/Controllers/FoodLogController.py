@@ -152,27 +152,33 @@ def add_FoodItem_to_existing_FoodLog():
     # Wrapping this in a try-except to catch any errors that might come up when querying the database.
     try:
         # Using the filter() method from SQLalchemy to grab the FoodLog object.
-        food_logs = FoodLog.query.filter(
+        food_log = FoodLog.query.filter(
             and_(
                 FoodLog.year == year,
                 FoodLog.month == month,
                 FoodLog.day == day
             )
-        ).all()
+        ).first()
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
     # Turning our FoodLog into a dictionary using the built-in to_dict() method to access its FoodItem array.
-    FoodLogToUpdate = [log.to_dict() for log in food_logs]
+    FoodLogToUpdate = food_log.to_dict()
 
     print(f"Here's the FoodLog object we're adding to: {FoodLogToUpdate}")
-    print(f"ID of the log we're updating: {FoodLogToUpdate[0]["id"]}")
+    print(f"ID of the log we're updating: {FoodLogToUpdate["id"]}")
 
     # Creating the new FoodItem to be added into the FoodLog.
     new_food_item = FoodItem(data)
     # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
     # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
-    new_food_item.food_log_id = FoodLogToUpdate[0]["id"]
+    new_food_item.food_log_id = FoodLogToUpdate["id"]
+
+    # Updating the total_* attributes on the FoodLog with the values from the new FoodItem.
+    food_log.total_calories = str(float(new_food_item.macros.calories) + float(food_log.total_calories))
+    food_log.total_protein = str(float(new_food_item.macros.protein) + float(food_log.total_protein))
+    food_log.total_carbs = str(float(new_food_item.macros.carbs) + float(food_log.total_carbs))
+    food_log.total_fat = str(float(new_food_item.macros.fat) + float(food_log.total_fat))
 
     # Adding the new FoodItem to the DB.
     db.session.add(new_food_item)
