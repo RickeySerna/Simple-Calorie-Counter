@@ -38,13 +38,6 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [previousDatesMonth, setPreviousDatesMonth] = useState(null);
 
-  const [totals, setTotals] = useState({
-    calories: 0,
-    protein: 0,
-    carbs: 0,
-    fat: 0
-  });
-
   // State tracking for the edit functionality.
   const [editingId, setEditingId] = useState(null);
   const [initialValues, setInitialValues] = useState({
@@ -57,7 +50,6 @@ function App() {
     carbs: '',
     fat: ''
   });
-
   const [editValues, setEditValues] = useState({
     weight_value: '',
     weight_unit: '',
