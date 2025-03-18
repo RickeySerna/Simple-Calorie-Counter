@@ -260,8 +260,8 @@ function App() {
       // First create a copy of the thisMonthsFoodLogs state.
       const updatedFoodLogs = [...thisMonthsFoodLogs];
 
-      // No need to loop through anything; just index into the food_items array we need and push the new FoodItem into it.
-      updatedFoodLogs[currentDate.getDate() - 1].food_items.push(data.new_food_item);
+      // The server returns a fully updated version of the FoodLog. So just get the index using the currentDate state and set the FoodLog for that date to the object returned by the server.
+      updatedFoodLogs[currentDate.getDate() - 1] = data.updated_food_log;
 
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setThisMonthsFoodLogs(updatedFoodLogs);
@@ -774,7 +774,11 @@ function App() {
               )}
             </ul>
             <div className="totals">
-              <p>{totals.calories} total calories, {totals.protein}g total of protein, {totals.carbs}g total of carbs, {totals.fat}g total of fat</p>
+              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
+                <p>{thisMonthsFoodLogs[currentDate.getDate() - 1].total_calories} total calories, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_protein}g total of protein, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_carbs}g total of carbs, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_fat}g total of fat</p>
+              ) : (
+                null
+              )}
             </div>
           </div>
         </div>

@@ -186,7 +186,7 @@ def add_FoodItem_to_existing_FoodLog():
 
     print("All done, new FoodItem added.")
 
-    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog', 'new_food_item': new_food_item.to_dict()}), 201
+    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog', 'updated_food_log': food_log.to_dict()}), 201
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])
