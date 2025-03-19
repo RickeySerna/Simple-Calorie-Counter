@@ -132,47 +132,32 @@ def update_food_item(id):
     db.session.commit()
     return jsonify({'message': 'Food item updated successfully'})
 
-@food_log_bp.route('/api/foodlog/', methods=['PATCH'])
-def add_FoodItem_to_existing_FoodLog():
+@food_log_bp.route('/api/foodlog/<int:id>', methods=['PATCH'])
+def add_FoodItem_to_existing_FoodLog(id):
     print("About to add FoodItem to existing FoodLog...")
 
     data = request.get_json()
     print(f"Data from frontend in PATCH call: {data}")
 
-    # Grabbing the date from the data.
-    date = data.get('date')
-
-    # Grabbing the date fields we need to pass into the query using indexing.
-    year = int(date[0:4])
-    month = int(date[5:7])
-    day = int(date[8:10])
-
-    print(f"Pulling the FoodLog with this date: year - {year}, month - {month}, day - {day}")
-
     # Wrapping this in a try-except to catch any errors that might come up when querying the database.
     try:
         # Using the filter() method from SQLalchemy to grab the FoodLog object.
+        # Find the update() (or whatever its called) call and COMMENT/LINK IT HERE
         food_log = FoodLog.query.filter(
             and_(
-                FoodLog.year == year,
-                FoodLog.month == month,
-                FoodLog.day == day
+                FoodLog.id == id
             )
         ).first()
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
-    # Turning our FoodLog into a dictionary using the built-in to_dict() method to access its FoodItem array.
-    FoodLogToUpdate = food_log.to_dict()
-
-    print(f"Here's the FoodLog object we're adding to: {FoodLogToUpdate}")
-    print(f"ID of the log we're updating: {FoodLogToUpdate["id"]}")
+    print(f"ID of the log we're updating: {food_log.id}")
 
     # Creating the new FoodItem to be added into the FoodLog.
-    new_food_item = FoodItem(data)
+    new_food_log = FoodLog(data.foodLog)
     # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
     # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
-    new_food_item.food_log_id = FoodLogToUpdate["id"]
+    new_food_item.food_log_id = food_log.id
 
     # Updating the total_* attributes on the FoodLog with the values from the new FoodItem.
     food_log.total_calories = str(float(new_food_item.macros.calories) + float(food_log.total_calories))

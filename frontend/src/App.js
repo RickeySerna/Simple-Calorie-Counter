@@ -225,12 +225,16 @@ function App() {
       console.log("Formatted weight: ", formData.weight_value);
     }
 
-    fetch('http://127.0.0.1:5000/api/foodlog', {
+    let id = thisMonthsFoodLogs[currentDate.getDate() - 1].id;
+
+    fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        foodLog: thisMonthsFoodLogs[currentDate.getDate() - 1]
+      }),
     })
     .then(response => {
       console.log('Response from server:', response);
