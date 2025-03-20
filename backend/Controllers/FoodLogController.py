@@ -53,16 +53,14 @@ def search_for_foodlogs_in_month():
     # Using calendar and the date strings we created to get the number of days in the month the user searched in.
     daysInTheMonth = monthrange(year, month)[1]
     
-    # Creating an array of the size of daysInTheMonth with all spaces initialized to Nonetypes.
-    food_logs_data = [None] * daysInTheMonth
+    # Create an initial dictionary with keys set to "day" and values set to None.
+    food_logs_data = {day: None for day in range(1, daysInTheMonth + 1)}
 
-    # Iterating over the FoodLogs returned by the query.
+    # Now replace the Nones in the dictionary with FoodLog objects where they exist - still ordered by day.
     for log in food_logs:
-        # Setting the index where the log will be placed - all FoodLogs will be placed chronologically by the day attribute.
-        # We subtract 1 from the day attribute to account for 0 indexing.
-        index = log.day - 1
-        # Set the index position of the object to the serialized version of the log.
-        food_logs_data[index] = log.to_dict()
+        food_logs_data[log.day] = log.to_dict()
+
+    print(f"food_logs_data being returned to the frontend: {food_logs_data}")
 
     return jsonify(food_logs_data), 200
 

@@ -184,7 +184,7 @@ function App() {
       let updatedFoodLogs = [...thisMonthsFoodLogs];
 
       // Now index the spot in the array for this day, then set it to the FoodLog returned by the server.
-      updatedFoodLogs[currentDate.getDate() - 1] = data.new_food_log;
+      updatedFoodLogs[currentDate.getDate()] = data.new_food_log;
 
       // Set the state to the updated version.
       setThisMonthsFoodLogs(updatedFoodLogs);
@@ -225,7 +225,7 @@ function App() {
       console.log("Formatted weight: ", formData.weight_value);
     }
 
-    let id = thisMonthsFoodLogs[currentDate.getDate() - 1].id;
+    let id = thisMonthsFoodLogs[currentDate.getDate()].id;
 
     fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
       method: 'PATCH',
@@ -233,7 +233,7 @@ function App() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        foodLog: thisMonthsFoodLogs[currentDate.getDate() - 1]
+        foodLog: thisMonthsFoodLogs[currentDate.getDate()]
       }),
     })
     .then(response => {
@@ -257,7 +257,7 @@ function App() {
       const updatedFoodLogs = [...thisMonthsFoodLogs];
 
       // The server returns a fully updated version of the FoodLog. So just get the index using the currentDate state and set the FoodLog for that date to the object returned by the server.
-      updatedFoodLogs[currentDate.getDate() - 1] = data.updated_food_log;
+      updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;
 
       // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setThisMonthsFoodLogs(updatedFoodLogs);
@@ -294,7 +294,7 @@ function App() {
       const updatedFoodLogs = [...thisMonthsFoodLogs];
 
       // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
-      updatedFoodLogs[currentDate.getDate() - 1].food_items = updatedFoodLogs[currentDate.getDate() - 1].food_items.filter(item => item.id != id);
+      updatedFoodLogs[currentDate.getDate()].food_items = updatedFoodLogs[currentDate.getDate()].food_items.filter(item => item.id != id);
 
       // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
       setThisMonthsFoodLogs(updatedFoodLogs);
@@ -501,10 +501,10 @@ function App() {
       const updatedFoodItems = [];
 
       // Loop through the food_items array in the FoodLog containing the FoodItem that was updated.
-      for (let i = 0; i < updatedFoodLogs[currentDate.getDate() - 1].food_items.length; i++) {
+      for (let i = 0; i < updatedFoodLogs[currentDate.getDate()].food_items.length; i++) {
         // If the object we're looking at has an ID that doesn't match the one we edited, just add it to the new array and move to the next.
-        if (updatedFoodLogs[currentDate.getDate() - 1].food_items[i].id !== id) {
-          updatedFoodItems.push(updatedFoodLogs[currentDate.getDate() - 1].food_items[i]);
+        if (updatedFoodLogs[currentDate.getDate()].food_items[i].id !== id) {
+          updatedFoodItems.push(updatedFoodLogs[currentDate.getDate()].food_items[i]);
         }
         // Once we find it, we update it with the changes made by user.
         else {
@@ -514,7 +514,7 @@ function App() {
       }
 
       // Instead of setting the array to a separate state as we did previously, now we just set the food_items array to the array we just created.
-      updatedFoodLogs[currentDate.getDate() - 1].food_items = updatedFoodItems;
+      updatedFoodLogs[currentDate.getDate()].food_items = updatedFoodItems;
       
       // Now set the thisMonthsFoodLogs state. Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
       setThisMonthsFoodLogs(updatedFoodLogs);
@@ -645,7 +645,7 @@ function App() {
                   </div>
                 </div>
               </fieldset>
-              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
+              {thisMonthsFoodLogs[currentDate.getDate()] ? (
                 <button type="button" onClick={onUpdate}>Update</button>
               ) : (
                 <button type="button" onClick={onCreate}>Create</button>
@@ -664,8 +664,8 @@ function App() {
             </div>
             <h2>Food Log</h2>
             <ul>
-              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
-                thisMonthsFoodLogs[currentDate.getDate() - 1].food_items.map((result, index) => (
+              {thisMonthsFoodLogs[currentDate.getDate()] ? (
+                thisMonthsFoodLogs[currentDate.getDate()].food_items.map((result, index) => (
                   <li key={index} className="list-item">
                     {editingId === result.id ? (
                       <>
@@ -770,8 +770,8 @@ function App() {
               )}
             </ul>
             <div className="totals">
-              {thisMonthsFoodLogs[currentDate.getDate() - 1] ? (
-                <p>{thisMonthsFoodLogs[currentDate.getDate() - 1].total_calories} total calories, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_protein}g total of protein, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_carbs}g total of carbs, {thisMonthsFoodLogs[currentDate.getDate() - 1].total_fat}g total of fat</p>
+              {thisMonthsFoodLogs[currentDate.getDate()] ? (
+                <p>{thisMonthsFoodLogs[currentDate.getDate()].total_calories} total calories, {thisMonthsFoodLogs[currentDate.getDate()].total_protein}g total of protein, {thisMonthsFoodLogs[currentDate.getDate()].total_carbs}g total of carbs, {thisMonthsFoodLogs[currentDate.getDate()].total_fat}g total of fat</p>
               ) : (
                 null
               )}
