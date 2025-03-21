@@ -269,7 +269,30 @@ function App() {
 
   const handleDelete = (id) => {
     console.log(`The ID to delete: ${id}`);
-    fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
+
+    let FoodLogToUpdate = JSON.parse(JSON.stringify(thisMonthsFoodLogs[currentDate.getDate()]));
+
+    let updatedFoodItems = [];
+    let FoodItemToDelete = null;
+    for (let i = 0; i < FoodLogToUpdate.food_items.length; i++) {
+      if (FoodLogToUpdate.food_items[i].id !== id) {
+        updatedFoodItems.push(FoodLogToUpdate.food_items[i]);
+      }
+      else {
+        FoodItemToDelete = FoodLogToUpdate.food_items[i];
+      }
+    }
+
+    FoodLogToUpdate.food_items = updatedFoodItems;
+
+    FoodLogToUpdate.total_calories = (parseFloat(FoodLogToUpdate.total_calories) - parseFloat(FoodItemToDelete.macros.calories)).toString();
+    FoodLogToUpdate.total_protein = (parseFloat(FoodLogToUpdate.total_protein) - parseFloat(FoodItemToDelete.macros.protein)).toString();
+    FoodLogToUpdate.total_fat = (parseFloat(FoodLogToUpdate.total_fat) - parseFloat(FoodItemToDelete.macros.fat)).toString();
+    FoodLogToUpdate.total_carbs = (parseFloat(FoodLogToUpdate.total_carbs) - parseFloat(FoodItemToDelete.macros.carbs)).toString();
+
+    console.log("The FoodLog after deleting the FoodItem: ", FoodLogToUpdate);
+    
+    /*fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -303,7 +326,7 @@ function App() {
     })
     .catch(error => {
       console.error('DELETE ERROR:', error.message);
-    });
+    });*/
   };
 
   const handleDateChange = (date) => {
