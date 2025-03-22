@@ -112,62 +112,44 @@ def get_food_items_by_date():
     return jsonify(food_logs_data), 200
 
 @food_log_bp.route('/api/foodlog/<int:id>', methods=['PUT'])
-def update_food_item(id):
-    data = request.get_json()
-    item = FoodItem.query.get_or_404(id)
-    print(f"Data with update values: {data}")
-    print(f"Item to update: {item}")
-
-    item.name = data['name']
-    item.sub_description = data['sub_description']
-    item.weight_value = data['weight']
-    item.weight_unit = data['weightUnit']
-    item.macros.calories = data['calories']
-    item.macros.protein = data['protein']
-    item.macros.carbs = data['carbs']
-    item.macros.fat = data['fat']
-
-    db.session.commit()
-    return jsonify({'message': 'Food item updated successfully'})
-
-@food_log_bp.route('/api/foodlog/<int:id>', methods=['PATCH'])
-def add_FoodItem_to_existing_FoodLog(id):
+def update_foodlog(id):
     print("About to add FoodItem to existing FoodLog...")
 
     data = request.get_json()
-    print(f"Data from frontend in PATCH call: {data}")
+    print(f"Data from frontend in PUT call: {data}")
 
     # Wrapping this in a try-except to catch any errors that might come up when querying the database.
     try:
         # Using the filter() method from SQLalchemy to grab the FoodLog object.
-        # Find the update() (or whatever its called) call and COMMENT/LINK IT HERE
-        food_log = FoodLog.query.filter(
-            and_(
-                FoodLog.id == id
-            )
-        ).first()
+        food_log = FoodLog.query.filter_by(id=id).first()
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
-    print(f"ID of the log we're updating: {food_log.id}")
+    print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
     # Creating the new FoodItem to be added into the FoodLog.
-    new_food_log = FoodLog(data.foodLog)
-    # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
-    # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
-    new_food_item.food_log_id = food_log.id
+    new_food_log = FoodLog(data["updated_food_log"])
 
-    # Updating the total_* attributes on the FoodLog with the values from the new FoodItem.
-    food_log.total_calories = str(float(new_food_item.macros.calories) + float(food_log.total_calories))
-    food_log.total_protein = str(float(new_food_item.macros.protein) + float(food_log.total_protein))
-    food_log.total_carbs = str(float(new_food_item.macros.carbs) + float(food_log.total_carbs))
-    food_log.total_fat = str(float(new_food_item.macros.fat) + float(food_log.total_fat))
+    # https://flask-sqlalchemy.readthedocs.io/en/stable/queries/#insert-update-delete
+    # Flask-sqlalchemy doesn't have an explicit update() command.
+    # Instead, we go through and update the attributes of the object we want to update, then commit that to the database.
+    # TODO: Get the FoodLog created properly from the updated_food_log.
 
-    # Adding the new FoodItem to the DB.
-    db.session.add(new_food_item)
-    db.session.commit()
+    # # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
+    # # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
+    # new_food_item.food_log_id = food_log.id
 
-    print("All done, new FoodItem added.")
+    # # Updating the total_* attributes on the FoodLog with the values from the new FoodItem.
+    # food_log.total_calories = str(float(new_food_item.macros.calories) + float(food_log.total_calories))
+    # food_log.total_protein = str(float(new_food_item.macros.protein) + float(food_log.total_protein))
+    # food_log.total_carbs = str(float(new_food_item.macros.carbs) + float(food_log.total_carbs))
+    # food_log.total_fat = str(float(new_food_item.macros.fat) + float(food_log.total_fat))
+
+    # # Adding the new FoodItem to the DB.
+    # db.session.add(new_food_item)
+    # db.session.commit()
+
+    # print("All done, new FoodItem added.")
 
     return jsonify({'message': 'New FoodItem successfully added to existing FoodLog', 'updated_food_log': food_log.to_dict()}), 201
 

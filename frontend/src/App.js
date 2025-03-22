@@ -269,6 +269,7 @@ function App() {
 
   const handleDelete = (id) => {
     console.log(`The ID to delete: ${id}`);
+    let FoodLogID = thisMonthsFoodLogs[currentDate.getDate()].id;
 
     let FoodLogToUpdate = JSON.parse(JSON.stringify(thisMonthsFoodLogs[currentDate.getDate()]));
 
@@ -292,11 +293,14 @@ function App() {
 
     console.log("The FoodLog after deleting the FoodItem: ", FoodLogToUpdate);
     
-    /*fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
-      method: 'DELETE',
+    fetch(`http://127.0.0.1:5000/api/foodlog/${FoodLogID}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        updated_food_log: FoodLogToUpdate
+      })
     })
     .then(response => {
       console.log('Response from server:', response);
@@ -326,7 +330,7 @@ function App() {
     })
     .catch(error => {
       console.error('DELETE ERROR:', error.message);
-    });*/
+    });
   };
 
   const handleDateChange = (date) => {
