@@ -291,7 +291,7 @@ function App() {
     FoodLogToUpdate.total_fat = (parseFloat(FoodLogToUpdate.total_fat) - parseFloat(FoodItemToDelete.macros.fat)).toString();
     FoodLogToUpdate.total_carbs = (parseFloat(FoodLogToUpdate.total_carbs) - parseFloat(FoodItemToDelete.macros.carbs)).toString();
 
-    console.log("The FoodLog after deleting the FoodItem: ", FoodLogToUpdate);
+    //console.log("The FoodLog after deleting the FoodItem: ", FoodLogToUpdate);
     
     fetch(`http://127.0.0.1:5000/api/foodlog/${FoodLogID}`, {
       method: 'PUT',
@@ -316,17 +316,16 @@ function App() {
       return response.json();
     })
     .then(data => {
+      console.log('Successful PUT: ', data);
       // With the update to using thisMonthsFoodLogs, this logic changes.
       // First create a copy of the entire state.
       const updatedFoodLogs = [...thisMonthsFoodLogs];
 
       // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
-      updatedFoodLogs[currentDate.getDate()].food_items = updatedFoodLogs[currentDate.getDate()].food_items.filter(item => item.id != id);
+      updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;
 
       // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
       setThisMonthsFoodLogs(updatedFoodLogs);
-
-      console.log('Successful deletion:', data);
     })
     .catch(error => {
       console.error('DELETE ERROR:', error.message);

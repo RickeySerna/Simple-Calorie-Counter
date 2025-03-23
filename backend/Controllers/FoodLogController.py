@@ -127,31 +127,24 @@ def update_foodlog(id):
 
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
-    # Creating the new FoodItem to be added into the FoodLog.
-    new_food_log = FoodLog(data["updated_food_log"])
+    # Creating a new FoodLog object from the updated_food_log object provided by the frontend.
+    updatedFoodLog = FoodLog(data["updated_food_log"])
 
     # https://flask-sqlalchemy.readthedocs.io/en/stable/queries/#insert-update-delete
     # Flask-sqlalchemy doesn't have an explicit update() command.
     # Instead, we go through and update the attributes of the object we want to update, then commit that to the database.
-    # TODO: Get the FoodLog created properly from the updated_food_log.
+    food_log.food_items = updatedFoodLog.food_items
+    food_log.total_calories = updatedFoodLog.total_calories
+    food_log.total_protein = updatedFoodLog.total_protein
+    food_log.total_carbs = updatedFoodLog.total_carbs
+    food_log.total_fat = updatedFoodLog.total_fat
 
-    # # FoodItem's __init__ method will set most everything as we need from the data object, but it doesn't have access to the ID of its FoodLog.
-    # # To solve that, we just manually set that value here as the ID of the FoodLog we pulled from the DB.
-    # new_food_item.food_log_id = food_log.id
+    # Now commit the changes to the DB.
+    db.session.commit()
 
-    # # Updating the total_* attributes on the FoodLog with the values from the new FoodItem.
-    # food_log.total_calories = str(float(new_food_item.macros.calories) + float(food_log.total_calories))
-    # food_log.total_protein = str(float(new_food_item.macros.protein) + float(food_log.total_protein))
-    # food_log.total_carbs = str(float(new_food_item.macros.carbs) + float(food_log.total_carbs))
-    # food_log.total_fat = str(float(new_food_item.macros.fat) + float(food_log.total_fat))
+    print("All done, FoodLog replaced.")
 
-    # # Adding the new FoodItem to the DB.
-    # db.session.add(new_food_item)
-    # db.session.commit()
-
-    # print("All done, new FoodItem added.")
-
-    return jsonify({'message': 'New FoodItem successfully added to existing FoodLog', 'updated_food_log': food_log.to_dict()}), 201
+    return jsonify({'message': 'FoodLog successfully updated', 'updated_food_log': food_log.to_dict()}), 201
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])

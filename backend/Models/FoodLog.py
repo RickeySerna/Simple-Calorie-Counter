@@ -17,18 +17,17 @@ class FoodLog(db.Model):
         print("Data from frontend in FoodLog constructor: ", data)
 
         # Creating the initial FoodItem outside of the food_items array so that we can use it's initial macros as the starting point for the FoodLogs' macros attributes.
-        newFoodItem = FoodItem(data)
         foodItems = []
-        for i, v in enumerate(data.foodItems):
-            foodItems.push(FoodItem(v))
+        for i, v in enumerate(data.get("food_items")):
+            foodItems.append(FoodItem(v))
 
-        self.year = int(data.get("date")[0:4])
-        self.month = int(data.get("date")[5:7])
-        self.day = int(data.get("date")[8:10])
-        self.total_calories = newFoodItem.macros.calories
-        self.total_protein = newFoodItem.macros.protein
-        self.total_carbs = newFoodItem.macros.carbs
-        self.total_fat = newFoodItem.macros.fat
+        self.year = data.get("year")
+        self.month = data.get("month")
+        self.day = data.get("day")
+        self.total_calories = data.get("total_calories")
+        self.total_protein = data.get("total_protein")
+        self.total_carbs = data.get("total_carbs")
+        self.total_fat = data.get("total_fat")
         self.food_items = foodItems
 
     def to_dict(self):
