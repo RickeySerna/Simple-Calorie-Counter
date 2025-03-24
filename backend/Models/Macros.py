@@ -1,11 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, datetime
 from decimal import Decimal, getcontext, ROUND_HALF_UP
-#from utils import *
 from Models import db
-
-
-#db = SQLAlchemy()
 
 class Macros(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,62 +24,16 @@ class Macros(db.Model):
         # Now that the macros are calculated, pass them into format_macros to be formatted properly.
         formatted_macros = self.__format_macros(calculated_macros)
         print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
-
-        # Creating the weights dictionary to be passed into the helper function.
-        # weights_to_format = {
-        #     # At LEAST one of these will be empty/None so we do the "or" statement to avoid any conversion errors.
-        #     "weight": Decimal(data.get('weight') or '0.0'),
-        #     "weight_pounds": Decimal(data.get('weightPounds') or '0.0'),
-        #     "weight_ounces": Decimal(data.get('weightOunces') or '0.0')
-        # }
-
-        # # Generating the weight formatting.
-        # # TODO: As is, these formatted weights don't actually get used. Need to find a better place to do this.
-        # formatted_weights = self.__format_weights(weights_to_format)
         
         self.calories = formatted_macros["calories"]
         self.protein = formatted_macros["protein"]
         self.carbs = formatted_macros["carbs"]
         self.fat = formatted_macros["fat"]
-
-    # def Macro_construction(self, data):
-    #     print("Data from frontend in Macro_construction: ", data)
-
-    #     # Convert weight and serving size to grams.
-    #     weights_in_grams = FoodItem.Macros.convert_to_grams(data)
-
-    #     # Run macro calculation.
-    #     calculated_macros = self.calculate_macros(data, weights_in_grams)
-
-    #     # Now that the macros are calculated, pass them into format_macros to be formatted properly.
-    #     formatted_macros = FoodItem.Macros.format_macros(calculated_macros)
-    #     print(f"formatted_macros dict as returned from the function in models: {formatted_macros}")
-
-    #     # Creating the weights dictionary to be passed into the helper function.
-    #     weights_to_format = {
-    #         # At LEAST one of these will be empty/None so we do the "or" statement to avoid any conversion errors.
-    #         "weight": Decimal(data.get('weight') or '0.0'),
-    #         "weight_pounds": Decimal(data.get('weightPounds') or '0.0'),
-    #         "weight_ounces": Decimal(data.get('weightOunces') or '0.0')
-    #     }
-
-    #     # Generating the weight formatting.
-    #     # TODO: As is, these formatted weights don't actually get used. Need to find a better place to do this.
-    #     formatted_weights = FoodItem.Macros.format_weights(weights_to_format)
-
-    #     return FoodItem.Macros(
-    #         calories = formatted_macros["calories"],
-    #         protein = formatted_macros["protein"],
-    #         carbs = formatted_macros["carbs"],
-    #         fat = formatted_macros["fat"]
-    #     )
     
     # Formula to convert food weight and serving size form whatever unit the user used to grams.
     def __convert_to_grams(self, data):
 
-        #weight: Decimal, unit: str, ounces: Decimal = Decimal('0.0')) -> Decimal:
-
-        # UPDATE: The function now uses a dictionary to pull the conversion rate.
+        # A dictionary storing the conversion factors for each unit of measurement.
         conversion_factors = {
             "kg": Decimal("1000"),
             "oz": Decimal("28.3495"),
