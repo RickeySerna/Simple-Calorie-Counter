@@ -124,8 +124,29 @@ function App() {
     }
   };
 
+  // Since we're not using an explicit submit button anymore, we check the validity of the input manually.
+  function validateForm() {
+    const form = document.getElementById("input-form");
+
+    // checkValidity() checks that all constraint validation rules are met - including required fields.
+    if (!form.checkValidity()) {
+      // This displays the validity message.
+      form.reportValidity();
+      return false;
+    }
+    // If the condition didn't trigger, all is set, move forward!
+    else {
+      return true;
+    }
+  }
+
   const onCreate = (e) => {
     console.log("We are in the onCreate function!");
+
+    let formValid = validateForm()
+    if (formValid == false) {
+      return;
+    }
 
     const { carbs, fiber, sugarAlcohol } = formData;
     const fiberValue = parseFloat(fiber) || 0;
@@ -196,6 +217,11 @@ function App() {
 
   const onUpdate = (e) => {
     console.log("We are in the onUpdate function!");
+
+    let formValid = validateForm()
+    if (formValid == false) {
+      return;
+    }
 
     const { carbs, fiber, sugarAlcohol } = formData;
     const fiberValue = parseFloat(fiber) || 0;
@@ -556,7 +582,7 @@ function App() {
         <h1>Simple Calorie Counter</h1>
         <div className="container">
           <div className="form-panel">
-            <form>
+            <form id = "input-form">
               <fieldset>
                 <legend>Food Item Information:</legend>
                 <div className="form-group">
