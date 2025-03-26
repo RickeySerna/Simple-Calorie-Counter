@@ -13,6 +13,11 @@ class FoodItem(db.Model):
     sub_description = db.Column(db.String(200))
     weight_value = db.Column(db.String(100), nullable=False)
     weight_unit = db.Column(db.String(10), nullable=False)
+    serving_size_value = db.Column(db.String(100), nullable=False)
+    serving_size_unit = db.Column(db.String(100), nullable=False)
+    protein_per_serving = db.Column(db.String(100), nullable=False)
+    carbs_per_serving = db.Column(db.String(100), nullable=False)
+    fat_per_serving = db.Column(db.String(100), nullable=False)
 
     def __init__(self, data):
         print("Data from frontend in FoodItem constructor: ", data)
