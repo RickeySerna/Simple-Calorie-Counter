@@ -12,15 +12,15 @@ function App() {
     weight_value: '',
     weight_unit: 'g',
     calories: '',
-    servingSize: '',
-    servingSizeUnit: 'g',
-    fat: '',
+    serving_size_value: '',
+    serving_size_unit: 'g',
+    protein_per_serving: '',
+    carbs_per_serving: '',
+    fat_per_serving: '',
     saturatedFat: '',
     transFat: '',
-    carbs: '',
     fiber: '',
     sugarAlcohol: '',
-    protein: '',
     sodium: '',
     cholesterol: '',
     weightPounds: '',
@@ -176,12 +176,16 @@ function App() {
       console.log("Formatted weight: ", formData.weight);
     }
 
+    let newFoodLog = {
+      food_items: [formData]
+    };
+
     fetch('http://127.0.0.1:5000/api/foodlog', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(newFoodLog)
     })
     .then(response => {
       console.log('Response from server:', response);
@@ -626,7 +630,7 @@ function App() {
               <fieldset>
                 <legend>Nutrition Label Information:</legend>
                 <div className="form-group">
-                  {formData.servingSizeUnit === 'lb_oz' ? (
+                  {formData.serving_size_unit === 'lb_oz' ? (
                     <>
                       <div className="form-group" style={{ flex: '2' }}>
                         <label>Serving size: (lbs)</label>
@@ -640,12 +644,12 @@ function App() {
                   ) : (
                     <div className="form-group" style={{ flex: '3' }}>
                       <label>Serving size:</label>
-                      <input type="number" name="servingSize" value={formData.servingSize} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                      <input type="number" name="serving_size_value" value={formData.serving_size_value} onChange={handleChange} onKeyDown={handleKeyDown} required />
                     </div>
                   )}
                   <div className="form-group" style={{ flex: '1' }}>
                     <label>Unit:</label>
-                    <select name="servingSizeUnit" value={formData.servingSizeUnit} onChange={handleChange} required>
+                    <select name="serving_size_unit" value={formData.serving_size_unit} onChange={handleChange} required>
                       <option value="g">g</option>
                       <option value="oz">oz</option>
                       <option value="lb_oz">lb & oz</option>
@@ -657,15 +661,15 @@ function App() {
                 <div className="form-group">
                   <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Fat (g):</label>
-                    <input type="number" name="fat" value={formData.fat} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                    <input type="number" name="fat_per_serving" value={formData.fat_per_serving} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
                   <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Carbs (g):</label>
-                    <input type="number" name="carbs" value={formData.carbs} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                    <input type="number" name="carbs_per_serving" value={formData.carbs_per_serving} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
                   <div className="form-group half-width" style={{ flex: '1' }}>
                     <label>Protein (g):</label>
-                    <input type="number" name="protein" value={formData.protein} onChange={handleChange} onKeyDown={handleKeyDown} required />
+                    <input type="number" name="protein_per_serving" value={formData.protein_per_serving} onChange={handleChange} onKeyDown={handleKeyDown} required />
                   </div>
                 </div>
                 <div className="form-group">

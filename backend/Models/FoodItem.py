@@ -28,6 +28,11 @@ class FoodItem(db.Model):
         self.sub_description = data.get("subclass")
         self.weight_value = data.get("weight_value")
         self.weight_unit = data.get("weight_unit")
+        self.serving_size_value = data.get("serving_size_value")
+        self.serving_size_unit = data.get("serving_size_unit")
+        self.protein_per_serving = data.get("protein_per_serving")
+        self.carbs_per_serving = data.get("carbs_per_serving")
+        self.fat_per_serving = data.get("fat_per_serving")
         self.macros = Macros(data)
 
     def generate_result_string(self, item):
