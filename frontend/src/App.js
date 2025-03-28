@@ -203,15 +203,10 @@ function App() {
     .then(data => {
       console.log('Success: ', data);
 
-      // onCreate specifically creates an entirely new FoodLog, meaning that if it's triggered, no FoodLog existed for the day.
-      // Now that one is created, we need to add it to the thisMonthsFoodLogs state.
-      // First create a copy of this state.
-      let updatedFoodLogs = [...thisMonthsFoodLogs];
-
-      // Now index the spot in the array for this day, then set it to the FoodLog returned by the server.
+      let updatedFoodLogs = { ...thisMonthsFoodLogs };
+    
       updatedFoodLogs[currentDate.getDate()] = data.new_food_log;
-
-      // Set the state to the updated version.
+    
       setThisMonthsFoodLogs(updatedFoodLogs);
     })
     .catch(error => {

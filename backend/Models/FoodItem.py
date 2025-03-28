@@ -86,6 +86,11 @@ class FoodItem(db.Model):
             'sub_description': self.sub_description,
             'weight_value': self.weight_value,
             'weight_unit': self.weight_unit,
+            'serving_size_value': self.serving_size_value,
+            'serving_size_unit': self.serving_size_unit,
+            'protein_per_serving': self.protein_per_serving,
+            'carbs_per_serving': self.carbs_per_serving,
+            'fat_per_serving': self.fat_per_serving,
             'result': self.generate_result_string(self),
             'macros': self.macros.to_dict()
         }

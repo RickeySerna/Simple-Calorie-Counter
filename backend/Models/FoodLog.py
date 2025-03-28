@@ -18,19 +18,30 @@ class FoodLog(db.Model):
 
         # Creating the initial FoodItem outside of the food_items array so that we can use it's initial macros as the starting point for the FoodLogs' macros attributes.
         foodItems = []
+        total_calories = 0
+        total_protein = 0
+        total_carbs = 0
+        total_fat = 0
+
         for item in data.get("food_items", []):
             newFoodItem = FoodItem(item)
             print(f"Here's our new FoodItem in the FoodLog constructor: {newFoodItem}")
             foodItems.append(newFoodItem)
 
+            total_calories += float(newFoodItem.macros.calories)
+            total_protein += float(newFoodItem.macros.protein)
+            total_carbs += float(newFoodItem.macros.carbs)
+            total_fat += float(newFoodItem.macros.fat)
 
-        self.year = int(data.get("food_items").date[0:4])
-        self.month = int(data.get("food_items").date[5:7])
-        self.day = int(data.get("food_items").date[8:10])
-        self.total_calories = data.get("total_calories")
-        self.total_protein = data.get("total_protein")
-        self.total_carbs = data.get("total_carbs")
-        self.total_fat = data.get("total_fat")
+        # Access the date attribute from the first item in the food_items list
+        first_item = data.get("food_items")[0]
+        self.year = int(first_item.get("date")[0:4])
+        self.month = int(first_item.get("date")[5:7])
+        self.day = int(first_item.get("date")[8:10])
+        self.total_calories = str(total_calories)
+        self.total_protein = str(total_protein)
+        self.total_carbs = str(total_carbs)
+        self.total_fat = str(total_fat)
         self.food_items = foodItems
 
     def to_dict(self):

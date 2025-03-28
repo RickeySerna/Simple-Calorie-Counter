@@ -52,12 +52,12 @@ class Macros(db.Model):
         else:
             weight_in_grams = Decimal(data.get('weight_value'))
 
-        if data.get('servingSizeUnit') in conversion_factors:
-            serving_size_in_grams = Decimal(data.get('servingSize')) * conversion_factors[data.get('servingSizeUnit')]
-        elif data.get('servingSizeUnit') == "lb_oz":
+        if data.get('serving_size_unit') in conversion_factors:
+            serving_size_in_grams = Decimal(data.get('serving_size_value')) * conversion_factors[data.get('serving_size_unit')]
+        elif data.get('serving_size_unit') == "lb_oz":
             serving_size_in_grams = (Decimal((data.get('servingSizePounds'))) * conversion_factors["lb"]) + (Decimal((data.get('servingSizeOunces'))) * conversion_factors["oz"])
         else:
-            serving_size_in_grams = Decimal(data.get('servingSize'))
+            serving_size_in_grams = Decimal(data.get('serving_size_value'))
 
         weights = {
             "weight_in_grams": weight_in_grams,
@@ -75,9 +75,9 @@ class Macros(db.Model):
         serving_size_in_grams = weights["serving_size_in_grams"]
 
         # Grabbing the macros we need from the data object.
-        fat_per_serving = Decimal(data.get('fat'))
-        protein_per_serving = Decimal(data.get('protein'))
-        carbs_per_serving = Decimal(data.get('carbs'))
+        fat_per_serving = Decimal(data.get('fat_per_serving'))
+        protein_per_serving = Decimal(data.get('protein_per_serving'))
+        carbs_per_serving = Decimal(data.get('carbs_per_serving'))
         fiber_per_serving = Decimal(data.get('fiber') or '0.0')
         sugar_alcohol_per_serving = Decimal(data.get('sugarAlcohol') or '0')
         print(f"fiber after formatting with conditional: {fiber_per_serving}")
