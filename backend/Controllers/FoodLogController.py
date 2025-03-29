@@ -113,7 +113,7 @@ def get_food_items_by_date():
 
 @food_log_bp.route('/api/foodlog/<int:id>', methods=['PUT'])
 def update_foodlog(id):
-    print("About to add FoodItem to existing FoodLog...")
+    print("About to replace an existing FoodLog...")
 
     data = request.get_json()
     print(f"Data from frontend in PUT call: {data}")
@@ -127,8 +127,8 @@ def update_foodlog(id):
 
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
-    # Creating a new FoodLog object from the updated_food_log object provided by the frontend.
-    updatedFoodLog = FoodLog(data["updated_food_log"])
+    # Creating a new FoodLog object from the new FoodLog object provided by the frontend.
+    updatedFoodLog = FoodLog(data["foodLog"])
 
     # https://flask-sqlalchemy.readthedocs.io/en/stable/queries/#insert-update-delete
     # Flask-sqlalchemy doesn't have an explicit update() command.

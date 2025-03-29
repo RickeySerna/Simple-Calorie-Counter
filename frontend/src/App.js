@@ -252,13 +252,17 @@ function App() {
 
     let id = thisMonthsFoodLogs[currentDate.getDate()].id;
 
+    let updatedFoodLog = { ...thisMonthsFoodLogs[currentDate.getDate()] };
+    updatedFoodLog.food_items.push(formData);
+    console.log("The FoodLog we're about to send over in the onUpdate function: ", updatedFoodLog);
+
     fetch(`http://127.0.0.1:5000/api/foodlog/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        foodLog: thisMonthsFoodLogs[currentDate.getDate()]
+        foodLog: updatedFoodLog
       }),
     })
     .then(response => {
