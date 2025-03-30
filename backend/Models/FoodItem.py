@@ -21,9 +21,15 @@ class FoodItem(db.Model):
 
     def __init__(self, data):
         print("Data from frontend in FoodItem constructor: ", data)
-        self.year = int(data.get("date")[0:4])
-        self.month = int(data.get("date")[5:7])
-        self.day = int(data.get("date")[8:10])
+        date_str = data.get("date")
+        if date_str:
+            self.year = int(date_str[0:4])
+            self.month = int(date_str[5:7])
+            self.day = int(date_str[8:10])
+        else:
+            self.year = data.get("year")
+            self.month = data.get("month")
+            self.day = data.get("day")
         self.name = data.get("foodName")
         self.sub_description = data.get("subclass")
         self.weight_value = data.get("weight_value")

@@ -130,6 +130,8 @@ def update_foodlog(id):
     # Creating a new FoodLog object from the new FoodLog object provided by the frontend.
     updatedFoodLog = FoodLog(data["foodLog"])
 
+    print(f"the updatedFoodLog after everything: {updatedFoodLog.to_dict()}")
+
     # https://flask-sqlalchemy.readthedocs.io/en/stable/queries/#insert-update-delete
     # Flask-sqlalchemy doesn't have an explicit update() command.
     # Instead, we go through and update the attributes of the object we want to update, then commit that to the database.
@@ -140,7 +142,7 @@ def update_foodlog(id):
     food_log.total_fat = updatedFoodLog.total_fat
 
     # Now commit the changes to the DB.
-    db.session.commit()
+    #db.session.commit()
 
     print("All done, FoodLog replaced.")
 
