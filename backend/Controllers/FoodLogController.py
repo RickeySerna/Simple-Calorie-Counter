@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from calendar import monthrange
-from sqlalchemy import and_
+from sqlalchemy import and_, update
+from sqlalchemy.orm import sessionmaker
 from Models import *
 import math
 
@@ -118,35 +119,32 @@ def update_foodlog(id):
     data = request.get_json()
     print(f"Data from frontend in PUT call: {data}")
 
-    # Wrapping this in a try-except to catch any errors that might come up when querying the database.
     try:
-        # Using the filter() method from SQLalchemy to grab the FoodLog object.
         food_log = FoodLog.query.filter_by(id=id).first()
+        if not food_log:
+            return jsonify({"ERROR": "FoodLog not found"}), 404
     except Exception as e:
         return jsonify({"DATABASE ERROR": str(e)}), 400
 
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
-    # Creating a new FoodLog object from the new FoodLog object provided by the frontend.
+    db.session.delete(food_log)
+    db.session.commit()
+
     updatedFoodLog = FoodLog(data["foodLog"])
+    updatedFoodLog.id = id
 
-    print(f"the updatedFoodLog after everything: {updatedFoodLog.to_dict()}")
+    print(f"The updatedFoodLog after everything: {updatedFoodLog.to_dict()}")
 
-    # https://flask-sqlalchemy.readthedocs.io/en/stable/queries/#insert-update-delete
-    # Flask-sqlalchemy doesn't have an explicit update() command.
-    # Instead, we go through and update the attributes of the object we want to update, then commit that to the database.
-    food_log.food_items = updatedFoodLog.food_items
-    food_log.total_calories = updatedFoodLog.total_calories
-    food_log.total_protein = updatedFoodLog.total_protein
-    food_log.total_carbs = updatedFoodLog.total_carbs
-    food_log.total_fat = updatedFoodLog.total_fat
+    db.session.add(updatedFoodLog)
 
-    # Now commit the changes to the DB.
-    #db.session.commit()
+    db.session.commit()
 
     print("All done, FoodLog replaced.")
 
-    return jsonify({'message': 'FoodLog successfully updated', 'updated_food_log': food_log.to_dict()}), 201
+    updated_food_log = FoodLog.query.filter_by(id=id).first()
+    print(f"Here's what the PUT endpoint is returning: {updated_food_log.to_dict()}")
+    return jsonify({'message': 'FoodLog successfully updated', 'updated_food_log': updated_food_log.to_dict()}), 201
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])

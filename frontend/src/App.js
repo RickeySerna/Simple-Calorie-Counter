@@ -7,8 +7,8 @@ import './App.css';
 function App() {
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
-    foodName: '',
-    subclass: '',
+    name: '',
+    sub_description: '',
     weight_value: '',
     weight_unit: 'g',
     calories: '',
@@ -281,14 +281,10 @@ function App() {
     .then(data => {
       console.log('Success: ', data);
 
-      // We're doing something similar here as we did in the DELETE call.
-      // First create a copy of the thisMonthsFoodLogs state.
-      const updatedFoodLogs = [...thisMonthsFoodLogs];
-
-      // The server returns a fully updated version of the FoodLog. So just get the index using the currentDate state and set the FoodLog for that date to the object returned by the server.
+      let updatedFoodLogs = { ...thisMonthsFoodLogs };
+    
       updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;
-
-      // Because it's a state, it will be automatically re-rendered by React and the user will see the updated list; no extra calls to the server needed!
+    
       setThisMonthsFoodLogs(updatedFoodLogs);
     })
     .catch(error => {
@@ -591,7 +587,7 @@ function App() {
                 <div className="form-group">
                   <div className="form-group" style={{ flex: '2' }}>
                     <label>Item:</label>
-                    <input type="text" name="foodName" value={formData.foodName} onChange={handleChange} required />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                   </div>
                   {formData.weight_unit === 'lb_oz' ? (
                     <>
@@ -623,7 +619,7 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>Sub-description:</label>
-                  <input type="text" name="subclass" value={formData.subclass} onChange={handleChange} />
+                  <input type="text" name="sub_description" value={formData.sub_description} onChange={handleChange} />
                 </div>
               </fieldset>
               <fieldset>
