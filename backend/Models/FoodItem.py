@@ -18,9 +18,15 @@ class FoodItem(db.Model):
     protein_per_serving = db.Column(db.String(100), nullable=False)
     carbs_per_serving = db.Column(db.String(100), nullable=False)
     fat_per_serving = db.Column(db.String(100), nullable=False)
+    macros = db.relationship('Macros', backref='food_item', uselist=False, cascade='all, delete-orphan')
 
     def __init__(self, data):
         print("Data from frontend in FoodItem constructor: ", data)
+
+        existing_ID = data.get("id")
+        if existing_ID:
+            self.id = existing_ID
+
         date_str = data.get("date")
         if date_str:
             self.year = int(date_str[0:4])

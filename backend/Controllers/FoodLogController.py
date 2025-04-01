@@ -128,16 +128,28 @@ def update_foodlog(id):
 
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
-    db.session.delete(food_log)
+    # Manually delete Macros associated with FoodItems
+    food_items = FoodItem.query.filter_by(food_log_id=id).all()
+    for item in food_items:
+        Macros.query.filter_by(food_item_id=item.id).delete()
+
+    # Clear existing FoodItems
+    FoodItem.query.filter_by(food_log_id=id).delete()
+
+    # Commit the deletion of FoodItems and Macros
     db.session.commit()
 
+    # Delete the existing FoodLog
+    db.session.delete(food_log)
+
+    # Create a new FoodLog instance from the incoming data
     updatedFoodLog = FoodLog(data["foodLog"])
-    updatedFoodLog.id = id
+    updatedFoodLog.id = id  # Set the id to the ID passed in the endpoint
 
-    print(f"The updatedFoodLog after everything: {updatedFoodLog.to_dict()}")
-
+    # Add the new FoodLog to the session
     db.session.add(updatedFoodLog)
 
+    # Commit the changes to the DB
     db.session.commit()
 
     print("All done, FoodLog replaced.")

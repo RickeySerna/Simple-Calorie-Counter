@@ -12,8 +12,11 @@ class Macros(db.Model):
     fat = db.Column(db.String(100), nullable=False)
 
     def __init__(self, data):
-
         print("Data from frontend in __init__: ", data)
+
+        existing_ID = data.get("id")
+        if existing_ID:
+            self.id = existing_ID
 
         # Convert weight and serving size to grams.
         weights_in_grams = self.__convert_to_grams(data)

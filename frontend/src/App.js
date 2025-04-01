@@ -324,7 +324,7 @@ function App() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        updated_food_log: FoodLogToUpdate
+        foodLog: FoodLogToUpdate
       })
     })
     .then(response => {
@@ -344,7 +344,7 @@ function App() {
       console.log('Successful PUT: ', data);
       // With the update to using thisMonthsFoodLogs, this logic changes.
       // First create a copy of the entire state.
-      const updatedFoodLogs = [...thisMonthsFoodLogs];
+      let updatedFoodLogs = { ...thisMonthsFoodLogs };
 
       // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
       updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;

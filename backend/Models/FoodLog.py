@@ -12,6 +12,7 @@ class FoodLog(db.Model):
     total_protein = db.Column(db.String(100), nullable=False)
     total_carbs = db.Column(db.String(100), nullable=False)
     total_fat = db.Column(db.String(100), nullable=False)
+    food_items = db.relationship('FoodItem', backref='food_log', lazy="dynamic", cascade="all, delete-orphan")
 
     def __init__(self, data):
         print("Data from frontend in FoodLog constructor: ", data)
