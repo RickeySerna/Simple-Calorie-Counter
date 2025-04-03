@@ -4,6 +4,7 @@ from decimal import Decimal, getcontext, ROUND_HALF_UP
 from Models import db
 
 class Macros(db.Model):
+    __tablename__ = 'macros'
     id = db.Column(db.Integer, primary_key=True)
     food_item_id = db.Column(db.Integer, db.ForeignKey('food_item.id'), nullable=False)
     calories = db.Column(db.String(100), nullable=False)

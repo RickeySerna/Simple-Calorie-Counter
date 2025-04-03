@@ -4,6 +4,7 @@ from Models import db
 from .Macros import Macros
 
 class FoodItem(db.Model):
+    __tablename__ = 'food_item'
     id = db.Column(db.Integer, primary_key=True)
     food_log_id = db.Column(db.Integer, db.ForeignKey('food_log.id'), nullable=False)
     year = db.Column(db.Integer, nullable=False)

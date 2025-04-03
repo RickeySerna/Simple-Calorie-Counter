@@ -128,10 +128,6 @@ def update_foodlog(id):
 
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
-    food_items = FoodItem.query.filter_by(food_log_id=id).all()
-    for item in food_items:
-        Macros.query.filter_by(food_item_id=item.id).delete()
-        db.session.delete(item)
     db.session.delete(food_log)
 
     updatedFoodLog = FoodLog(data["foodLog"])
@@ -142,9 +138,7 @@ def update_foodlog(id):
 
     print("All done, FoodLog replaced.")
 
-    updated_food_log = FoodLog.query.filter_by(id=id).first()
-    print(f"Here's what the PUT endpoint is returning: {updated_food_log.to_dict()}")
-    return jsonify({'message': 'FoodLog successfully updated', 'updated_food_log': updated_food_log.to_dict()}), 201
+    return jsonify({'message': 'FoodLog successfully updated', 'updated_food_log': updatedFoodLog.to_dict()}), 201
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])
