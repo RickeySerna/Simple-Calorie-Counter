@@ -65,53 +65,6 @@ def search_for_foodlogs_in_month():
 
     return jsonify(food_logs_data), 200
 
-@food_log_bp.route('/api/foodlog/', methods=['GET'])
-def get_food_items_by_date():
-    date_str = request.args.get('date')
-    print(f"Date in server: {date_str}")
-
-    year = int(date_str[0:4])
-    month = int(date_str[5:7])
-    day = int(date_str[8:10])
-
-    food_logs = FoodLog.query.filter(
-        and_(
-            FoodLog.year == year,
-            FoodLog.month == month,
-        )
-    ).all()
-
-    food_logs_data = [{
-        'id': log.id,
-        'year': log.year,
-        'month': log.month,
-        'day': log.day,
-        'total_calories': log.total_calories,
-        'total_protein': log.total_protein,
-        'total_carbs': log.total_carbs,
-        'total_fat': log.total_fat,
-        'food_items': [{
-            'id': item.id,
-            'food_log_id': item.food_log_id,
-            'year': item.year,
-            'month': item.month,
-            'day': item.day,
-            'name': item.name,
-            'sub_description': item.sub_description,
-            'weight_value': item.weight_value,
-            'weight_unit': item.weight_unit,
-            'macros': {
-                'id': item.macros.id,
-                'calories': item.macros.calories,
-                'protein': item.macros.protein,
-                'carbs': item.macros.carbs,
-                'fat': item.macros.fat
-            } if item.macros else None
-        } for item in log.food_items]
-    } for log in food_logs]
-    
-    return jsonify(food_logs_data), 200
-
 @food_log_bp.route('/api/foodlog/<int:id>', methods=['PUT'])
 def update_foodlog(id):
     print("About to replace an existing FoodLog...")
@@ -129,6 +82,12 @@ def update_foodlog(id):
     print(f"The FoodLog pulled from SQLalchemy with the id: {food_log}")
 
     db.session.delete(food_log)
+
+    food_items = data["foodLog"]["food_items"]
+    print(f"food_items in PUT: {food_items}")
+    if len(food_items) == 0:
+        db.session.commit()
+        return jsonify({'message': 'FoodLog successfully deleted.', 'updated_food_log': None}), 200
 
     updatedFoodLog = FoodLog(data["foodLog"])
     updatedFoodLog.id = id
