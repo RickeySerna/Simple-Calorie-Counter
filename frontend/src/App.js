@@ -7,6 +7,9 @@ import './App.css';
 function App() {
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
+    year: '',
+    month: '',
+    day: '',
     name: '',
     sub_description: '',
     weight_value: '',
@@ -359,6 +362,9 @@ function App() {
 
   const handleDateChange = (date) => {
     formData.date = format(date, 'yyyy-MM-dd');
+    formData.year = formData.date.slice(0, 4);
+    formData.month = formData.date.slice(5, 7);
+    formData.day = formData.date.slice(8, 10);
     setCurrentDate(date);
   };
 

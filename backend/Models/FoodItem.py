@@ -28,15 +28,9 @@ class FoodItem(db.Model):
         if existing_ID:
             self.id = existing_ID
 
-        date_str = data.get("date")
-        if date_str:
-            self.year = int(date_str[0:4])
-            self.month = int(date_str[5:7])
-            self.day = int(date_str[8:10])
-        else:
-            self.year = data.get("year")
-            self.month = data.get("month")
-            self.day = data.get("day")
+        self.year = data.get("year")
+        self.month = data.get("month")
+        self.day = data.get("day")
         self.name = data.get("name")
         self.sub_description = data.get("sub_description")
         self.weight_value = data.get("weight_value")
