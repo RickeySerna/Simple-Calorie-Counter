@@ -101,8 +101,8 @@ def update_foodlog(id):
 
 # Removing the int constraint here to allow for better error handling.
 @food_log_bp.route('/api/foodlog/<id>', methods=['DELETE'])
-def delete_food_item(id):    
-    print(f"Attempting to delete FoodItem with ID: {id}")
+def delete_food_log(id):    
+    print(f"Attempting to delete FoodLog with ID: {id}")
 
     # The endpoint will not take ANY input passed in the URL.
     # To make sure that value passed is an int, we try casting it to an int.
@@ -115,28 +115,28 @@ def delete_food_item(id):
     # Grabbing the FoodItem to delete.
     # UPDATE: No longer using get_or_404() here. That method worked fine, but it would just immediately throw a 404 if no FoodItem was found.
     # This would ignore the logic I have below. With this, it either returns the FoodItem if there is one, or None if not. Now the logic below works.
-    item = FoodItem.query.filter_by(id=id).first()
+    log = FoodLog.query.filter_by(id=id).first()
     print(f"The item pulled from the query: {item}")
 
     # Attempting to delete the FoodItem.
-    if item:
+    if log:
         # Wrapping this in a try-except to catch any potential database errors.
         try:
-            db.session.delete(item)
+            db.session.delete(log)
             db.session.commit()
-            print(f"Deleted FoodItem with ID: {id}")
-            return jsonify({'message': 'FoodItem deleted successfully.'}), 200
+            print(f"Deleted FoodLog with ID: {id}")
+            return jsonify({'message': 'FoodLog deleted successfully.'}), 200
         # If there is an error with the DB for whatever reason, we return it and a 400 response.
         except Exception as e:
             return jsonify({"DATABASE ERROR": str(e)}), 400
-    # If no FoodItem was found in the DB with that ID, return a 404 and a message explaining that.
+    # If no FoodLog was found in the DB with that ID, return a 404 and a message explaining that.
     else:
-        print(f"FoodItem with ID: {id} not found")
-        return jsonify({'message': 'FoodItem not found.'}), 404
+        print(f"FoodLog with ID: {id} not found")
+        return jsonify({'message': 'FoodLog not found.'}), 404
 
 # Defining a separate DELETE route with no ID purely for error checking.
 # If an empty string is passed, Flask interprets that as '/api/foodlog/', which does not fit the above route and hence the initial error isn't thrown.
 # So we define this route and if ANY request comes here, it's immediately refused with the appropriate error response.
 @food_log_bp.route('/api/foodlog/', methods=['DELETE'])
-def delete_food_item_no_id():
-    return jsonify({"ERROR": "DELETE endpoint requires a FoodItem ID."}), 400
+def delete_food_log_no_id():
+    return jsonify({"ERROR": "DELETE endpoint requires a FoodLog ID."}), 400
