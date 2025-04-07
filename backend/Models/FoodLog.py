@@ -33,11 +33,9 @@ class FoodLog(db.Model):
             total_carbs += float(newFoodItem.macros.carbs)
             total_fat += float(newFoodItem.macros.fat)
 
-        print("foodItems array after everything: ", foodItems)
-        first_item = foodItems[0]
-        self.year = first_item.year
-        self.month = first_item.month
-        self.day = first_item.day
+        self.year = data.get("year")
+        self.month = data.get("month")
+        self.day = data.get("day")
         self.total_calories = str(total_calories)
         self.total_protein = str(total_protein)
         self.total_carbs = str(total_carbs)

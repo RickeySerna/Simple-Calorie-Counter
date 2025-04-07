@@ -180,7 +180,10 @@ function App() {
     }
 
     let newFoodLog = {
-      food_items: [formData]
+      food_items: [formData],
+      day: formData.day,
+      month: formData.month,
+      year: formData.year
     };
 
     fetch('http://127.0.0.1:5000/api/foodlog', {
