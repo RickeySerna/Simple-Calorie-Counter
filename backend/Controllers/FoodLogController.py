@@ -83,12 +83,6 @@ def update_foodlog(id):
 
     db.session.delete(food_log)
 
-    food_items = data["foodLog"]["food_items"]
-    print(f"food_items in PUT: {food_items}")
-    if len(food_items) == 0:
-        db.session.commit()
-        return jsonify({'message': 'FoodLog successfully deleted.', 'updated_food_log': None}), 200
-
     updatedFoodLog = FoodLog(data["foodLog"])
     updatedFoodLog.id = id
 
@@ -116,7 +110,7 @@ def delete_food_log(id):
     # UPDATE: No longer using get_or_404() here. That method worked fine, but it would just immediately throw a 404 if no FoodItem was found.
     # This would ignore the logic I have below. With this, it either returns the FoodItem if there is one, or None if not. Now the logic below works.
     log = FoodLog.query.filter_by(id=id).first()
-    print(f"The item pulled from the query: {item}")
+    print(f"The log pulled from the query: {log}")
 
     # Attempting to delete the FoodItem.
     if log:

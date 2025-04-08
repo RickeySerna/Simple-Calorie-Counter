@@ -324,43 +324,82 @@ function App() {
 
     //console.log("The FoodLog after deleting the FoodItem: ", FoodLogToUpdate);
     
-    fetch(`http://127.0.0.1:5000/api/foodlog/${FoodLogID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        foodLog: FoodLogToUpdate
+    console.log(`Length of the FoodItems array: ${FoodLogToUpdate.food_items.length}`)
+    if (FoodLogToUpdate.food_items.length > 0) {
+      fetch(`http://127.0.0.1:5000/api/foodlog/${FoodLogID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          foodLog: FoodLogToUpdate
+        })
       })
-    })
-    .then(response => {
-      console.log('Response from server:', response);
-      
-      // Checking if a 200 level response was received from the server.
-      if (!response.ok) {
-        // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
-        return response.json().then(errorData => {
-          // Just returning the HTTP status and the message the server returned.
-          throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
-        });
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Successful PUT: ', data);
-      // With the update to using thisMonthsFoodLogs, this logic changes.
-      // First create a copy of the entire state.
-      let updatedFoodLogs = { ...thisMonthsFoodLogs };
+      .then(response => {
+        console.log('Response from server:', response);
+        
+        // Checking if a 200 level response was received from the server.
+        if (!response.ok) {
+          // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+          return response.json().then(errorData => {
+            // Just returning the HTTP status and the message the server returned.
+            throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Successful PUT: ', data);
+        // With the update to using thisMonthsFoodLogs, this logic changes.
+        // First create a copy of the entire state.
+        let updatedFoodLogs = { ...thisMonthsFoodLogs };
 
-      // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
-      updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;
+        // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
+        updatedFoodLogs[currentDate.getDate()] = data.updated_food_log;
 
-      // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
-      setThisMonthsFoodLogs(updatedFoodLogs);
-    })
-    .catch(error => {
-      console.error('DELETE ERROR:', error.message);
-    });
+        // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
+        setThisMonthsFoodLogs(updatedFoodLogs);
+      })
+      .catch(error => {
+        console.error('DELETE ERROR:', error.message);
+      });
+    }
+    else {
+      fetch(`http://127.0.0.1:5000/api/foodlog/${FoodLogID}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        console.log('Response from server:', response);
+        
+        // Checking if a 200 level response was received from the server.
+        if (!response.ok) {
+          // If not, we throw an error here so that we don't move forward with deleting the FoodItem from the state.
+          return response.json().then(errorData => {
+            // Just returning the HTTP status and the message the server returned.
+            throw new Error(`Status code: ${response.status}, Message: ${errorData.message || errorData.ERROR}`);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Successful PUT: ', data);
+        // With the update to using thisMonthsFoodLogs, this logic changes.
+        // First create a copy of the entire state.
+        let updatedFoodLogs = { ...thisMonthsFoodLogs };
+
+        // Now use filter() on the specific FoodLogs' food_items array to re-create the array WITHOUT the FoodItem with the ID we deleted.
+        updatedFoodLogs[currentDate.getDate()] = null;
+
+        // Set the months FoodLogs to the updated one which doesn't include the FoodItem we deleted.
+        setThisMonthsFoodLogs(updatedFoodLogs);
+      })
+      .catch(error => {
+        console.error('DELETE ERROR:', error.message);
+      });
+    }
   };
 
   const handleDateChange = (date) => {
